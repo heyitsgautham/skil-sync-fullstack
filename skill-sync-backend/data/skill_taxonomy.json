@@ -1,0 +1,920 @@
+{
+    "skills": [
+        {
+            "name": "React",
+            "category": "Frontend",
+            "aliases": [
+                "ReactJS",
+                "React.js",
+                "React JS",
+                "React Framework"
+            ]
+        },
+        {
+            "name": "Angular",
+            "category": "Frontend",
+            "aliases": [
+                "AngularJS",
+                "Angular.js",
+                "Angular Framework"
+            ]
+        },
+        {
+            "name": "Vue",
+            "category": "Frontend",
+            "aliases": [
+                "VueJS",
+                "Vue.js",
+                "Vue JS"
+            ]
+        },
+        {
+            "name": "JavaScript",
+            "category": "Frontend",
+            "aliases": [
+                "JS",
+                "ECMAScript",
+                "ES6",
+                "ES2015",
+                "ES2020",
+                "Vanilla JS"
+            ]
+        },
+        {
+            "name": "TypeScript",
+            "category": "Frontend",
+            "aliases": [
+                "TS"
+            ]
+        },
+        {
+            "name": "HTML",
+            "category": "Frontend",
+            "aliases": [
+                "HTML5",
+                "Hypertext Markup Language"
+            ]
+        },
+        {
+            "name": "CSS",
+            "category": "Frontend",
+            "aliases": [
+                "CSS3",
+                "Cascading Style Sheets",
+                "Stylesheets"
+            ]
+        },
+        {
+            "name": "Sass",
+            "category": "Frontend",
+            "aliases": [
+                "SCSS",
+                "Syntactically Awesome Style Sheets"
+            ]
+        },
+        {
+            "name": "Tailwind CSS",
+            "category": "Frontend",
+            "aliases": [
+                "Tailwind",
+                "TailwindCSS"
+            ]
+        },
+        {
+            "name": "Bootstrap",
+            "category": "Frontend",
+            "aliases": [
+                "Bootstrap CSS",
+                "Bootstrap Framework"
+            ]
+        },
+        {
+            "name": "Material-UI",
+            "category": "Frontend",
+            "aliases": [
+                "MUI",
+                "Material UI",
+                "MaterialUI"
+            ]
+        },
+        {
+            "name": "Redux",
+            "category": "Frontend",
+            "aliases": [
+                "Redux Toolkit",
+                "Redux Store"
+            ]
+        },
+        {
+            "name": "Next.js",
+            "category": "Frontend",
+            "aliases": [
+                "NextJS",
+                "Next",
+                "Next Framework"
+            ]
+        },
+        {
+            "name": "Webpack",
+            "category": "Frontend",
+            "aliases": [
+                "Webpack Bundler"
+            ]
+        },
+        {
+            "name": "Node.js",
+            "category": "Backend",
+            "aliases": [
+                "NodeJS",
+                "Node",
+                "Node Framework"
+            ]
+        },
+        {
+            "name": "Express",
+            "category": "Backend",
+            "aliases": [
+                "ExpressJS",
+                "Express.js",
+                "Express Framework"
+            ]
+        },
+        {
+            "name": "Python",
+            "category": "Backend",
+            "aliases": [
+                "Python3",
+                "Python 3",
+                "Py"
+            ]
+        },
+        {
+            "name": "Django",
+            "category": "Backend",
+            "aliases": [
+                "Django Framework",
+                "Django Web Framework"
+            ]
+        },
+        {
+            "name": "Flask",
+            "category": "Backend",
+            "aliases": [
+                "Flask Framework",
+                "Flask Web Framework"
+            ]
+        },
+        {
+            "name": "FastAPI",
+            "category": "Backend",
+            "aliases": [
+                "Fast API"
+            ]
+        },
+        {
+            "name": "Java",
+            "category": "Backend",
+            "aliases": [
+                "Java SE",
+                "Java EE",
+                "JDK"
+            ]
+        },
+        {
+            "name": "Spring Boot",
+            "category": "Backend",
+            "aliases": [
+                "Spring",
+                "Spring Framework",
+                "SpringBoot"
+            ]
+        },
+        {
+            "name": "C#",
+            "category": "Backend",
+            "aliases": [
+                "CSharp",
+                "C Sharp",
+                "C-Sharp"
+            ]
+        },
+        {
+            "name": ".NET",
+            "category": "Backend",
+            "aliases": [
+                "DotNet",
+                "Dot Net",
+                "ASP.NET",
+                "ASP.NET Core"
+            ]
+        },
+        {
+            "name": "Ruby",
+            "category": "Backend",
+            "aliases": [
+                "Ruby Language"
+            ]
+        },
+        {
+            "name": "Ruby on Rails",
+            "category": "Backend",
+            "aliases": [
+                "Rails",
+                "RoR"
+            ]
+        },
+        {
+            "name": "PHP",
+            "category": "Backend",
+            "aliases": [
+                "PHP Language"
+            ]
+        },
+        {
+            "name": "Laravel",
+            "category": "Backend",
+            "aliases": [
+                "Laravel Framework"
+            ]
+        },
+        {
+            "name": "Go",
+            "category": "Backend",
+            "aliases": [
+                "Golang",
+                "Go Language"
+            ]
+        },
+        {
+            "name": "Rust",
+            "category": "Backend",
+            "aliases": [
+                "Rust Language"
+            ]
+        },
+        {
+            "name": "REST API",
+            "category": "Backend",
+            "aliases": [
+                "RESTful API",
+                "REST",
+                "RESTful",
+                "REST Services",
+                "RESTful Services"
+            ]
+        },
+        {
+            "name": "GraphQL",
+            "category": "Backend",
+            "aliases": [
+                "Graph QL",
+                "GraphQL API"
+            ]
+        },
+        {
+            "name": "Microservices",
+            "category": "Backend",
+            "aliases": [
+                "Micro Services",
+                "Microservice Architecture"
+            ]
+        },
+        {
+            "name": "PostgreSQL",
+            "category": "Database",
+            "aliases": [
+                "Postgres",
+                "psql",
+                "PostgresQL"
+            ]
+        },
+        {
+            "name": "MySQL",
+            "category": "Database",
+            "aliases": [
+                "My SQL"
+            ]
+        },
+        {
+            "name": "MongoDB",
+            "category": "Database",
+            "aliases": [
+                "Mongo",
+                "Mongo DB"
+            ]
+        },
+        {
+            "name": "Redis",
+            "category": "Database",
+            "aliases": [
+                "Redis Cache",
+                "Redis DB"
+            ]
+        },
+        {
+            "name": "SQL",
+            "category": "Database",
+            "aliases": [
+                "Structured Query Language",
+                "SQL Queries"
+            ]
+        },
+        {
+            "name": "NoSQL",
+            "category": "Database",
+            "aliases": [
+                "No SQL",
+                "Non-SQL"
+            ]
+        },
+        {
+            "name": "Elasticsearch",
+            "category": "Database",
+            "aliases": [
+                "Elastic Search",
+                "ES"
+            ]
+        },
+        {
+            "name": "DynamoDB",
+            "category": "Database",
+            "aliases": [
+                "Dynamo DB",
+                "AWS DynamoDB"
+            ]
+        },
+        {
+            "name": "Cassandra",
+            "category": "Database",
+            "aliases": [
+                "Apache Cassandra"
+            ]
+        },
+        {
+            "name": "Firebase",
+            "category": "Database",
+            "aliases": [
+                "Firebase Realtime Database",
+                "Firebase Firestore"
+            ]
+        },
+        {
+            "name": "Docker",
+            "category": "DevOps",
+            "aliases": [
+                "Docker Container",
+                "Docker Containerization"
+            ]
+        },
+        {
+            "name": "Kubernetes",
+            "category": "DevOps",
+            "aliases": [
+                "K8s",
+                "K8",
+                "Kube"
+            ]
+        },
+        {
+            "name": "CI/CD",
+            "category": "DevOps",
+            "aliases": [
+                "Continuous Integration",
+                "Continuous Deployment",
+                "CI CD"
+            ]
+        },
+        {
+            "name": "Jenkins",
+            "category": "DevOps",
+            "aliases": [
+                "Jenkins CI",
+                "Jenkins Pipeline"
+            ]
+        },
+        {
+            "name": "GitHub Actions",
+            "category": "DevOps",
+            "aliases": [
+                "GH Actions",
+                "GitHub CI"
+            ]
+        },
+        {
+            "name": "GitLab CI",
+            "category": "DevOps",
+            "aliases": [
+                "GitLab CI/CD",
+                "GitLab Pipeline"
+            ]
+        },
+        {
+            "name": "AWS",
+            "category": "Cloud",
+            "aliases": [
+                "Amazon Web Services",
+                "Amazon AWS"
+            ]
+        },
+        {
+            "name": "Azure",
+            "category": "Cloud",
+            "aliases": [
+                "Microsoft Azure",
+                "Azure Cloud"
+            ]
+        },
+        {
+            "name": "GCP",
+            "category": "Cloud",
+            "aliases": [
+                "Google Cloud Platform",
+                "Google Cloud",
+                "GCloud"
+            ]
+        },
+        {
+            "name": "Terraform",
+            "category": "DevOps",
+            "aliases": [
+                "Infrastructure as Code",
+                "IaC"
+            ]
+        },
+        {
+            "name": "Ansible",
+            "category": "DevOps",
+            "aliases": [
+                "Ansible Automation"
+            ]
+        },
+        {
+            "name": "Git",
+            "category": "Tools",
+            "aliases": [
+                "Version Control",
+                "Git VCS",
+                "Source Control"
+            ]
+        },
+        {
+            "name": "GitHub",
+            "category": "Tools",
+            "aliases": [
+                "Github"
+            ]
+        },
+        {
+            "name": "GitLab",
+            "category": "Tools",
+            "aliases": [
+                "Gitlab"
+            ]
+        },
+        {
+            "name": "Linux",
+            "category": "Tools",
+            "aliases": [
+                "Unix",
+                "Ubuntu",
+                "Debian",
+                "CentOS",
+                "Red Hat"
+            ]
+        },
+        {
+            "name": "Bash",
+            "category": "Tools",
+            "aliases": [
+                "Shell Scripting",
+                "Bash Scripting",
+                "Shell"
+            ]
+        },
+        {
+            "name": "Machine Learning",
+            "category": "AI/ML",
+            "aliases": [
+                "ML",
+                "Machine Intelligence"
+            ]
+        },
+        {
+            "name": "Deep Learning",
+            "category": "AI/ML",
+            "aliases": [
+                "DL",
+                "Neural Networks"
+            ]
+        },
+        {
+            "name": "TensorFlow",
+            "category": "AI/ML",
+            "aliases": [
+                "Tensor Flow",
+                "TF"
+            ]
+        },
+        {
+            "name": "PyTorch",
+            "category": "AI/ML",
+            "aliases": [
+                "Pytorch",
+                "Torch"
+            ]
+        },
+        {
+            "name": "scikit-learn",
+            "category": "AI/ML",
+            "aliases": [
+                "sklearn",
+                "Scikit Learn"
+            ]
+        },
+        {
+            "name": "Keras",
+            "category": "AI/ML",
+            "aliases": [
+                "Keras Framework"
+            ]
+        },
+        {
+            "name": "NLP",
+            "category": "AI/ML",
+            "aliases": [
+                "Natural Language Processing",
+                "Natural Language"
+            ]
+        },
+        {
+            "name": "Computer Vision",
+            "category": "AI/ML",
+            "aliases": [
+                "CV",
+                "Image Processing"
+            ]
+        },
+        {
+            "name": "Data Analysis",
+            "category": "Data Science",
+            "aliases": [
+                "Data Analytics",
+                "Data Mining"
+            ]
+        },
+        {
+            "name": "Pandas",
+            "category": "Data Science",
+            "aliases": [
+                "Python Pandas"
+            ]
+        },
+        {
+            "name": "NumPy",
+            "category": "Data Science",
+            "aliases": [
+                "Numpy",
+                "Numerical Python"
+            ]
+        },
+        {
+            "name": "Matplotlib",
+            "category": "Data Science",
+            "aliases": [
+                "Matplotlib Visualization"
+            ]
+        },
+        {
+            "name": "Tableau",
+            "category": "Data Science",
+            "aliases": [
+                "Tableau Visualization"
+            ]
+        },
+        {
+            "name": "Power BI",
+            "category": "Data Science",
+            "aliases": [
+                "PowerBI",
+                "Microsoft Power BI"
+            ]
+        },
+        {
+            "name": "Apache Spark",
+            "category": "Data Science",
+            "aliases": [
+                "Spark",
+                "PySpark"
+            ]
+        },
+        {
+            "name": "Hadoop",
+            "category": "Data Science",
+            "aliases": [
+                "Apache Hadoop"
+            ]
+        },
+        {
+            "name": "Agile",
+            "category": "Soft Skills",
+            "aliases": [
+                "Agile Methodology",
+                "Scrum",
+                "Agile Development"
+            ]
+        },
+        {
+            "name": "Communication",
+            "category": "Soft Skills",
+            "aliases": [
+                "Verbal Communication",
+                "Written Communication",
+                "Communication Skills"
+            ]
+        },
+        {
+            "name": "Teamwork",
+            "category": "Soft Skills",
+            "aliases": [
+                "Team Collaboration",
+                "Collaboration",
+                "Team Player"
+            ]
+        },
+        {
+            "name": "Problem Solving",
+            "category": "Soft Skills",
+            "aliases": [
+                "Problem-Solving",
+                "Critical Thinking",
+                "Analytical Thinking"
+            ]
+        },
+        {
+            "name": "Leadership",
+            "category": "Soft Skills",
+            "aliases": [
+                "Team Leadership",
+                "Leading Teams"
+            ]
+        },
+        {
+            "name": "Time Management",
+            "category": "Soft Skills",
+            "aliases": [
+                "Time-Management",
+                "Prioritization"
+            ]
+        },
+        {
+            "name": "Adaptability",
+            "category": "Soft Skills",
+            "aliases": [
+                "Flexibility",
+                "Adaptable"
+            ]
+        },
+        {
+            "name": "Attention to Detail",
+            "category": "Soft Skills",
+            "aliases": [
+                "Detail-Oriented",
+                "Meticulousness"
+            ]
+        },
+        {
+            "name": "Unit Testing",
+            "category": "Testing",
+            "aliases": [
+                "Unit Tests",
+                "Test-Driven Development",
+                "TDD"
+            ]
+        },
+        {
+            "name": "Jest",
+            "category": "Testing",
+            "aliases": [
+                "Jest Testing",
+                "Jest Framework"
+            ]
+        },
+        {
+            "name": "Pytest",
+            "category": "Testing",
+            "aliases": [
+                "Python Testing",
+                "Pytest Framework"
+            ]
+        },
+        {
+            "name": "Selenium",
+            "category": "Testing",
+            "aliases": [
+                "Selenium WebDriver",
+                "Selenium Automation"
+            ]
+        },
+        {
+            "name": "JUnit",
+            "category": "Testing",
+            "aliases": [
+                "Java Unit Testing",
+                "JUnit Framework"
+            ]
+        },
+        {
+            "name": "Postman",
+            "category": "Tools",
+            "aliases": [
+                "Postman API",
+                "API Testing"
+            ]
+        },
+        {
+            "name": "JIRA",
+            "category": "Tools",
+            "aliases": [
+                "Jira",
+                "Atlassian JIRA"
+            ]
+        },
+        {
+            "name": "Confluence",
+            "category": "Tools",
+            "aliases": [
+                "Atlassian Confluence"
+            ]
+        },
+        {
+            "name": "Figma",
+            "category": "Design",
+            "aliases": [
+                "Figma Design"
+            ]
+        },
+        {
+            "name": "Adobe XD",
+            "category": "Design",
+            "aliases": [
+                "XD",
+                "Adobe Experience Design"
+            ]
+        },
+        {
+            "name": "UI/UX Design",
+            "category": "Design",
+            "aliases": [
+                "UI Design",
+                "UX Design",
+                "User Interface Design",
+                "User Experience Design"
+            ]
+        },
+        {
+            "name": "Responsive Design",
+            "category": "Design",
+            "aliases": [
+                "Mobile-First Design",
+                "Responsive Web Design"
+            ]
+        },
+        {
+            "name": "Cybersecurity",
+            "category": "Security",
+            "aliases": [
+                "Information Security",
+                "InfoSec",
+                "Security"
+            ]
+        },
+        {
+            "name": "OAuth",
+            "category": "Security",
+            "aliases": [
+                "OAuth2",
+                "OAuth 2.0",
+                "Authentication"
+            ]
+        },
+        {
+            "name": "JWT",
+            "category": "Security",
+            "aliases": [
+                "JSON Web Token",
+                "JSON Web Tokens"
+            ]
+        },
+        {
+            "name": "WebSockets",
+            "category": "Backend",
+            "aliases": [
+                "Web Sockets",
+                "Socket.io",
+                "WebSocket"
+            ]
+        },
+        {
+            "name": "RabbitMQ",
+            "category": "Backend",
+            "aliases": [
+                "Rabbit MQ",
+                "Message Queue"
+            ]
+        },
+        {
+            "name": "Kafka",
+            "category": "Backend",
+            "aliases": [
+                "Apache Kafka"
+            ]
+        },
+        {
+            "name": "Nginx",
+            "category": "DevOps",
+            "aliases": [
+                "NGINX",
+                "Nginx Server"
+            ]
+        },
+        {
+            "name": "Apache",
+            "category": "DevOps",
+            "aliases": [
+                "Apache HTTP Server",
+                "Apache Web Server"
+            ]
+        },
+        {
+            "name": "React Native",
+            "category": "Mobile",
+            "aliases": [
+                "ReactNative",
+                "React-Native"
+            ]
+        },
+        {
+            "name": "Flutter",
+            "category": "Mobile",
+            "aliases": [
+                "Flutter Framework"
+            ]
+        },
+        {
+            "name": "Swift",
+            "category": "Mobile",
+            "aliases": [
+                "Swift Language",
+                "iOS Development"
+            ]
+        },
+        {
+            "name": "Kotlin",
+            "category": "Mobile",
+            "aliases": [
+                "Kotlin Language",
+                "Android Development"
+            ]
+        },
+        {
+            "name": "Android",
+            "category": "Mobile",
+            "aliases": [
+                "Android Development",
+                "Android SDK"
+            ]
+        },
+        {
+            "name": "iOS",
+            "category": "Mobile",
+            "aliases": [
+                "iOS Development",
+                "iPhone Development"
+            ]
+        },
+        {
+            "name": "Blockchain",
+            "category": "Emerging Tech",
+            "aliases": [
+                "Distributed Ledger",
+                "Blockchain Technology"
+            ]
+        },
+        {
+            "name": "Solidity",
+            "category": "Emerging Tech",
+            "aliases": [
+                "Solidity Language",
+                "Smart Contracts"
+            ]
+        },
+        {
+            "name": "Web3",
+            "category": "Emerging Tech",
+            "aliases": [
+                "Web 3.0",
+                "Decentralized Web"
+            ]
+        }
+    ]
+}

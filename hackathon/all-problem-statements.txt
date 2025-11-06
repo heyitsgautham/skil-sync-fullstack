@@ -1,0 +1,345 @@
+Table of Contents Domain 1: Healthcare ............................................................................................................................. 2 
+D1-PS1: AI-Powered Medical Imaging .......................................................................................... 2 
+D1-PS2: Remote Patient Monitoring Dashboard ............................................................................ 2 
+D1-PS3: AI Chatbot for Mental Health ........................................................................................... 2 
+D1-PS4: Hospital Queue & Appointment Optimizer ...................................................................... 2 
+D1-PS5: Disease Progression Predictor .......................................................................................... 3 
+Domain 2: FinTech ................................................................................................................................. 4 
+D2-PS1: Fraud Detection in UPI/Online Payments ......................................................................... 4 
+D2-PS2: AI-Based Stock Market Sentiment Tracker ...................................................................... 4 
+D2PS3: Loan Default Predictor ....................................................................................................... 4 
+D2-PS4: Smart Invoice Digitizer ..................................................................................................... 4 
+D2-PS5: Credit Risk Scoring Platform ............................................................................................ 5 
+Domain 3: Artificial Intelligence ............................................................................................................ 6 
+D3-PS1: Fake News Detector .......................................................................................................... 6 
+D3-PS2: Human Pose Detection...................................................................................................... 6 
+D3-PS3: Text-to-Image Generator ................................................................................................... 6 
+D3-PS4: Research Assistant AI Agent ............................................................................................ 6 
+D3-PS5: Sentiment Analysis for Social Media ................................................................................ 7 
+Domain 4: Education & Learning Technologies ..................................................................................... 8 
+D4-PS1: AI Virtual Tutor................................................................................................................. 8 
+D4-PS2: Student Performance Predictor ......................................................................................... 8 
+D4-PS3: Plagiarism & AI-Generated Content Detector .................................................................. 8 
+D4-PS4: Coding Practice Assistant ................................................................................................. 8 
+D4-PS5: AI Auto-Grader for Code Submissions ............................................................................. 9 
+Domain 5: Sponsored Problem Statements ........................................................................................... 10 
+-PYGENICARC ................................................................................................................................ 10 
+D5-PS1: Automated Document Verification Portal for Post-Selection Background Checks ....... 10 
+D5-PS2: Secure Online Examination Platform with Browser Lock and Proctoring .................... 10 
+-QUORUM CHAIN .......................................................................................................................... 10 
+D5-PS3: Decentralized Trust for Smart Agriculture ..................................................................... 10 
+-VTRICKS TECHNOLOGIES ......................................................................................................... 11 
+D5-PS4: Intelligent Resume Filtering ........................................................................................... 11 
+D5-PS5: AI-Based Job Description Matching .............................................................................. 11 
+Domain 6: Student Innovation .............................................................................................................. 12 
+ 
+ 
+Domain 1: Healthcare 
+ 
+D1-PS1: AI-Powered Medical Imaging 
+Background: Diagnosing diseases from medical scans such as X-rays, MRIs, or CT scans is a critical 
+yet time-consuming process that heavily depends on human expertise. Radiologists and doctors often 
+face fatigue, increasing the chances of oversight or misinterpretation — especially when dealing with 
+large  volumes  of  data.  In  resource-limited  hospitals,  delayed  or  inaccurate  interpretations  can 
+significantly affect patient outcomes. 
+Problem Statement: Develop an intelligent software tool that can automatically analyse uploaded 
+medical images and highlight regions that appear abnormal or suspicious. The goal is to assist medical 
+professionals in early detection and decision-making, not replace them. 
+ 
+D1-PS2: Remote Patient Monitoring Dashboard 
+Background: Chronic diseases such as hypertension, diabetes, and heart conditions require continuous 
+health tracking to prevent emergencies. Yet most healthcare facilities still depend on manual updates or 
+disconnected systems, leaving doctors with fragmented patient data. A centralized monitoring solution 
+— accessible from multiple devices — can help detect early warning signs, streamline response, and 
+improve patient outcomes. 
+Problem Statement: Build a system that simulates real-time monitoring of patient vitals such as heart 
+rate, blood pressure, and oxygen saturation using mock or sample datasets. The platform should allow 
+healthcare providers to visualize multiple patients’ vitals simultaneously, receive alerts when values 
+cross safe thresholds, and view historical health data trends. 
+ 
+D1-PS3: AI Chatbot for Mental Health 
+Background: Stress, anxiety, and depression are rising rapidly across all age groups, yet timely access 
+to mental health professionals remains limited. Many individuals hesitate to seek help due to stigma, 
+distance,  or  cost,  resulting  in  late  intervention  and  worsening  conditions.  Technology  offers  an 
+opportunity to provide early, accessible, and judgment-free support through intelligent tools that can 
+listen, assess, and guide users toward better mental wellbeing. 
+Problem Statement: Create an AI-based system that can understand user input—through text, speech, 
+or  other  interactions—detect  signs  of  stress  or  emotional  distress,  and  offer  meaningful  coping 
+strategies.  The  solution  should  be  capable  of  assessing  emotional  state,  providing  personalized 
+suggestions, and connecting users to professional or emergency resources in severe cases. 
+ 
+D1-PS4: Hospital Queue & Appointment Optimizer 
+Background: Long waiting times in hospitals and clinics not only frustrate patients but also reduce the 
+efficiency of medical staff and resources. In many healthcare centres, appointments and walk-ins 
+overlap  without  proper  coordination,  leading  to  congestion,  delayed  consultations,  and  patient 
+dissatisfaction.  A  smarter  scheduling  system  can  help  streamline  patient  flow,  balance  doctor 
+availability, and enhance overall hospital operations. 
+ 
+Problem Statement: Develop an intelligent system that predicts patient waiting times and optimizes 
+scheduling to reduce delays and resource bottlenecks. The solution should manage appointments, 
+estimate queue lengths, and dynamically adjust based on real-time updates such as doctor availability 
+or emergency cases. 
+
+ 
+D1-PS5: Disease Progression Predictor 
+Background: In critical care and chronic disease management, timely intervention can make the 
+difference between recovery and severe complications. However, doctors often rely on periodic check-
+ups and manual review of patient data, which may delay the detection of early warning signs. Predictive 
+analysis of patient vitals and health records can help anticipate deterioration before it becomes critical, 
+enabling faster, life-saving decisions. 
+ 
+Problem Statement: Develop an AI-based system that predicts the likelihood of a patient’s condition 
+worsening, classifying risk levels as low, medium, or high. The system should analyse historical and 
+current health parameters to identify patterns that indicate potential decline, supporting doctors with 
+data-backed insights for early intervention. 
+ 
+Domain 2: FinTech 
+ 
+D2-PS1: Fraud Detection in UPI/Online Payments 
+Background: As digital transactions through wallets, UPI, and online banking continue to surge, so do 
+instances of fraudulent activity. Unusual spending behaviour, rapid transfers, or irregular location-based 
+transactions often go unnoticed until it’s too late. Detecting such anomalies early is essential for 
+protecting both users and financial institutions from significant losses. 
+Problem Statement: Design a system that analyses transaction data—such as amount, frequency, 
+location, and timing—to identify suspicious or potentially fraudulent patterns. The solution should be 
+capable of flagging anomalies that deviate from a user’s typical behaviour and providing interpretable 
+insights into why a transaction is marked as risky. 
+ 
+D2-PS2: AI-Based Stock Market Sentiment Tracker 
+Background: In financial markets, investor sentiment plays a major role in driving stock prices. Traders 
+and analysts increasingly depend on real-time data from news articles, social media, and forums to 
+gauge public opinion about companies or sectors. However, manually tracking this information is time-
+consuming and prone to bias. Automating the process with sentiment analysis can give investors timely 
+insights and a clearer view of market mood. 
+Problem Statement: Build a system that collects and analyses financial news headlines, articles, or 
+social media posts related to specific companies or sectors, classifying them as positive, negative, or 
+neutral. The  goal  is  to  help  users  visualize  overall  sentiment  trends  and  understand  how  public 
+perception might influence stock performance. 
+ 
+D2PS3: Loan Default Predictor 
+Background: Financial institutions face significant challenges in assessing the repayment ability of 
+borrowers. Traditional credit scoring systems often fail to capture subtle behavioural or contextual 
+indicators,  leading  to  inaccurate  evaluations  and  loan  defaults.  With  the  growing  availability  of 
+applicant and transaction data, machine learning offers a smarter, data-driven approach to predict 
+repayment likelihood and reduce financial risk. 
+Problem Statement: Develop a machine learning model that predicts the probability of a borrower 
+defaulting on a loan based on applicant data such as income, credit history, debt-to-income ratio, and 
+other relevant features. The system should generate a clear risk classification (e.g., low, medium, high) 
+and provide basic reasoning or feature importance for each prediction to ensure interpretability. 
+ 
+D2-PS4: Smart Invoice Digitizer 
+Background:  Small and medium-sized  enterprises (SMEs) often  depend on manual methods for 
+managing invoices, receipts, and billing documents. This approach is time-consuming, error-prone, and 
+inefficient—especially when dealing with large volumes of paperwork. Automating invoice extraction 
+and  classification  can  help  businesses  streamline  accounting,  improve  record  accuracy,  and  save 
+valuable time. 
+
+ 
+Problem Statement: Develop a system that can read invoices in PDF or image format, extract key 
+details  such  as  invoice  number,  date,  vendor,  amount,  and  tax  values  using  Optical  Character 
+Recognition (OCR), and automatically categorize them into structured formats for storage or analysis. 
+ 
+D2-PS5: Credit Risk Scoring Platform 
+Background: Banks, NBFCs, and digital lenders require quick yet reliable ways to evaluate loan 
+applicants. Traditional credit scoring systems often depend on incomplete data or lack transparency in 
+how scores are derived, leading to unfair decisions or missed opportunities. An AI-driven scoring 
+platform can make the process faster, fairer, and more explainable by analysing a broader set of 
+borrower attributes. 
+ 
+Problem Statement: Design a system that generates creditworthiness scores based on simplified 
+borrower  profiles,  using  parameters  such  as  income,  repayment  history,  liabilities,  and  spending 
+behaviour. The solution should emphasize clarity and fairness by showing how each factor influences 
+the final score. 
+ 
+Domain 3: Artificial Intelligence 
+ 
+D3-PS1: Fake News Detector 
+Background: In today’s hyperconnected world, misinformation spreads faster than verified facts, often 
+influencing public opinion, elections, and even social stability. The rise of social media and unverified 
+online sources has made it increasingly difficult for users to distinguish authentic news from fabricated 
+content.  Combating  this  challenge requires  automated,  data-driven  systems  that  can  evaluate  the 
+credibility of information in real time. 
+Problem Statement: Develop an AI-based system that analyses news articles, headlines, or social 
+media posts and classifies them as real or fake based on linguistic, contextual, and source-based cues. 
+The system should provide a confidence level or reliability score for each classification, helping users 
+assess the trustworthiness of the content they consume. 
+ 
+D3-PS2: Human Pose Detection 
+Background: Human pose estimation has wide-ranging applications in fitness tracking, sports analysis, 
+rehabilitation, animation, and augmented reality. By detecting and mapping key body points from 
+images  or  video  frames, pose  detection  systems  can  analyse  movement,  form,  and  posture  with 
+precision. Building such systems bridges the gap between computer vision and real-world motion 
+understanding. 
+Problem Statement: Develop a software tool that can accurately detect and visualize key body joints 
+from uploaded images or short video clips. The system should identify major body landmarks—such as 
+limbs, joints, and torso positions—and generate a clear skeletal overlay that represents human posture 
+or movement. 
+ 
+D3-PS3: Text-to-Image Generator 
+Background: Generative AI has unlocked new ways to create art, design mock-ups, and visualize ideas 
+from simple textual prompts. Open-source diffusion and transformer models make it possible for 
+creators,  designers,  and  students  to  prototype  visuals  quickly  without  deep  graphics  expertise. 
+Democratizing this capability helps speed up ideation, lowers the barrier to creative exploration, and 
+supports rapid prototyping across domains. 
+Problem Statement: Build a simplified text-to-image system that converts user prompts into visually 
+coherent images  using open-source  models  and libraries. The solution should focus on usability, 
+responsible content filters, and producing outputs that are relevant to the given prompts. 
+ 
+D3-PS4: Research Assistant AI Agent 
+Background: Students and researchers spend hours hunting for relevant papers, filtering noise, and 
+extracting the useful bits. The process is repetitive and inefficient: locating high-quality sources, 
+understanding their contributions, and prioritizing which papers to read takes time away from actual 
+research and learning. 
+ 
+7 
+ 
+Problem Statement: Create an AI agent that, given a research topic or query, autonomously finds 
+relevant  academic  papers,  summarizes  their  key  contributions  and  methods,  and  ranks  them  by 
+relevance and quality. The agent should help users quickly grasp which works matter most for a given 
+question and why, reducing the time from topic to insight. 
+ 
+D3-PS5: Sentiment Analysis for Social Media 
+Background: Online conversations shape brand perception in real time. Tweets, reviews, and posts are 
+a goldmine of customer insight, but volume and noise make manual monitoring impractical. Brands 
+that can quickly read the room gain an edge — spotting PR risks, measuring campaign impact, and 
+discovering unmet user needs sooner. 
+ 
+Problem Statement: Build an NLP-based system that analyses social media content (e.g., tweets, posts, 
+comments) for sentiment and emotional tone, and surface actionable insights for a given hashtag, 
+keyword, or brand. The system should handle noisy short-text data, account for context (sarcasm, 
+emojis, slang where possible), and produce aggregated signals that help stakeholders understand public 
+mood and trends. 
+  
+ 
+Domain 4: Education & Learning Technologies 
+ 
+D4-PS1: AI Virtual Tutor            
+Background: Many students need one-on-one explanations and practice but classrooms and instructors 
+have limited bandwidth. Personalized tutoring—adapting to a student’s pace, gaps, and learning style—
+boosts understanding and retention, yet is often expensive or inaccessible. Intelligent tutoring systems 
+can fill that gap by delivering targeted guidance, practice problems, and explanations when students 
+need them. 
+Problem Statement: Build an AI-driven tutoring system that interactively explains concepts, adapts to 
+a student’s pace, and provides practice tailored to their strengths and weaknesses. The solution should 
+support multi-turn interaction, clarify misunderstandings, and present explanations at an appropriate 
+level for the learner. 
+ 
+D4-PS2: Student Performance Predictor 
+Background: Teachers often realize too late when students begin to fall behind. Early signs like 
+irregular attendance, missed assignments, or declining test scores are easy to miss without consistent 
+tracking. Technology can help educators identify these patterns early and support students before poor 
+performance becomes failure. 
+Problem Statement: Create a system that analyses student-related data to identify those at risk of 
+underperforming. The solution should highlight learning trends and provide clear insights to help 
+teachers or mentors take timely action and offer personalized support. 
+ 
+D4-PS3: Plagiarism & AI-Generated Content Detector 
+Background: With AI tools becoming widely accessible, students can now generate essays, reports, 
+and assignments in seconds. While such tools can support learning, they also blur the line between 
+original effort and automated output. Educators face growing difficulty in distinguishing genuine 
+student work from copied or AI-generated text, calling for smarter detection systems. 
+ 
+Problem Statement: Design a system that analyses student submissions to identify possible plagiarism 
+and detect AI-generated writing. The tool should assess text originality, highlight suspicious sections, 
+and provide clear, interpretable indicators of content authenticity. 
+ 
+D4-PS4: Coding Practice Assistant 
+Background: Students learning to code often get stuck on small errors or inefficient patterns and need 
+immediate, contextual guidance. Waiting for instructor feedback or searching forums interrupts flow 
+and slows learning. Real-time, helpful hints — not just final answers — accelerate mastery and teach 
+debugging as a skill. 
+Problem Statement: Create an intelligent tool that analyses student code and offers actionable, step-
+wise suggestions: bug explanation, probable fixes, style or complexity improvements, and hints that 
+nudge learners toward the solution without giving it away. The system should be pedagogically aware 
+9 
+ 
+(prioritize learning over giving answers) and produce clear, interpretable feedback that students and 
+instructors can trust. 
+ 
+D4-PS5: AI Auto-Grader for Code Submissions 
+Background: Instructors face a heavy burden grading large volumes of programming assignments. 
+Manual grading is slow, inconsistent, and often focuses on output correctness while missing style, 
+efficiency, and pedagogical feedback. Students benefit more from fast, constructive feedback that helps 
+them learn from mistakes immediately. 
+ 
+Problem  Statement:  Design  an  AI-driven  auto-grading  system  that  evaluates  programming 
+assignments by running tests, checking correctness, and providing actionable, pedagogical feedback. 
+The system should help instructors scale assessment while giving students meaningful, timely guidance 
+to improve their code and understanding. 
+ 
+Domain 5: Sponsored Problem Statements 
+ 
+-PYGENICARC  
+ 
+D5-PS1:  Automated  Document  Verification  Portal  for  Post-Selection 
+Background Checks  
+Background: Organizations face growing challenges in verifying the authenticity of academic, identity, 
+and employment documents during hiring. Manual verification is time-consuming, prone to oversight, 
+and leaves companies vulnerable to fraud through forged degrees, fake experience letters, or tampered 
+certificates. A fast, secure, and automated system can drastically improve accuracy and efficiency in the 
+post-selection background-check process. 
+ 
+Problem Statement: To mitigate the risk of hiring based on forged documents (e.g., fake degrees, 
+experience certificates), organizations need a fast, automated solution for background checks. The 
+challenge is to build a portal that automates the verification of a selected candidate's academic and 
+identity documents by securely integrating with authoritative digital sources (like NAD/DigiLocker and 
+government APIs) to provide an accurate, auditable, and instant check before final employment. 
+ 
+ 
+D5-PS2: Secure Online Examination Platform with Browser Lock and Proctoring  
+Background: With remote and hybrid learning becoming the norm, ensuring fairness and integrity in 
+online examinations has become a major challenge. Traditional systems often fail to prevent malpractice 
+such as tab switching, impersonation, or unauthorized resource access. Institutions require a secure, 
+transparent, and scalable solution that maintains exam credibility in virtual environments. 
+ 
+Problem Statement: The need for high-stakes exam integrity in remote and online testing is growing. 
+Traditional online exam systems are vulnerable to cheating and fraud. The challenge is to develop a 
+secure  online  examination  platform  that  ensures  fairness  and  trust  by  implementing  multi-factor 
+candidate authentication and a secure lockdown browser to prevent unauthorized actions (like tab 
+switching or copy/paste), along with real-time, webcam-based AI proctoring to monitor and flag 
+suspicious candidate behaviour. 
+ 
+-QUORUM CHAIN  
+ 
+D5-PS3: Decentralized Trust for Smart Agriculture 
+Background: In modern agriculture, critical data like soil moisture, weather and crop health are 
+collected using IoT sensors and smart devices. However, most of this data is stored in centralized 
+systems that are prone to manipulation or inaccessibility. Farmers, suppliers and consumers need a 
+trusted, transparent system that ensures the data they rely on is accurate, verifiable and securely shared. 
+11 
+ 
+Problem Statement: Design and prototype a decentralized data platform that ensures the integrity, 
+transparency and traceability of agricultural data. Your solution can integrate blockchain principles 
+(immutability, distributed validation and cryptographic proof) to build a trust layer between farmers, 
+researchers and consumers without depending on complex blockchain infrastructure. 
+ 
+-VTRICKS TECHNOLOGIES 
+ 
+D5-PS4: Intelligent Resume Filtering 
+Background: Hiring teams sift through large volumes of resumes to find suitable candidates, wasting 
+time on manual screening and risking biased or inconsistent shortlisting. Recruiters need tools that can 
+quickly surface relevant applicants while preserving fairness, transparency, and auditability in the hiring 
+pipeline. 
+ 
+Problem Statement: Build  an  intelligent  resume  filtering  system  that  helps  recruiters  prioritize 
+applicants by extracting structured information (skills, experience, education), matching profiles to job 
+requirements, and surfacing the best-fit candidates with interpretable reasons. The solution should 
+support scalable pre-screening while reducing unconscious bias and improving hiring efficiency. 
+ 
+D5-PS5: AI-Based Job Description Matching 
+Background: Recruiters often struggle to align job descriptions with the most relevant resumes. 
+Manual comparison is slow, inconsistent, and prone to human bias. Candidates may also misinterpret 
+job  requirements,  leading  to  mismatched  applications.  An  intelligent  system  that  automatically 
+compares resumes against job descriptions can make recruitment faster, fairer, and more precise. 
+ 
+Problem Statement: Develop an AI-driven system that matches candidate resumes to job descriptions 
+by analysing skill relevance, experience alignment, and role fit. The system should evaluate both textual 
+and  contextual  similarity,  helping  recruiters  identify  the  most  suitable  candidates  and  assisting 
+applicants in understanding their compatibility with listed roles. 
+ 
+Domain 6: Student Innovation 
+ 
+Participants are allowed to propose solutions to already existing problems which are not included in 
+any of the above Domains. 
+
+*** END OF FILE*** 

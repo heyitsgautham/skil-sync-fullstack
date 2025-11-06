@@ -1,0 +1,106 @@
+Question:
+Can you attach files in SMTP? 
+
+Answer:
+Yes — you can attach files in SMTP, but SMTP itself does not handle attachments directly. Instead, attachments are included using MIME (Multipurpose Internet Mail Extensions), which encodes the file (usually Base64) and wraps it inside the email body.
+
+✅ How attachments work in SMTP
+
+SMTP only transfers text, so binary files (PDF, images, etc.) are encoded using Base64 and formatted like this:
+	•	The email is set to MIME type multipart/mixed
+	•	A boundary string separates different parts
+	•	One part contains the text body
+	•	Another part contains the Base64-encoded attachment
+
+✅ Example (Python smtplib)
+
+Here’s a simple example of sending an email with an attachment in Python:
+
+import smtplib
+from email.mime.multipart import MIMEMultipart
+from email.mime.base import MIMEBase
+from email.mime.text import MIMEText
+from email import encoders
+
+sender = "you@example.com"
+receiver = "someone@example.com"
+password = "your_smtp_password"
+
+msg = MIMEMultipart()
+msg["From"] = sender
+msg["To"] = receiver
+msg["Subject"] = "Test Email with Attachment"
+
+# Text part
+msg.attach(MIMEText("This is an email with an attachment.", "plain"))
+
+# Attachment part
+filename = "file.pdf"
+with open(filename, "rb") as f:
+    part = MIMEBase("application", "octet-stream")
+    part.set_payload(f.read())
+
+encoders.encode_base64(part)
+part.add_header("Content-Disposition", f"attachment; filename= {filename}")
+
+msg.attach(part)
+
+# Send email
+server = smtplib.SMTP("smtp.gmail.com", 587)
+server.starttls()
+server.login(sender, password)
+server.sendmail(sender, receiver, msg.as_string())
+server.quit()
+
+✅ Summary
+
+Feature	SMTP Support
+Sending plain text email	✅ Yes
+Sending HTML email	✅ Yes (via MIME)
+Sending attachments	✅ Yes (via MIME base64 encoding)
+Sending multiple attachments	✅ Yes
+
+
+Question:Can you attach CSV and Excel files (XLS/XLSX) using SMTP?
+
+Answer:
+Yes — you can attach CSV and Excel files (XLS/XLSX) using the exact same SMTP + MIME method. ✅
+
+✅ CSV Attachment
+
+CSV is just text, so it is attached as:
+
+text/csv
+
+(or simply as application/octet-stream)
+
+✅ Excel Attachment
+
+Excel files (XLSX or XLS) are binary formats:
+	•	XLS → application/vnd.ms-excel
+	•	XLSX → application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
+
+But even if you don’t specify the exact MIME type, SMTP will still send it correctly as long as you Base64 encode and include Content-Disposition: attachment.
+
+✅ Python Example (CSV + XLSX)
+
+attachments = ["data.csv", "report.xlsx"]
+
+for file in attachments:
+    with open(file, "rb") as f:
+        part = MIMEBase("application", "octet-stream")
+        part.set_payload(f.read())
+
+    encoders.encode_base64(part)
+    part.add_header("Content-Disposition", f"attachment; filename={file}")
+
+    msg.attach(part)
+
+✅ Summary
+
+File Type	Can attach via SMTP?	MIME Type
+.csv	✅ Yes	text/csv
+.xls	✅ Yes	application/vnd.ms-excel
+.xlsx	✅ Yes	application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
+
+✅ Works on Gmail SMTP, Outlook SMTP, AWS SES SMTP, SendGrid SMTP, etc.

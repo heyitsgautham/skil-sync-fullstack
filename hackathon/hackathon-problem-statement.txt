@@ -1,0 +1,9 @@
+Intelligent Resume Filtering
+Background: Hiring teams sift through large volumes of resumes to find suitable candidates, wasting
+time on manual screening and risking biased or inconsistent shortlisting. Recruiters need tools that can
+quickly surface relevant applicants while preserving fairness, transparency, and auditability in the hiring
+pipeline.
+Problem Statement: Build an intelligent resume filtering system that helps recruiters prioritize
+applicants by extracting structured information (skills, experience, education), matching profiles to job
+requirements, and surfacing the best-fit candidates with interpretable reasons. The solution should
+support scalable pre-screening while reducing unconscious bias and improving hiring efficiency.
