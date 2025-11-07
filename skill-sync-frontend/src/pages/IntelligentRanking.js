@@ -53,7 +53,6 @@ const IntelligentRanking = () => {
     const [exportLoading, setExportLoading] = useState(false);
     const [expandedAccordions, setExpandedAccordions] = useState({});
     const [onlyApplicants, setOnlyApplicants] = useState(false); // Default to showing all candidates
-<<<<<<< Updated upstream
     
     // Flagged candidates modal state
     const [flaggedModalOpen, setFlaggedModalOpen] = useState(false);
@@ -69,9 +68,8 @@ const IntelligentRanking = () => {
         // Otherwise, add https://
         return `https://${url}`;
     };
-=======
+    
     const [anonymizationEnabled, setAnonymizationEnabled] = useState(false); // Track anonymization status
->>>>>>> Stashed changes
 
     useEffect(() => {
         fetchInternships();
