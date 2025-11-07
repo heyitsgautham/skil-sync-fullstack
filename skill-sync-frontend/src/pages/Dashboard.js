@@ -906,10 +906,10 @@ const Dashboard = () => {
                             Clear Embeddings
                         </Typography>
                         <Typography variant="body2" color="text.secondary" sx={{ mb: 2, lineHeight: 1.7 }}>
-                            Delete all student resume embeddings and match data from ChromaDB. ⚠️ This action is permanent!
+                            Delete all student resume embeddings and match data from ChromaDB. This action is permanent!
                         </Typography>
 
-                        {systemStatus && (
+                        {/* {systemStatus && (
                             <Box sx={{ mb: 2, p: 2, bgcolor: '#fff5f5', borderRadius: 2, border: '1px solid #fee' }}>
                                 <Typography variant="caption" sx={{ display: 'block', fontWeight: 600, mb: 0.5, color: '#c53030' }}>
                                     📊 Current Status
@@ -923,8 +923,8 @@ const Dashboard = () => {
                                 <Typography variant="caption" sx={{ display: 'block' }}>
                                     Total Matches: {systemStatus.matches?.total || 0}
                                 </Typography>
-                            </Box>
-                        )}
+                            </Box>  
+                        )} */}
 
                         <Button
                             variant="contained"
@@ -1089,17 +1089,17 @@ const Dashboard = () => {
                                 width: 80,
                                 height: 80,
                                 borderRadius: 3,
-                                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                                background: 'linear-gradient(135deg, #d32f2f 0%, #d32f2fdd 100%)',
                                 display: 'flex',
                                 alignItems: 'center',
                                 justifyContent: 'center',
                                 mr: 3,
-                                boxShadow: '0 8px 24px rgba(102, 126, 234, 0.3)',
+                                boxShadow: '0 8px 24px rgba(211, 47, 47, 0.3)',
                             }}
                         >
                             {React.cloneElement(getRoleIcon(), {
                                 sx: { fontSize: 48, color: 'white', m: 0 }
-                            })}
+                            })} 
                         </Box>
                         <Box sx={{ flexGrow: 1 }}>
                             <Typography
@@ -1116,7 +1116,7 @@ const Dashboard = () => {
                             <Typography
                                 variant="body1"
                                 sx={{
-                                    color: '#666',
+                                    color: '#666666ff',
                                     mb: 1.5,
                                     fontWeight: 500,
                                 }}

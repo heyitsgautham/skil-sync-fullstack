@@ -153,12 +153,12 @@ const Analytics = () => {
                                 width: 80,
                                 height: 80,
                                 borderRadius: 3,
-                                background: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
+                                background: 'linear-gradient(135deg,#d32f2f 0%, #d32f2fdd 100% )',
                                 display: 'flex',
                                 alignItems: 'center',
                                 justifyContent: 'center',
                                 mr: 3,
-                                boxShadow: '0 8px 24px rgba(240, 147, 251, 0.3)',
+                                boxShadow: '0 8px 24px rgba(211, 10, 10, 0.3)',
                             }}
                         >
                             <AnalyticsIcon sx={{ fontSize: 48, color: 'white' }} />
