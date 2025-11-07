@@ -16,12 +16,20 @@ import {
     TextField,
     InputAdornment,
     Snackbar,
+    Dialog,
+    DialogTitle,
+    DialogContent,
+    DialogActions,
+    IconButton,
+    Tooltip,
 } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import TimerIcon from '@mui/icons-material/Timer';
 import MonetizationOnIcon from '@mui/icons-material/MonetizationOn';
 import WorkIcon from '@mui/icons-material/Work';
+import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/Delete';
 import apiClient from '../services/api';
 import Layout from '../components/Layout';
 import InternshipApplicationDialog from '../components/InternshipApplicationDialog';
@@ -38,6 +46,17 @@ const InternshipList = () => {
     const [applicationDialogOpen, setApplicationDialogOpen] = useState(false);
     const [successMessage, setSuccessMessage] = useState('');
     const [showSuccess, setShowSuccess] = useState(false);
+    const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+    const [internshipToDelete, setInternshipToDelete] = useState(null);
+    const [editDialogOpen, setEditDialogOpen] = useState(false);
+    const [editFormData, setEditFormData] = useState({
+        title: '',
+        description: '',
+        location: '',
+        duration: '',
+        stipend: '',
+        required_skills: []
+    });
 
     useEffect(() => {
         // Get user role from localStorage
@@ -98,6 +117,59 @@ const InternshipList = () => {
 
     const handleCloseSuccess = () => {
         setShowSuccess(false);
+    };
+
+    const handleEditClick = (internship) => {
+        setSelectedInternship(internship);
+        setEditFormData({
+            title: internship.title,
+            description: internship.description,
+            location: internship.location || '',
+            duration: internship.duration || '',
+            stipend: internship.stipend || '',
+            required_skills: internship.required_skills || []
+        });
+        setEditDialogOpen(true);
+    };
+
+    const handleEditSubmit = async () => {
+        try {
+            // Convert required_skills string to array if needed
+            const skills = typeof editFormData.required_skills === 'string' 
+                ? editFormData.required_skills.split(',').map(s => s.trim()).filter(s => s)
+                : editFormData.required_skills;
+
+            await apiClient.put(`/internship/${selectedInternship.id}`, {
+                ...editFormData,
+                required_skills: skills
+            });
+            
+            setSuccessMessage('Internship updated successfully');
+            setShowSuccess(true);
+            setEditDialogOpen(false);
+            fetchInternships(userRole);
+        } catch (err) {
+            console.error('Error updating internship:', err);
+            setError(err.response?.data?.detail || 'Failed to update internship');
+        }
+    };
+
+    const handleDeleteClick = (internship) => {
+        setInternshipToDelete(internship);
+        setDeleteDialogOpen(true);
+    };
+
+    const handleDeleteConfirm = async () => {
+        try {
+            await apiClient.delete(`/internship/${internshipToDelete.id}`);
+            setSuccessMessage('Internship deleted successfully');
+            setShowSuccess(true);
+            setDeleteDialogOpen(false);
+            fetchInternships(userRole);
+        } catch (err) {
+            console.error('Error deleting internship:', err);
+            setError(err.response?.data?.detail || 'Failed to delete internship');
+        }
     };
 
     return (
@@ -315,28 +387,79 @@ const InternshipList = () => {
                                         </CardContent>
 
                                         <CardActions sx={{ p: 3, pt: 0 }}>
-                                            <Button
-                                                variant="contained"
-                                                fullWidth
-                                                onClick={() => handleApply(internship)}
-                                                sx={{
-                                                    py: 1.5,
-                                                    borderRadius: 2,
-                                                    background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                                                    fontWeight: 700,
-                                                    textTransform: 'none',
-                                                    fontSize: '1rem',
-                                                    boxShadow: '0 4px 16px rgba(102, 126, 234, 0.3)',
-                                                    transition: 'all 0.3s ease',
-                                                    '&:hover': {
-                                                        transform: 'translateY(-2px)',
-                                                        boxShadow: '0 8px 24px rgba(102, 126, 234, 0.4)',
-                                                        background: 'linear-gradient(135deg, #764ba2 0%, #667eea 100%)',
-                                                    },
-                                                }}
-                                            >
-                                                {userRole === 'company' ? 'View Details' : 'Apply Now'}
-                                            </Button>
+                                            {userRole === 'admin' ? (
+                                                <Box sx={{ display: 'flex', gap: 1, width: '100%' }}>
+                                                    <Button
+                                                        variant="outlined"
+                                                        fullWidth
+                                                        startIcon={<EditIcon />}
+                                                        onClick={() => handleEditClick(internship)}
+                                                        sx={{
+                                                            py: 1.5,
+                                                            borderRadius: 2,
+                                                            borderColor: '#667eea',
+                                                            color: '#667eea',
+                                                            fontWeight: 700,
+                                                            textTransform: 'none',
+                                                            fontSize: '1rem',
+                                                            transition: 'all 0.3s ease',
+                                                            '&:hover': {
+                                                                borderColor: '#667eea',
+                                                                background: 'rgba(102, 126, 234, 0.1)',
+                                                                transform: 'translateY(-2px)',
+                                                            },
+                                                        }}
+                                                    >
+                                                        Edit
+                                                    </Button>
+                                                    <Button
+                                                        variant="outlined"
+                                                        fullWidth
+                                                        startIcon={<DeleteIcon />}
+                                                        onClick={() => handleDeleteClick(internship)}
+                                                        sx={{
+                                                            py: 1.5,
+                                                            borderRadius: 2,
+                                                            borderColor: '#f5576c',
+                                                            color: '#f5576c',
+                                                            fontWeight: 700,
+                                                            textTransform: 'none',
+                                                            fontSize: '1rem',
+                                                            transition: 'all 0.3s ease',
+                                                            '&:hover': {
+                                                                borderColor: '#f5576c',
+                                                                background: 'rgba(245, 87, 108, 0.1)',
+                                                                transform: 'translateY(-2px)',
+                                                            },
+                                                        }}
+                                                    >
+                                                        Delete
+                                                    </Button>
+                                                </Box>
+                                            ) : (
+                                                <Button
+                                                    variant="contained"
+                                                    fullWidth
+                                                    onClick={() => handleApply(internship)}
+                                                    sx={{
+                                                        py: 1.5,
+                                                        borderRadius: 2,
+                                                        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                                                        fontWeight: 700,
+                                                        textTransform: 'none',
+                                                        fontSize: '1rem',
+                                                        boxShadow: '0 4px 16px rgba(102, 126, 234, 0.3)',
+                                                        transition: 'all 0.3s ease',
+                                                        '&:hover': {
+                                                            transform: 'translateY(-2px)',
+                                                            boxShadow: '0 8px 24px rgba(102, 126, 234, 0.4)',
+                                                            background: 'linear-gradient(135deg, #764ba2 0%, #667eea 100%)',
+                                                        },
+                                                    }}
+                                                >
+                                                    {userRole === 'company' ? 'View Details' : 'Apply Now'}
+                                                </Button>
+                                            )}
                                         </CardActions>
                                     </Card>
                                 </Grid>
@@ -352,6 +475,160 @@ const InternshipList = () => {
                     internship={selectedInternship}
                     onSuccess={handleApplicationSuccess}
                 />
+
+                {/* Edit Internship Dialog */}
+                <Dialog 
+                    open={editDialogOpen} 
+                    onClose={() => setEditDialogOpen(false)}
+                    maxWidth="md"
+                    fullWidth
+                >
+                    <DialogTitle sx={{ 
+                        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                        color: 'white',
+                        fontWeight: 700
+                    }}>
+                        Edit Internship
+                    </DialogTitle>
+                    <DialogContent sx={{ mt: 2 }}>
+                        <TextField
+                            fullWidth
+                            label="Title"
+                            value={editFormData.title}
+                            onChange={(e) => setEditFormData({ ...editFormData, title: e.target.value })}
+                            margin="normal"
+                            required
+                        />
+                        <TextField
+                            fullWidth
+                            label="Description"
+                            value={editFormData.description}
+                            onChange={(e) => setEditFormData({ ...editFormData, description: e.target.value })}
+                            margin="normal"
+                            multiline
+                            rows={4}
+                            required
+                        />
+                        <TextField
+                            fullWidth
+                            label="Location"
+                            value={editFormData.location}
+                            onChange={(e) => setEditFormData({ ...editFormData, location: e.target.value })}
+                            margin="normal"
+                        />
+                        <TextField
+                            fullWidth
+                            label="Duration"
+                            value={editFormData.duration}
+                            onChange={(e) => setEditFormData({ ...editFormData, duration: e.target.value })}
+                            margin="normal"
+                            placeholder="e.g., 3 months"
+                        />
+                        <TextField
+                            fullWidth
+                            label="Stipend"
+                            value={editFormData.stipend}
+                            onChange={(e) => setEditFormData({ ...editFormData, stipend: e.target.value })}
+                            margin="normal"
+                            placeholder="e.g., $1000/month"
+                        />
+                        <TextField
+                            fullWidth
+                            label="Required Skills (comma-separated)"
+                            value={Array.isArray(editFormData.required_skills) 
+                                ? editFormData.required_skills.join(', ') 
+                                : editFormData.required_skills}
+                            onChange={(e) => setEditFormData({ ...editFormData, required_skills: e.target.value })}
+                            margin="normal"
+                            placeholder="e.g., Python, React, SQL"
+                        />
+                    </DialogContent>
+                    <DialogActions sx={{ p: 2 }}>
+                        <Button 
+                            onClick={() => setEditDialogOpen(false)}
+                            sx={{ color: '#666' }}
+                        >
+                            Cancel
+                        </Button>
+                        <Button 
+                            onClick={handleEditSubmit}
+                            variant="contained"
+                            sx={{
+                                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                                '&:hover': {
+                                    background: 'linear-gradient(135deg, #5568d3 0%, #6a3f8e 100%)',
+                                }
+                            }}
+                        >
+                            Save Changes
+                        </Button>
+                    </DialogActions>
+                </Dialog>
+
+                {/* Delete Confirmation Dialog */}
+                <Dialog 
+                    open={deleteDialogOpen} 
+                    onClose={() => setDeleteDialogOpen(false)}
+                    maxWidth="sm"
+                    fullWidth
+                >
+                    <DialogTitle sx={{ 
+                        background: 'linear-gradient(135deg, #f5576c 0%, #f093fb 100%)',
+                        color: 'white',
+                        fontWeight: 700
+                    }}>
+                        ⚠️ Confirm Delete Internship
+                    </DialogTitle>
+                    <DialogContent sx={{ mt: 2 }}>
+                        <Typography variant="h6" sx={{ mb: 2 }}>
+                            Are you sure you want to delete this internship?
+                        </Typography>
+                        
+                        <Paper sx={{ p: 2, mb: 2, bgcolor: 'rgba(245, 87, 108, 0.1)' }}>
+                            <Typography variant="body1" sx={{ fontWeight: 600 }}>
+                                {internshipToDelete?.title}
+                            </Typography>
+                            <Typography variant="body2" color="text.secondary">
+                                {internshipToDelete?.company_name}
+                            </Typography>
+                        </Paper>
+
+                        <Typography color="error" sx={{ mb: 1, fontWeight: 600 }}>
+                            ⚠️ This action cannot be undone!
+                        </Typography>
+                        
+                        <Typography variant="body2" sx={{ mb: 1 }}>
+                            The following data will be permanently deleted:
+                        </Typography>
+                        
+                        <Box component="ul" sx={{ pl: 2, mt: 1 }}>
+                            <li><Typography variant="body2">Internship posting</Typography></li>
+                            <li><Typography variant="body2">All student applications</Typography></li>
+                            <li><Typography variant="body2">All matching data</Typography></li>
+                        </Box>
+                    </DialogContent>
+                    <DialogActions sx={{ p: 2 }}>
+                        <Button 
+                            onClick={() => setDeleteDialogOpen(false)}
+                            sx={{ color: '#666' }}
+                        >
+                            Cancel
+                        </Button>
+                        <Button 
+                            onClick={handleDeleteConfirm}
+                            variant="contained"
+                            color="error"
+                            sx={{
+                                background: 'linear-gradient(135deg, #f5576c 0%, #f093fb 100%)',
+                                '&:hover': {
+                                    background: 'linear-gradient(135deg, #e04558 0%, #d97fe6 100%)',
+                                }
+                            }}
+                        >
+                            Delete Internship
+                        </Button>
+                    </DialogActions>
+                </Dialog>
 
                 {/* Success Snackbar */}
                 <Snackbar

@@ -62,3 +62,13 @@ htmlcov/
 .mypy_cache/
 .dmypy.json
 dmypy.json
+
+
+skill-sync-backend/data/chroma_db/*
+chroma_db
+
+
+
+
+
+
