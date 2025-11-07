@@ -14,7 +14,7 @@ import csv
 from datetime import datetime
 
 from app.database.connection import get_db
-from app.models.user import User
+from app.models.user import User, UserRole
 from app.models.internship import Internship
 from app.models.resume import Resume
 from app.models.application import Application
@@ -23,6 +23,7 @@ from app.services.resume_intelligence_service import ResumeIntelligenceService
 from app.services.rag_engine import RAGEngine
 from app.services.matching_engine import MatchingEngine
 from app.services.resume_service import ResumeService
+from app.services.candidate_flagging_service import CandidateFlaggingService
 from app.utils.security import get_current_user, get_current_company
 
 router = APIRouter(prefix="/api/filter", tags=["intelligent-filtering"])
@@ -389,13 +390,38 @@ async def rank_candidates_for_internship(
             # Count how many have tailored resumes
             tailored_count = sum(1 for c in ranked_candidates if c['scoring_breakdown']['has_tailored'])
             
+            # ✨ ADD FLAGGING INFORMATION
+            logger.info("🚩 Detecting flagged candidates...")
+            candidate_ids = [c['candidate_id'] for c in ranked_candidates]
+            flag_info = CandidateFlaggingService.get_flag_info_for_candidates(candidate_ids, db)
+            
+            # Add flag info to each candidate
+            for candidate in ranked_candidates:
+                candidate_id = candidate['candidate_id']
+                if candidate_id in flag_info:
+                    candidate['is_flagged'] = True
+                    candidate['flag_reasons'] = flag_info[candidate_id]['reasons']
+                    candidate['flagged_with'] = flag_info[candidate_id]['flagged_with']
+                    candidate['flag_reason_text'] = CandidateFlaggingService.format_flag_reason(
+                        flag_info[candidate_id]['reasons']
+                    )
+                else:
+                    candidate['is_flagged'] = False
+                    candidate['flag_reasons'] = []
+                    candidate['flagged_with'] = {}
+                    candidate['flag_reason_text'] = None
+            
+            flagged_count = sum(1 for c in ranked_candidates if c['is_flagged'])
+            logger.info(f"🚩 Found {flagged_count} flagged candidates out of {len(ranked_candidates)}")
+            
             return {
                 "success": True,
                 "message": f"Ranked {len(ranked_candidates)} applicants using dual resume analysis",
                 "total_candidates": len(ranked_candidates),
                 "ranked_candidates": ranked_candidates,
                 "performance_note": f"✨ Dual resume analysis: {tailored_count} with tailored resumes, {len(ranked_candidates) - tailored_count} with base only",
-                "methodology": "Combines base resume (20%) + tailored resume (80%) when available"
+                "methodology": "Combines base resume (20%) + tailored resume (80%) when available",
+                "flagged_candidates_count": flagged_count
             }
         
         else:
@@ -516,13 +542,38 @@ async def rank_candidates_for_internship(
                 else:
                     candidate['scoring_breakdown']['has_tailored'] = False
             
+            # ✨ ADD FLAGGING INFORMATION
+            logger.info("🚩 Detecting flagged candidates...")
+            candidate_ids = [c['candidate_id'] for c in ranked_candidates]
+            flag_info = CandidateFlaggingService.get_flag_info_for_candidates(candidate_ids, db)
+            
+            # Add flag info to each candidate
+            for candidate in ranked_candidates:
+                candidate_id = candidate['candidate_id']
+                if candidate_id in flag_info:
+                    candidate['is_flagged'] = True
+                    candidate['flag_reasons'] = flag_info[candidate_id]['reasons']
+                    candidate['flagged_with'] = flag_info[candidate_id]['flagged_with']
+                    candidate['flag_reason_text'] = CandidateFlaggingService.format_flag_reason(
+                        flag_info[candidate_id]['reasons']
+                    )
+                else:
+                    candidate['is_flagged'] = False
+                    candidate['flag_reasons'] = []
+                    candidate['flagged_with'] = {}
+                    candidate['flag_reason_text'] = None
+            
+            flagged_count = sum(1 for c in ranked_candidates if c['is_flagged'])
+            logger.info(f"🚩 Found {flagged_count} flagged candidates out of {len(ranked_candidates)}")
+            
             return {
                 "success": True,
                 "message": f"Ranked {len(ranked_candidates)} candidates using pre-computed similarity (instant!)",
                 "total_candidates": len(ranked_candidates),
                 "ranked_candidates": ranked_candidates,
                 "performance_note": "⚡ Pre-computed base similarity: <200ms response time",
-                "methodology": "Base similarity from batch computation"
+                "methodology": "Base similarity from batch computation",
+                "flagged_candidates_count": flagged_count
             }
         
     except Exception as e:
@@ -530,6 +581,86 @@ async def rank_candidates_for_internship(
         logger.error(f"❌ Error ranking candidates: {str(e)}")
         logger.error(traceback.format_exc())
         raise HTTPException(status_code=500, detail=f"Error ranking candidates: {str(e)}")
+
+
+@router.get("/flagged-candidates-details")
+async def get_flagged_candidates_details(
+    candidate_ids: str = Query(..., description="Comma-separated list of candidate IDs"),
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_company)
+):
+    """
+    Get detailed information about flagged candidates for modal display
+    
+    Query Parameters:
+    - candidate_ids: Comma-separated list of candidate IDs (e.g., "1,2,3")
+    
+    Returns:
+    - List of candidate details including names, contact info, and flagging reasons
+    """
+    import logging
+    logger = logging.getLogger(__name__)
+    
+    try:
+        # Parse candidate IDs
+        try:
+            id_list = [int(id.strip()) for id in candidate_ids.split(',')]
+        except ValueError:
+            raise HTTPException(status_code=400, detail="Invalid candidate IDs format")
+        
+        logger.info(f"🔍 Fetching details for flagged candidates: {id_list}")
+        
+        # Get candidate details
+        candidates = db.query(User).filter(
+            User.id.in_(id_list),
+            User.role == UserRole.student
+        ).all()
+        
+        if not candidates:
+            return {
+                "success": True,
+                "candidates": [],
+                "message": "No candidates found"
+            }
+        
+        # Get flagging info for these candidates
+        flag_info = CandidateFlaggingService.get_flag_info_for_candidates(id_list, db)
+        
+        # Build response
+        candidate_details = []
+        for candidate in candidates:
+            details = {
+                'candidate_id': candidate.id,
+                'candidate_name': candidate.full_name,
+                'email': candidate.email,
+                'phone': candidate.phone,
+                'linkedin_url': candidate.linkedin_url,
+                'github_url': candidate.github_url,
+                'is_flagged': candidate.id in flag_info,
+                'flag_reasons': flag_info.get(candidate.id, {}).get('reasons', []),
+                'flagged_with': flag_info.get(candidate.id, {}).get('flagged_with', {}),
+                'flag_reason_text': CandidateFlaggingService.format_flag_reason(
+                    flag_info.get(candidate.id, {}).get('reasons', [])
+                ) if candidate.id in flag_info else None
+            }
+            candidate_details.append(details)
+        
+        logger.info(f"✅ Retrieved details for {len(candidate_details)} candidates")
+        
+        return {
+            "success": True,
+            "candidates": candidate_details,
+            "total_count": len(candidate_details)
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        import traceback
+        logger.error(f"❌ Error fetching flagged candidate details: {str(e)}")
+        logger.error(traceback.format_exc())
+        raise HTTPException(status_code=500, detail=f"Error fetching candidate details: {str(e)}")
+
 
 @router.get("/candidate-profile/{student_id}")
 async def get_detailed_candidate_profile(

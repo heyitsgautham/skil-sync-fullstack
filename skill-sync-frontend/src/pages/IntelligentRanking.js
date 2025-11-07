@@ -35,7 +35,9 @@ import DescriptionIcon from '@mui/icons-material/Description';
 import TableViewIcon from '@mui/icons-material/TableView';
 import LinkedInIcon from '@mui/icons-material/LinkedIn';
 import GitHubIcon from '@mui/icons-material/GitHub';
+import WarningIcon from '@mui/icons-material/Warning';
 import Layout from '../components/Layout';
+import FlaggedCandidatesModal from '../components/FlaggedCandidatesModal';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 
@@ -51,6 +53,10 @@ const IntelligentRanking = () => {
     const [exportLoading, setExportLoading] = useState(false);
     const [expandedAccordions, setExpandedAccordions] = useState({});
     const [onlyApplicants, setOnlyApplicants] = useState(false); // Default to showing all candidates
+    
+    // Flagged candidates modal state
+    const [flaggedModalOpen, setFlaggedModalOpen] = useState(false);
+    const [selectedFlaggedCandidate, setSelectedFlaggedCandidate] = useState(null);
 
     // Helper function to ensure URL has proper protocol
     const ensureHttpProtocol = (url) => {
@@ -302,6 +308,16 @@ const IntelligentRanking = () => {
         }));
     }, []);
 
+    const handleFlaggedClick = (candidate) => {
+        setSelectedFlaggedCandidate(candidate);
+        setFlaggedModalOpen(true);
+    };
+
+    const handleCloseFlaggedModal = () => {
+        setFlaggedModalOpen(false);
+        setSelectedFlaggedCandidate(null);
+    };
+
     return (
         <Layout>
             <Container maxWidth="xl" sx={{ mt: 4, mb: 4 }}>
@@ -511,6 +527,38 @@ const IntelligentRanking = () => {
                                                             height: 24,
                                                         }}
                                                     />
+                                                )}
+                                                {/* FLAGGED BADGE */}
+                                                {candidate.is_flagged && (
+                                                    <>
+                                                        <Chip
+                                                            icon={<WarningIcon sx={{ color: 'white !important' }} />}
+                                                            label="FLAGGED"
+                                                            size="small"
+                                                            sx={{
+                                                                backgroundColor: '#f44336',
+                                                                color: 'white',
+                                                                fontWeight: 'bold',
+                                                                fontSize: '0.75rem',
+                                                                height: 24,
+                                                            }}
+                                                        />
+                                                        <Typography
+                                                            variant="caption"
+                                                            sx={{
+                                                                color: '#f44336',
+                                                                cursor: 'pointer',
+                                                                textDecoration: 'underline',
+                                                                fontWeight: 'bold',
+                                                                '&:hover': {
+                                                                    color: '#d32f2f',
+                                                                }
+                                                            }}
+                                                            onClick={() => handleFlaggedClick(candidate)}
+                                                        >
+                                                            {candidate.flag_reason_text}
+                                                        </Typography>
+                                                    </>
                                                 )}
                                             </Box>
                                             <Typography variant="body2" color="text.secondary">
@@ -777,6 +825,17 @@ const IntelligentRanking = () => {
                     </Paper>
                 )}
             </Container>
+
+            {/* Flagged Candidates Modal */}
+            {selectedFlaggedCandidate && (
+                <FlaggedCandidatesModal
+                    open={flaggedModalOpen}
+                    onClose={handleCloseFlaggedModal}
+                    candidateId={selectedFlaggedCandidate.candidate_id}
+                    flaggedWith={selectedFlaggedCandidate.flagged_with}
+                    flagReasons={selectedFlaggedCandidate.flag_reasons}
+                />
+            )}
         </Layout>
     );
 };
