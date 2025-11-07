@@ -33,6 +33,8 @@ import PsychologyIcon from '@mui/icons-material/Psychology';
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
 import DescriptionIcon from '@mui/icons-material/Description';
 import TableViewIcon from '@mui/icons-material/TableView';
+import LinkedInIcon from '@mui/icons-material/LinkedIn';
+import GitHubIcon from '@mui/icons-material/GitHub';
 import Layout from '../components/Layout';
 import axios from 'axios';
 import toast from 'react-hot-toast';
@@ -49,6 +51,17 @@ const IntelligentRanking = () => {
     const [exportLoading, setExportLoading] = useState(false);
     const [expandedAccordions, setExpandedAccordions] = useState({});
     const [onlyApplicants, setOnlyApplicants] = useState(false); // Default to showing all candidates
+
+    // Helper function to ensure URL has proper protocol
+    const ensureHttpProtocol = (url) => {
+        if (!url) return url;
+        // If URL already has http:// or https://, return as is
+        if (url.startsWith('http://') || url.startsWith('https://')) {
+            return url;
+        }
+        // Otherwise, add https://
+        return `https://${url}`;
+    };
 
     useEffect(() => {
         fetchInternships();
@@ -504,6 +517,51 @@ const IntelligentRanking = () => {
                                                 ID: {candidate.candidate_id}
                                             </Typography>
                                         </Box>
+
+                                        {/* Social Profile Links */}
+                                        <Box sx={{ display: 'flex', gap: 1, mr: 2 }}>
+                                            {candidate.linkedin_url && (
+                                                <Button
+                                                    variant="outlined"
+                                                    size="small"
+                                                    startIcon={<LinkedInIcon />}
+                                                    href={ensureHttpProtocol(candidate.linkedin_url)}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    sx={{
+                                                        borderColor: '#0077B5',
+                                                        color: '#0077B5',
+                                                        '&:hover': {
+                                                            borderColor: '#005582',
+                                                            backgroundColor: 'rgba(0, 119, 181, 0.04)',
+                                                        },
+                                                    }}
+                                                >
+                                                    LinkedIn
+                                                </Button>
+                                            )}
+                                            {candidate.github_url && (
+                                                <Button
+                                                    variant="outlined"
+                                                    size="small"
+                                                    startIcon={<GitHubIcon />}
+                                                    href={ensureHttpProtocol(candidate.github_url)}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    sx={{
+                                                        borderColor: '#333',
+                                                        color: '#333',
+                                                        '&:hover': {
+                                                            borderColor: '#000',
+                                                            backgroundColor: 'rgba(0, 0, 0, 0.04)',
+                                                        },
+                                                    }}
+                                                >
+                                                    GitHub
+                                                </Button>
+                                            )}
+                                        </Box>
+
                                         <Chip
                                             label={`${candidate.match_score.toFixed(1)}% Match`}
                                             sx={{

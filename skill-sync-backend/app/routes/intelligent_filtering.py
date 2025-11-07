@@ -360,6 +360,8 @@ async def rank_candidates_for_internship(
                     'candidate_name': student.full_name,  # Frontend expects candidate_name
                     'student_id': student.id,  # Keep for backward compatibility
                     'student_name': student.full_name,  # Keep for backward compatibility
+                    'linkedin_url': student.linkedin_url,  # Social profile links
+                    'github_url': student.github_url,  # Social profile links
                     'resume_id': tailored_resume.id,
                     'personal_info': tailored_resume.parsed_data.get('personal_info', {}) if tailored_resume.parsed_data else {},
                     'skills': all_candidate_skills,  # COMBINED skills from both resumes
@@ -465,6 +467,8 @@ async def rank_candidates_for_internship(
                     'candidate_name': student.full_name,  # Frontend expects candidate_name
                     'student_id': student.id,  # Keep for backward compatibility
                     'student_name': student.full_name,  # Keep for backward compatibility
+                    'linkedin_url': student.linkedin_url,  # Social profile links
+                    'github_url': student.github_url,  # Social profile links
                     'resume_id': resume.id,
                     'personal_info': resume.parsed_data.get('personal_info', {}) if resume.parsed_data else {},
                     'skills': candidate_skills,
