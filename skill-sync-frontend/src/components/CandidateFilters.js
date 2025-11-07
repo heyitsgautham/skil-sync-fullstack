@@ -10,11 +10,21 @@ import {
     Grid,
     Chip,
     Divider,
+    Collapse,
+    IconButton,
+    Alert,
 } from '@mui/material';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import ClearIcon from '@mui/icons-material/Clear';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 
-const CandidateFilters = ({ onApplyFilters, onReset }) => {
+const CandidateFilters = ({ 
+    onApplyFilters, 
+    onReset,
+    scoringInfo
+}) => {
+    const [expanded, setExpanded] = useState(false);
     const [filters, setFilters] = useState({
         matchScoreRange: [0, 100],
         experienceRange: [0, 24], // Changed to months (0-24 months = 0-2 years)
@@ -129,12 +139,13 @@ const CandidateFilters = ({ onApplyFilters, onReset }) => {
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'space-between',
-                    mb: 2,
+                    cursor: 'pointer',
                 }}
+                onClick={() => setExpanded(!expanded)}
             >
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                     <FilterListIcon color="primary" />
-                    <Typography variant="h6" fontWeight="bold">
+                    <Typography variant="body1" fontWeight="bold">
                         Advanced Filters
                     </Typography>
                     {activeFiltersCount > 0 && (
@@ -151,17 +162,43 @@ const CandidateFilters = ({ onApplyFilters, onReset }) => {
                         <Button
                             size="small"
                             startIcon={<ClearIcon />}
-                            onClick={handleResetFilters}
-                            sx={{ mr: 1 }}
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                handleResetFilters();
+                            }}
                         >
                             Clear All
                         </Button>
                     )}
+                    <IconButton size="small">
+                        {expanded ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+                    </IconButton>
                 </Box>
             </Box>
 
-            {/* Filter Content */}
-            <Divider sx={{ mb: 2 }} />
+            {/* Collapsible Filter Content */}
+            <Collapse in={expanded}>
+                <Divider sx={{ my: 2 }} />
+
+                {/* Scoring Methodology Info */}
+                {scoringInfo && (
+                    <Alert severity="info" sx={{ mb: 2 }}>
+                        <Typography variant="body2" fontWeight="bold" gutterBottom>
+                            Scoring Methodology: {scoringInfo.methodology}
+                        </Typography>
+                        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mt: 1 }}>
+                            {Object.entries(scoringInfo.components).map(([key, value]) => (
+                                <Chip
+                                    key={key}
+                                    label={`${key.replace(/_/g, ' ')}: ${value}`}
+                                    size="small"
+                                    variant="outlined"
+                                />
+                            ))}
+                        </Box>
+                    </Alert>
+                )}
+
             <Grid container spacing={3}>
                     {/* Match Score Filter */}
                     <Grid size={{ xs: 12, md: 4 }}>
@@ -271,6 +308,7 @@ const CandidateFilters = ({ onApplyFilters, onReset }) => {
                         </Box>
                     </Grid>
                 </Grid>
+            </Collapse>
         </Paper>
     );
 };
