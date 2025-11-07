@@ -9,7 +9,7 @@ import os
 # Add parent directory to path to import app modules
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-from app.database.connection import get_db_session
+from app.database.connection import SessionLocal
 from app.models.user import User, UserRole
 from app.services.candidate_flagging_service import CandidateFlaggingService
 
@@ -66,12 +66,25 @@ def test_duplicate_detection():
     print("Testing Duplicate Candidate Detection")
     print("=" * 80)
     
-    db = next(get_db_session())
+    db = SessionLocal()
     
     try:
+        from app.models.resume import Resume
+        
         # Get all students
-        students = db.query(User).filter(User.role == UserRole.student).all()
-        print(f"📊 Total students in database: {len(students)}")
+        all_students = db.query(User).filter(User.role == UserRole.student).all()
+        print(f"📊 Total students in database: {len(all_students)}")
+        
+        # Get students with resumes
+        students_with_resumes = db.query(User.id).join(
+            Resume, Resume.student_id == User.id
+        ).filter(
+            User.role == UserRole.student,
+            Resume.is_active == 1
+        ).distinct().all()
+        
+        print(f"📄 Students with uploaded resumes: {len(students_with_resumes)}")
+        print(f"ℹ️  Note: Only students with resumes will be checked for duplicates")
         print()
         
         # Detect flagged candidates
