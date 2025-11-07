@@ -17,214 +17,200 @@
 
 ---
 
-## Phase 1: Database & Model Changes ✅ COMPLETE
+## Phase 1: Database & Model Changes
 **Dependencies:** None  
-**Why First:** All other features depend on the data model  
-**Status:** ✅ Completed on November 6, 2025
+**Why First:** All other features depend on the data model
 
-### Task 1.1: Create Database Migration for Internship Model Enhancements ✅
+### Task 1.1: Create Database Migration for Internship Model Enhancements
 **File:** `skill-sync-backend/scripts/migrate_job_posting_enhancements.py`
 
 **Add to `Internship` model:**
-- [x] `preferred_years` (Float) - Preferred years of experience (separate from min)
-- [x] `rubric_weights` (JSON) - Custom weights per job: `{semantic: 0.35, skills: 0.30, experience: 0.20, education: 0.10, projects: 0.05}`
-- [x] `skill_weights` (JSON) - Individual skill importance: `[{skill: "React", weight: 1.0, type: "must"}, ...]`
-- [x] `top_responsibilities` (JSON) - List of 3 key responsibilities
-- [x] `key_deliverable` (Text) - First 3-month deliverable description
-- [x] `requires_portfolio` (Boolean) - Whether portfolio/GitHub is required
-- [x] `role_level` (String) - Intern/Junior/Mid/Senior
-- [x] `extracted_skills_raw` (JSON) - Raw AI-extracted skills before HR editing
-- [x] `skills_extraction_confidence` (JSON) - Confidence scores for each extracted skill
+- [ ] `preferred_years` (Float) - Preferred years of experience (separate from min)
+- [ ] `rubric_weights` (JSON) - Custom weights per job: `{semantic: 0.35, skills: 0.30, experience: 0.20, education: 0.10, projects: 0.05}`
+- [ ] `skill_weights` (JSON) - Individual skill importance: `[{skill: "React", weight: 1.0, type: "must"}, ...]`
+- [ ] `top_responsibilities` (JSON) - List of 3 key responsibilities
+- [ ] `key_deliverable` (Text) - First 3-month deliverable description
+- [ ] `requires_portfolio` (Boolean) - Whether portfolio/GitHub is required
+- [ ] `role_level` (String) - Intern/Junior/Mid/Senior
+- [ ] `extracted_skills_raw` (JSON) - Raw AI-extracted skills before HR editing
+- [ ] `skills_extraction_confidence` (JSON) - Confidence scores for each extracted skill
 
-**Migration Script:** ✅ Implemented and executed successfully
-- Added all 9 columns to internships table
-- Backfilled existing records with defaults
-- Created indexes for better query performance
-- Verified all columns present and accessible
+**Migration Script:**
+```python
+# Add columns to internships table
+# Backfill existing records with defaults
+# Create indexes for new JSON columns
+```
 
-### Task 1.2: Create Explainability Models ✅
+### Task 1.2: Create Explainability Models
 **File:** `skill-sync-backend/app/models/explainability.py`
 
 Create new models:
-- [x] **`CandidateExplanation` table:**
-  - `id`, `candidate_id`, `internship_id`, `overall_score`, `confidence` ✅
-  - `recommendation` (SHORTLIST/MAYBE/REJECT) ✅
-  - `component_scores` (JSON) - semantic, skills, experience, education, projects ✅
-  - `matched_skills` (JSON) - with proficiency, evidence, confidence ✅
-  - `missing_skills` (JSON) - with impact, reason, recommendation ✅
-  - `experience_analysis` (JSON) - total_years, relevant_years, breakdown ✅
-  - `education_analysis` (JSON) ✅
-  - `project_analysis` (JSON) ✅
-  - `ai_recommendation` (JSON) - action, priority, justification, prompt, response ✅
-  - `provenance` (JSON) - extraction_model, extract_time, data_sources ✅
-  - `created_at`, `updated_at` ✅
+- [ ] **`CandidateExplanation` table:**
+  - `id`, `candidate_id`, `internship_id`, `overall_score`, `confidence`
+  - `recommendation` (SHORTLIST/MAYBE/REJECT)
+  - `component_scores` (JSON) - semantic, skills, experience, education, projects
+  - `matched_skills` (JSON) - with proficiency, evidence, confidence
+  - `missing_skills` (JSON) - with impact, reason, recommendation
+  - `experience_analysis` (JSON) - total_years, relevant_years, breakdown
+  - `education_analysis` (JSON)
+  - `project_analysis` (JSON)
+  - `ai_recommendation` (JSON) - action, priority, justification, prompt, response
+  - `provenance` (JSON) - extraction_model, extract_time, data_sources
+  - `created_at`, `updated_at`
 
-- [x] **`AuditLog` table:**
-  - `id`, `audit_id` (unique, e.g., AUD-2025-11-06-001) ✅
-  - `user_id`, `action` (rank/explain/shortlist/compare) ✅
-  - `internship_id`, `candidate_ids` (JSON array) ✅
-  - `filters_applied` (JSON), `blind_mode` (Boolean) ✅
-  - `result_hash` (String) - hash of results for verification ✅
-  - `timestamp`, `ip_address`, `user_agent` ✅
+- [ ] **`AuditLog` table:**
+  - `id`, `audit_id` (unique, e.g., AUD-2025-11-06-001)
+  - `user_id`, `action` (rank/explain/shortlist/compare)
+  - `internship_id`, `candidate_ids` (JSON array)
+  - `filters_applied` (JSON), `blind_mode` (Boolean)
+  - `result_hash` (String) - hash of results for verification
+  - `timestamp`, `ip_address`, `user_agent`
 
-- [x] **`FairnessCheck` table:**
-  - `id`, `audit_id` (FK to AuditLog) ✅
-  - `internship_id`, `check_type` (gini/disparate_impact/statistical_parity) ✅
-  - `metric_value` (Float), `pass_threshold` (Float) ✅
-  - `passed` (Boolean), `notes` (Text) ✅
-  - `created_at` ✅
+- [ ] **`FairnessCheck` table:**
+  - `id`, `audit_id` (FK to AuditLog)
+  - `internship_id`, `check_type` (gini/disparate_impact/statistical_parity)
+  - `metric_value` (Float), `pass_threshold` (Float)
+  - `passed` (Boolean), `notes` (Text)
+  - `created_at`
 
-**Migration Script:** ✅ `scripts/migrate_explainability_tables.py` executed successfully
-- Created all 3 tables with 38 total columns
-- Added 10 indexes for optimal query performance
-- All tables verified and accessible
-
-### Task 1.3: Add Provenance Fields to Resume Model ✅
+### Task 1.3: Add Provenance Fields to Resume Model
 **File:** `skill-sync-backend/app/models/resume.py`
 
 Add fields:
-- [x] `extraction_confidence` (JSON) - confidence per section (skills, experience, education)
-- [x] `skill_evidences` (JSON) - snippets that prove each skill with line numbers
-- [x] `experience_evidences` (JSON) - raw text snippets for each job
-- [x] `project_evidences` (JSON) - raw text snippets for each project
-- [x] `extraction_metadata` (JSON) - model used, timestamp, version
-
-**Migration Script:** ✅ Included in `scripts/migrate_explainability_tables.py`
-- All 5 provenance fields added successfully
-- Fields verified and accessible on resumes table
+- [ ] `extraction_confidence` (JSON) - confidence per section (skills, experience, education)
+- [ ] `skill_evidences` (JSON) - snippets that prove each skill with line numbers
+- [ ] `experience_evidences` (JSON) - raw text snippets for each job
+- [ ] `project_evidences` (JSON) - raw text snippets for each project
+- [ ] `extraction_metadata` (JSON) - model used, timestamp, version
 
 ---
 
-## Phase 2: Backend Core Services ✅ COMPLETE
+## Phase 2: Backend Core Services
 **Dependencies:** Phase 1 (Database Models)
-**Status:** ✅ Completed on November 6, 2025
 
-### Task 2.1: Implement Provenance Extraction Service ✅
+### Task 2.1: Implement Provenance Extraction Service
 **File:** `skill-sync-backend/app/services/provenance_service.py`
 
 Create functions:
-- [x] `extract_skill_provenance(resume_text, skills)` → Returns snippets with line numbers
-- [x] `extract_experience_provenance(resume_text, experiences)` → Returns date ranges + snippets
-- [x] `extract_project_provenance(resume_text, projects)` → Returns project descriptions + tech stacks
-- [x] `calculate_extraction_confidence(evidences)` → Returns confidence score 0-1
-- [x] `store_provenance(resume_id, provenances)` → Saves to database
+- [ ] `extract_skill_provenance(resume_text, skills)` → Returns snippets with line numbers
+- [ ] `extract_experience_provenance(resume_text, experiences)` → Returns date ranges + snippets
+- [ ] `extract_project_provenance(resume_text, projects)` → Returns project descriptions + tech stacks
+- [ ] `calculate_extraction_confidence(evidences)` → Returns confidence score 0-1
+- [ ] `store_provenance(resume_id, provenances)` → Saves to database
 
-**Implementation:** ✅ Uses Gemini API to identify exact text spans with confidence scores
+**Use:** Gemini API to identify exact text spans that support each extracted claim
 
-### Task 2.2: Implement Component Score Calculator Service ✅
+### Task 2.2: Implement Component Score Calculator Service
 **File:** `skill-sync-backend/app/services/component_score_service.py`
 
 Create functions:
-- [x] `calculate_semantic_score(resume_embedding, job_embedding)` → 0-100
-- [x] `calculate_skills_score(candidate_skills, required_skills, preferred_skills, skill_weights)` → 0-100
-  - Handles exact match, fuzzy match (fuzzywuzzy), proficiency weighting
-  - Returns matched_skills list and missing_skills list with impact ratings
-- [x] `calculate_experience_score(candidate_exp, min_years, preferred_years)` → 0-100
-  - Calculates relevant_years from roles mentioning required skills
-- [x] `calculate_education_score(candidate_edu, required_edu)` → 0-100
-- [x] `calculate_projects_score(candidate_projects, required_skills)` → 0-100
-- [x] `calculate_final_score(component_scores, rubric_weights)` → 0-100
-- [x] `generate_confidence_score(component_confidences)` → 0-1
+- [ ] `calculate_semantic_score(resume_embedding, job_embedding)` → 0-100
+- [ ] `calculate_skills_score(candidate_skills, required_skills, preferred_skills, skill_weights)` → 0-100
+  - Handle exact match, fuzzy match, proficiency weighting
+  - Return matched_skills list and missing_skills list with impact ratings
+- [ ] `calculate_experience_score(candidate_exp, min_years, preferred_years)` → 0-100
+  - Calculate relevant_years from roles mentioning required skills
+- [ ] `calculate_education_score(candidate_edu, required_edu)` → 0-100
+- [ ] `calculate_projects_score(candidate_projects, required_skills)` → 0-100
+- [ ] `calculate_final_score(component_scores, rubric_weights)` → 0-100
+- [ ] `generate_confidence_score(component_confidences)` → 0-1
 
-**Testing:** ✅ All functions tested with sample data, scores calculated correctly
-
-### Task 2.3: Enhance Match Explanation Service ✅
+### Task 2.3: Enhance Match Explanation Service
 **File:** `skill-sync-backend/app/services/match_explanation_service.py`
 
 Implement full explainability:
-- [x] `generate_explanation(candidate_id, internship_id)` → CandidateExplanation object
-  - Fetches resume with provenance
-  - Fetches internship with requirements
-  - Calculates all component scores with evidence
-  - Generates AI recommendation paragraph using Gemini
-  - Stores provenance (model, timestamp, data sources)
-  - Returns structured explanation JSON
+- [ ] `generate_explanation(candidate_id, internship_id)` → CandidateExplanation object
+  - Fetch resume with provenance
+  - Fetch internship with requirements
+  - Calculate all component scores with evidence
+  - Generate AI recommendation paragraph using Gemini
+  - Store provenance (model, timestamp, data sources)
+  - Return structured explanation JSON
   
-- [x] `generate_comparison_explanation(candidate_id_1, candidate_id_2, internship_id)` → Comparison object
+- [ ] `generate_comparison_explanation(candidate_id_1, candidate_id_2, internship_id)` → Comparison object
   - Side-by-side component scores
-  - Highlights decisive differences
-  - Generates natural language summary ("Why A > B")
+  - Highlight decisive differences
+  - Generate natural language summary ("Why A > B")
   - Actionable next steps for each candidate
 
-- [x] `generate_short_reason(explanation)` → One-sentence summary for card header
+- [ ] `generate_short_reason(explanation)` → One-sentence summary for card header
 
-**Features:** ✅ Comprehensive explanations with AI recommendations, comparison analysis, and provenance
-
-### Task 2.4: Implement Skill Proficiency Analyzer ✅
+### Task 2.4: Implement Skill Proficiency Analyzer
 **File:** `skill-sync-backend/app/services/skill_proficiency_service.py`
 
 Create functions:
-- [x] `calculate_proficiency(skill, resume_data)` → Expert/Advanced/Intermediate/Beginner
+- [ ] `calculate_proficiency(skill, resume_data)` → Expert/Advanced/Intermediate/Beginner
   - Years of experience with skill (from roles/projects): 0-10 years
   - Number of projects using skill: 0-N
   - Certifications: Boolean
   - Formula: `proficiency = 0.5*norm(years) + 0.3*norm(projects) + 0.2*cert_flag`
-- [x] `map_proficiency_score(proficiency_value)` → String label
-- [x] `get_skill_evidence(skill, resume_text, resume_data)` → List of evidence objects
+- [ ] `map_proficiency_score(proficiency_value)` → String label
+- [ ] `get_skill_evidence(skill, resume_text, resume_data)` → List of evidence objects
 
-**Testing:** ✅ Proficiency levels calculated correctly with evidence extraction
-
-### Task 2.5: Create Audit Log Service ✅
+### Task 2.5: Create Audit Log Service
 **File:** `skill-sync-backend/app/services/audit_service.py`
 
 Implement:
-- [x] `create_audit_log(user_id, action, internship_id, candidate_ids, filters, blind_mode)` → audit_id
-- [x] `generate_audit_id()` → "AUD-YYYY-MM-DD-XXXX" format
-- [x] `calculate_result_hash(results)` → SHA-256 hash
-- [x] `get_audit_trail(internship_id)` → List of audit logs
-- [x] `verify_audit_integrity(audit_id)` → Boolean (check hash)
-- [x] `get_audit_statistics()` → Audit usage statistics
-
-**Testing:** ✅ Audit IDs generated correctly, hash integrity verified (SHA-256)
+- [ ] `create_audit_log(user_id, action, internship_id, candidate_ids, filters, blind_mode)` → audit_id
+- [ ] `generate_audit_id()` → "AUD-YYYY-MM-DD-XXXX" format
+- [ ] `calculate_result_hash(results)` → SHA-256 hash
+- [ ] `get_audit_trail(internship_id)` → List of audit logs
+- [ ] `verify_audit_integrity(audit_id)` → Boolean (check hash)
 
 ---
 
-## Phase 3: Job Posting Skill Extraction ✅ COMPLETE
+## Phase 3: Job Posting Skill Extraction
 **Dependencies:** Phase 2 (Component Score Service for skill taxonomy)
-**Status:** ✅ Completed on November 6, 2025
 
-### Task 3.1: Create Skill Taxonomy Service ✅
+### Task 3.1: Create Skill Taxonomy Service
 **File:** `skill-sync-backend/app/services/skill_taxonomy_service.py`
 
 Build skill vocabulary:
-- [x] Load comprehensive skill list (tech + soft skills)
-- [x] Create skill categorization: `{skill: {category: "Frontend/Backend/Database/Soft", aliases: [...]}}`
-- [x] `find_skill_matches(text)` → Fuzzy match skills in text
-- [x] `categorize_skill(skill_name)` → Category
-- [x] `get_skill_aliases(skill_name)` → List of alternatives
+- [ ] Load comprehensive skill list (tech + soft skills)
+- [ ] Create skill categorization: `{skill: {category: "Frontend/Backend/Database/Soft", aliases: [...]}}`
+- [ ] `find_skill_matches(text)` → Fuzzy match skills in text
+- [ ] `categorize_skill(skill_name)` → Category
+- [ ] `get_skill_aliases(skill_name)` → List of alternatives
 
-**Data source:** Created `data/skill_taxonomy.json` with 120+ common skills ✅
+**Data source:** Create `data/skill_taxonomy.json` with 200+ common skills
 
-### Task 3.2: Implement AI Skill Extraction Service ✅
+### Task 3.2: Implement AI Skill Extraction Service
 **File:** `skill-sync-backend/app/services/skill_extraction_service.py`
 
 Create functions:
-- [x] `extract_skills_from_description(title, description, num_suggestions=15)` → List of skills with confidence
-  - Uses Gemini API (gemini-2.5-flash) with structured JSON schema for guaranteed valid output
-  - Returns skills sorted by confidence
-  - Includes text span positions for highlighting
-  - Fallback to taxonomy-based extraction if AI fails
+- [ ] `extract_skills_from_description(title, description, num_suggestions=15)` → List of skills with confidence
+  - Use Gemini API with specific prompt:
+    ```
+    Extract up to 15 relevant hard and soft skills from this job description.
+    Return JSON: [{"skill": name, "category": "tech"|"soft", "confidence": 0-1, "span": [start, end]}]
+    
+    Job Title: {title}
+    Description: {description}
+    ```
+  - Return skills sorted by confidence
+  - Include text span positions for highlighting
 
-- [x] `highlight_skills_in_text(description, extracted_skills)` → HTML with highlighted spans
-  - Generates HTML with `<mark class="skill-highlight-{confidence}">skill</mark>`
-  - Different colors for confidence levels: High (>0.8), Medium (0.6-0.8), Low (<0.6)
+- [ ] `highlight_skills_in_text(description, extracted_skills)` → HTML with highlighted spans
+  - Generate HTML with `<mark class="skill-highlight-{confidence}">skill</mark>>`
+  - Different colors for confidence levels: High (green), Medium (yellow), Low (orange)
 
-- [x] `categorize_extracted_skills(skills, required_threshold=0.8)` → {must_have: [], preferred: []}
-  - Auto-suggests must_have for confidence > 0.8
-  - Auto-suggests preferred for 0.6 < confidence <= 0.8
+- [ ] `categorize_extracted_skills(skills, required_threshold=0.8)` → {must_have: [], preferred: []}
+  - Auto-suggest must_have for confidence > 0.8
+  - Auto-suggest preferred for 0.6 < confidence <= 0.8
 
-### Task 3.3: Create Job Posting Skill Extraction API Endpoint ✅
+### Task 3.3: Create Job Posting Skill Extraction API Endpoint
 **File:** `skill-sync-backend/app/routes/internship.py`
 
-Added endpoint:
-- [x] **POST `/api/internship/extract-skills`**
+Add endpoint:
+- [ ] **POST `/api/internship/extract-skills`**
   - Input: `{title, description, num_suggestions}`
-  - Process: Calls skill extraction service with Gemini AI
+  - Process: Call skill extraction service
   - Output: 
     ```json
     {
       "skills": [
-        {"skill": "React", "confidence": 0.97, "category": "Frontend", "span": [45, 50], "in_taxonomy": true},
+        {"skill": "React", "confidence": 0.97, "category": "tech", "span": [45, 50]},
         ...
       ],
       "suggested_must_have": ["React", "Node.js", ...],
@@ -233,229 +219,249 @@ Added endpoint:
     }
     ```
 
-### Task 3.4: Update Job Posting Creation Endpoint ✅
+### Task 3.4: Update Job Posting Creation Endpoint
 **File:** `skill-sync-backend/app/routes/internship.py`
 
-Enhanced **POST `/api/internship/post`**:
-- [x] Accept new fields: `preferred_years`, `rubric_weights`, `skill_weights`, `top_responsibilities`, `key_deliverable`, `requires_portfolio`, `role_level`
-- [x] Accept `extracted_skills_raw` (AI-extracted before HR editing)
-- [x] Accept `skills_extraction_confidence`
-- [x] Validate rubric_weights sum to 1.0
-- [x] Store both raw extracted skills and final HR-confirmed skills
-- [x] Calculate content_hash for change detection
+Enhance **POST `/api/internship/post`**:
+- [ ] Accept new fields: `preferred_years`, `rubric_weights`, `skill_weights`, `top_responsibilities`, `key_deliverable`, `requires_portfolio`, `role_level`
+- [ ] Accept `extracted_skills_raw` (AI-extracted before HR editing)
+- [ ] Accept `skills_extraction_confidence`
+- [ ] Validate rubric_weights sum to 1.0
+- [ ] Store both raw extracted skills and final HR-confirmed skills
+- [ ] Calculate content_hash for change detection
 
 ---
 
-## Phase 4: Enhanced Explainability Backend ✅ COMPLETE
+## Phase 4: Enhanced Explainability Backend
 **Dependencies:** Phase 2 (Core Services), Phase 3 (Skill Extraction)
-**Status:** ✅ Completed on November 6, 2025
 
-### Task 4.1: Create Candidate Explanation API Endpoint ✅
+### Task 4.1: Create Candidate Explanation API Endpoint
 **File:** `skill-sync-backend/app/routes/recommendations.py`
 
 Add endpoint:
-- [x] **GET `/api/candidates/{candidate_id}/explanation?internship_id={id}`**
-  - [x] Fetch candidate and internship data
-  - [x] Call `match_explanation_service.generate_explanation()`
-  - [x] Return full explainability JSON with:
-    - [x] Overall score, confidence, recommendation badge
-    - [x] Component scores with formula
-    - [x] Matched skills with proficiency, evidence snippets, confidence
-    - [x] Missing skills with impact, reason, mitigation
-    - [x] Experience timeline with relevant_years calculation
-    - [x] Education match level
-    - [x] Project highlights with evidence
-    - [x] AI recommendation (strengths, concerns, interview questions)
-    - [x] Provenance metadata
-    - [x] Audit ID (if logged)
+- [ ] **GET `/api/candidates/{candidate_id}/explanation?internship_id={id}`**
+  - Fetch candidate and internship data
+  - Call `match_explanation_service.generate_explanation()`
+  - Return full explainability JSON with:
+    - Overall score, confidence, recommendation badge
+    - Component scores with formula
+    - Matched skills with proficiency, evidence snippets, confidence
+    - Missing skills with impact, reason, mitigation
+    - Experience timeline with relevant_years calculation
+    - Education match level
+    - Project highlights with evidence
+    - AI recommendation (strengths, concerns, interview questions)
+    - Provenance metadata
+    - Audit ID (if logged)
   
   **Example response:** (See candidate_card_wireframe_job_posting_template.md section 3)
 
-### Task 4.2: Create Candidate Comparison API Endpoint ✅
+### Task 4.2: Create Candidate Comparison API Endpoint
 **File:** `skill-sync-backend/app/routes/recommendations.py`
 
 Add endpoint:
-- [x] **GET `/api/internship/{internship_id}/compare?candidates={id1},{id2}`**
-  - [x] Fetch explanations for both candidates
-  - [x] Generate comparison structure:
-    - [x] Side-by-side component scores
-    - [x] Aligned skill lists (matched vs missing)
-    - [x] Experience comparison (relevant years, project count)
-    - [x] Natural language "Why A > B" summary
-    - [x] Actionable next steps for each
-  - [x] Log comparison action in audit log
-  - [x] Return comparison JSON
+- [ ] **GET `/api/internship/{internship_id}/compare?candidates={id1},{id2}`**
+  - Fetch explanations for both candidates
+  - Generate comparison structure:
+    - Side-by-side component scores
+    - Aligned skill lists (matched vs missing)
+    - Experience comparison (relevant years, project count)
+    - Natural language "Why A > B" summary
+    - Actionable next steps for each
+  - Log comparison action in audit log
+  - Return comparison JSON
 
-### Task 4.3: Create AI Recommendation Generator ✅
-**File:** `skill-sync-backend/app/services/match_explanation_service.py`
+### Task 4.3: Create AI Recommendation Generator
+**File:** `skill-sync-backend/app/services/ai_recommendation_service.py`
 
 Enhance existing service:
-- [x] `_generate_ai_recommendation(candidate_data, internship_data, component_scores)` → AI recommendation object
-  - [x] Use Gemini API with detailed prompt and structured JSON schema
-  - [x] Store full prompt and response for provenance
-  - [x] Return structured recommendation with action, priority, strengths, concerns, interview questions
-  - [x] Temperature: 0.3 for consistency
-  - [x] Model: gemini-2.5-flash
+- [ ] `generate_detailed_recommendation(candidate_data, internship_data, component_scores)` → AI recommendation object
+  - Use Gemini API with detailed prompt:
+    ```
+    Analyze this candidate for the internship role.
+    
+    Candidate: {name}, {experience}, {skills}, {projects}
+    Role: {title}, {requirements}, {responsibilities}
+    Scores: {component_scores}
+    
+    Provide:
+    1. Action: SHORTLIST | MAYBE | REJECT
+    2. Priority: High | Medium | Low
+    3. Top 3 Strengths (bullet points)
+    4. Top 2 Concerns (bullet points)
+    5. 3 Interview Focus Questions
+    6. Overall Justification (2-3 sentences)
+    ```
+  - Store full prompt and response for provenance
+  - Return structured recommendation
 
-- [x] Store LLM prompt and response in explanation object
+- [ ] Store LLM prompt and response in explanation object
 
-### Task 4.4: Implement Precomputation Service ✅
+### Task 4.4: Implement Precomputation Service
 **File:** `skill-sync-backend/app/services/precompute_service.py`
 
 Create batch explanation generation:
-- [x] `precompute_explanations_for_internship(internship_id)` → Generates explanations for all matched candidates
-  - [x] Fetch top N candidates from `student_internship_matches`
-  - [x] Generate full explanations for each
-  - [x] Store in `CandidateExplanation` table
-  - [x] Smart cache detection (24-hour TTL)
-  - [x] Error resilience (continues on individual failures)
-- [x] **POST `/api/internship/{id}/precompute`** (Company/Admin endpoint)
-  - [x] Trigger precomputation for specific internship
-  - [x] Return status and count of explanations generated
-  - [x] Parameters: top_n (default 50, max 200), force_refresh
-- [x] **GET `/api/internship/{id}/precompute-status`**
-  - [x] Return cache coverage and freshness statistics
-- [x] `invalidate_cache_for_internship(internship_id)` → Delete cached explanations
-- [x] `invalidate_cache_for_candidate(candidate_id)` → Delete cached explanations
-- [x] `get_precompute_status(internship_id)` → Return statistics
+- [ ] `precompute_explanations_for_internship(internship_id)` → Generates explanations for all matched candidates
+  - Fetch top N candidates from `student_internship_matches`
+  - Generate full explanations for each
+  - Store in `CandidateExplanation` table
+  - Update cache invalidation logic
+- [ ] **POST `/api/internship/{id}/precompute`** (Admin endpoint)
+  - Trigger precomputation for specific internship
+  - Return status and count of explanations generated
 
-### Task 4.5: Update Intelligent Filtering to Use Explanations ✅
+### Task 4.5: Update Intelligent Filtering to Use Explanations
 **File:** `skill-sync-backend/app/routes/intelligent_filtering.py`
 
 Enhance existing endpoints:
-- [x] Update **GET `/api/filter/rank-candidates/{id}/filtered`**
-  - [x] Check if precomputed explanations exist
-  - [x] If yes, return cached explanations with full data
-  - [x] If no, mark as "not cached" with instruction message
-  - [x] Include full explanation in response
-  - [x] Log ranking action in audit log
-  - [x] Return audit ID and cache statistics
+- [ ] Update **GET `/api/internship/{id}/ranked-candidates`**
+  - Check if precomputed explanations exist
+  - If yes, return cached explanations
+  - If no, generate on-the-fly
+  - Include full explanation in response
+  - Log ranking action in audit log
 
 ---
 
-## Phase 5: Frontend Components & UI ✅ COMPLETE
+## Phase 5: Frontend Components & UI
 **Dependencies:** Phase 4 (Backend APIs)
-**Status:** ✅ Completed on November 7, 2025
 
-### Task 5.1: Create Job Posting Skill Extraction UI ✅
+### Task 5.1: Create Job Posting Skill Extraction UI
 **File:** `skill-sync-frontend/src/components/company/SkillExtractionPanel.js`
 
 Build Material-UI component:
-- [x] Input: Large textarea for job description
-- [x] "Extract Skills" button (calls `/api/internship/extract-skills`)
-- [x] Loading state while extracting
-- [x] Display highlighted description with color-coded skills:
+- [ ] Input: Large textarea for job description
+- [ ] "Extract Skills" button (calls `/api/internship/extract-skills`)
+- [ ] Loading state while extracting
+- [ ] Display highlighted description with color-coded skills:
   - High confidence (>0.8): Green background
   - Medium confidence (0.6-0.8): Yellow background
   - Low confidence (<0.6): Orange background
-- [x] Extracted skills displayed as editable chips:
+- [ ] Extracted skills displayed as editable chips:
   - Chip color by confidence
   - Delete icon on each chip
   - Tooltip showing confidence score on hover
-- [x] Two sections: "Must-Have Skills" and "Preferred Skills"
-  - Click to move between sections
-- [x] Manual "Add Skill" input field
-- [x] Toggle functionality for each skill (Must-have / Preferred)
-- [x] "Re-run Extraction" button
-- [x] Props: `description`, `onSkillsExtracted(skills)`, `onChange(skills)`
+- [ ] Two sections: "Must-Have Skills" and "Preferred Skills"
+  - Drag-and-drop or click to move between sections
+- [ ] Manual "Add Skill" input field
+- [ ] Toggle switches for each skill (Must-have / Preferred)
+- [ ] "Re-run Extraction" button
+- [ ] Props: `description`, `onSkillsExtracted(skills)`, `onChange(skills)`
 
-### Task 5.2: Enhance Job Posting Form ✅
-**File:** `skill-sync-frontend/src/pages/CreateInternship.js`
+### Task 5.2: Enhance Job Posting Form
+**File:** `skill-sync-frontend/src/pages/company/CreateInternship.js`
 
 Add new fields:
-- [x] Preferred years (separate from minimum years)
-- [x] Top 3 responsibilities (bullet list input)
-- [x] Key deliverable (text area)
-- [x] Requires portfolio checkbox
-- [x] Role level dropdown (Intern/Junior/Mid/Senior)
-- [x] Integrate `SkillExtractionPanel` component
-- [x] Rubric weight sliders (optional, collapsible section):
+- [ ] Preferred years (separate from minimum years)
+- [ ] Top 3 responsibilities (bullet list input)
+- [ ] Key deliverable (text area)
+- [ ] Requires portfolio checkbox
+- [ ] Role level dropdown (Intern/Junior/Mid/Senior)
+- [ ] Integrate `SkillExtractionPanel` component
+- [ ] Rubric weight sliders (optional, collapsible section):
   - Skills weight (0-100%)
   - Experience weight (0-100%)
   - Semantic weight (0-100%)
   - Education weight (0-100%)
   - Projects weight (0-100%)
   - Show validation: must sum to 100%
-- [x] Submit form with all new fields
+- [ ] Submit form with all new fields
 
-### Task 5.3: Create Candidate Explanation Card Component ✅
+### Task 5.3: Create Candidate Explanation Card Component
 **File:** `skill-sync-frontend/src/components/company/CandidateExplanationCard.js`
 
-Build comprehensive Material-UI card:
+Build comprehensive Material-UI card (see wireframe in candidate_card_wireframe_job_posting_template.md):
 
 **Header Section:**
-- [x] Avatar, overall score, recommendation badge
-- [x] Confidence icon (high/medium/low)
-- [x] Audit ID (if present)
-- [x] Support for anonymized mode
+- [ ] Avatar, name, overall score, recommendation badge
+- [ ] Confidence icon (high/medium/low)
+- [ ] Short reason phrase
+- [ ] Audit ID (if present)
+- [ ] Anonymized flag (if blind mode)
 
 **WHY Pane (Default Visible):**
-- [x] Component score horizontal stacked bar
+- [ ] Component score horizontal stacked bar
   - Clickable segments with tooltip showing formula
   - Colors for each component (semantic, skills, experience, education, projects)
   - Percentage labels
-- [x] Natural language summary from AI recommendation
+- [ ] Natural language summary sentence
 
 **Skills Section:**
-- [x] Matched skills as green chips
-  - Format: "Skill • Proficiency"
-  - Tooltip with confidence score
-- [x] Missing skills as error alerts
+- [ ] Matched skills as green chips
+  - Format: "Skill • Proficiency • Confidence"
+  - Click expands to show evidence snippets
+  - Evidence modal with:
+    - Resume snippets (highlighted)
+    - Project references
+    - Extraction confidence
+- [ ] Missing skills as red/orange chips
   - Impact rating badge (High/Medium/Low)
   - Reason for missing
   - Recommended mitigation action
 
 **Experience Timeline:**
-- [x] Compact role display with skills tags
-- [x] Show computed `relevant_years`
+- [ ] Compact timeline visualization (Material-UI Timeline)
+- [ ] Role cards: title, company, duration, skills tags
+- [ ] Highlight relevant roles (used required skills)
+- [ ] Show computed `relevant_years`
 
 **Education & Certs:**
-- [x] Degree, institution
-- [x] GPA (if present)
+- [ ] Degree, institution, match level
+- [ ] GPA (if present)
+- [ ] Certification badges
 
 **Projects Section:**
-- [x] Top 2-3 project cards
-- [x] Project title, description, technologies
-- [x] Expandable sections
+- [ ] Top 2-3 project cards
+- [ ] Project title, role, duration, technologies
+- [ ] Link to portfolio/GitHub (if available)
+- [ ] Expandable excerpt from resume
 
 **AI Recommendation Block:**
-- [x] Action badge (SHORTLIST/MAYBE/REJECT)
-- [x] Priority indicator
-- [x] Strengths (bullet points)
-- [x] Concerns (bullet points)
-- [x] Interview focus questions (expandable)
-- [x] Collapsible "View Provenance" section
+- [ ] Action badge (SHORTLIST/MAYBE/REJECT)
+- [ ] Priority indicator
+- [ ] Strengths (3 bullet points)
+- [ ] Concerns (2 bullet points)
+- [ ] Interview focus questions (3 questions, expandable)
+- [ ] Collapsible "View Provenance" section:
+  - LLM prompt used
+  - LLM response
+  - Model name, timestamp
+
+**Bias & Audit (If Applicable):**
+- [ ] "Fair Screening Active" chip
+- [ ] Audit ID display
+- [ ] Fairness score metric
 
 **Action Buttons:**
-- [x] Shortlist button
-- [x] Schedule interview button
-- [x] Send assessment button
-- [x] View full resume button
-- [x] Download explanation PDF button
+- [ ] Shortlist button
+- [ ] Schedule interview button
+- [ ] Send assessment button
+- [ ] View full resume button
+- [ ] Download explanation PDF button (nice-to-have)
 
 **Props:** `explanation` (full explanation object), `onAction(action, candidateId)`
 
-### Task 5.4: Create Evidence Modal Component ✅
+### Task 5.4: Create Evidence Modal Component
 **File:** `skill-sync-frontend/src/components/company/EvidenceModal.js`
 
 Build modal to show detailed evidence:
-- [x] Skill/experience/project name header
-- [x] List of evidence snippets
-- [x] Each snippet shows:
+- [ ] Skill/experience/project name header
+- [ ] List of evidence snippets
+- [ ] Each snippet shows:
   - Source (resume.pdf, section)
   - Highlighted text with context
   - Confidence score
   - Line numbers (if available)
-- [x] Close button
-- [x] Props: `open`, `onClose`, `evidenceList`, `title`
+- [ ] Close button
+- [ ] Props: `open`, `onClose`, `evidenceList`, `title`
 
-### Task 5.5: Create Side-by-Side Comparison Component ✅
+### Task 5.5: Create Side-by-Side Comparison Component
 **File:** `skill-sync-frontend/src/components/company/CandidateComparison.js`
 
 Build comparison UI:
-- [x] Two-column layout (Grid)
-- [x] Comparison header: "Candidate A (score%) vs Candidate B (score%)"
-- [x] Aligned rows with highlights:
+- [ ] Two-column layout (Grid)
+- [ ] Comparison header: "Candidate A (score%) vs Candidate B (score%)"
+- [ ] Aligned rows with highlights:
   - Overall scores with visual bar comparison
   - Component scores (side-by-side bars)
   - Matched skills count (A: 5/7 vs B: 4/7)
@@ -463,58 +469,60 @@ Build comparison UI:
   - Highest-impact missing skills (red badges)
   - Experience comparison (relevant years, project count)
   - Education comparison
-- [x] Natural language "Why A > B" summary at top (Material-UI Alert)
-- [x] Actionable next steps for each candidate
-- [x] Export comparison button
-- [x] Props: `comparison` (comparison object from API)
+- [ ] Natural language "Why A > B" summary at top (Material-UI Alert)
+- [ ] Actionable next steps for each candidate
+- [ ] Export comparison button
+- [ ] Props: `comparison` (comparison object from API)
 
-### Task 5.6: Update Company Dashboard - Ranked Candidates View ✅
-**File:** `skill-sync-frontend/src/pages/company/EnhancedCandidateRanking.js`
+### Task 5.6: Update Company Dashboard - Ranked Candidates View
+**File:** `skill-sync-frontend/src/pages/company/InternshipDetails.js`
 
 Enhance candidate list:
-- [x] Replace simple list with `CandidateExplanationCard` components
-- [x] Load explanations from `/api/candidates/{id}/explanation`
-- [x] Add "Compare Selected" button (multi-select mode)
+- [ ] Replace simple list with `CandidateExplanationCard` components
+- [ ] Load explanations from `/api/candidates/{id}/explanation`
+- [ ] Add "Compare Selected" button (multi-select mode)
   - Checkboxes on each card
   - Compare up to 2 candidates at a time
   - Opens comparison modal/page
-- [x] Add filters panel:
+- [ ] Add filters panel:
   - Min score slider
   - Recommendation filter (SHORTLIST/MAYBE/REJECT)
-- [x] Add sort options:
+  - Skill filters (must have specific skill)
+  - Experience range
+- [ ] Add sort options:
   - By overall score
   - By skills match
   - By experience
   - By confidence
-- [x] Pagination with lazy loading
-- [x] Skeleton loaders while fetching explanations
+- [ ] Pagination with lazy loading
+- [ ] Skeleton loaders while fetching explanations
 
-### Task 5.7: Create Component Score Visualization ✅
+### Task 5.7: Create Component Score Visualization
 **File:** `skill-sync-frontend/src/components/company/ComponentScoreBar.js`
 
 Build interactive stacked bar:
-- [x] Horizontal stacked bar chart (use Material-UI Box)
-- [x] Segments for each component (semantic, skills, experience, education, projects)
-- [x] Color-coded segments
-- [x] Hover tooltip showing:
+- [ ] Horizontal stacked bar chart (use Material-UI Box or custom Canvas)
+- [ ] Segments for each component (semantic, skills, experience, education, projects)
+- [ ] Color-coded segments
+- [ ] Hover tooltip showing:
   - Component name
   - Percentage contribution
   - Raw score
   - Formula used
-- [x] Click segment to expand details
-- [x] Props: `componentScores`, `rubricWeights`
+- [ ] Click segment to expand details
+- [ ] Props: `componentScores`, `rubricWeights`
 
-### Task 5.8: Create Skill Evidence Snippet Component ✅
+### Task 5.8: Create Skill Evidence Snippet Component
 **File:** `skill-sync-frontend/src/components/company/EvidenceSnippet.js`
 
 Build snippet display:
-- [x] Card with snippet text
-- [x] Highlighted skill/keyword in text
-- [x] Source badge (e.g., "Resume.pdf - Experience Section")
-- [x] Confidence score badge
-- [x] Line numbers (if available)
-- [x] Expandable context button
-- [x] Props: `snippet`, `source`, `confidence`, `highlighted_term`
+- [ ] Card with snippet text
+- [ ] Highlighted skill/keyword in text
+- [ ] Source badge (e.g., "Resume.pdf - Experience Section")
+- [ ] Confidence score badge
+- [ ] Line numbers (if available)
+- [ ] Expandable context button
+- [ ] Props: `snippet`, `source`, `confidence`, `highlighted_term`
 
 ---
 
@@ -765,23 +773,23 @@ Phase 2 (Core Services)
 ## ✅ Testing Checklist (Per Phase)
 
 ### Phase 1-2 Testing:
-- [x] Database migrations run successfully
-- [x] New models create tables correctly
-- [x] Component score calculations accurate
-- [x] Provenance extraction works for sample resumes
-- [x] Explanation generation completes without errors
+- [ ] Database migrations run successfully
+- [ ] New models create tables correctly
+- [ ] Component score calculations accurate
+- [ ] Provenance extraction works for sample resumes
+- [ ] Explanation generation completes without errors
 
 ### Phase 3 Testing:
-- [x] Skill extraction identifies 10+ skills from sample JD
-- [x] Highlighting shows correct text spans
-- [x] Confidence scores reasonable (0.7-1.0 for obvious skills)
-- [x] API endpoint returns valid JSON
+- [ ] Skill extraction identifies 10+ skills from sample JD
+- [ ] Highlighting shows correct text spans
+- [ ] Confidence scores reasonable (0.7-1.0 for obvious skills)
+- [ ] API endpoint returns valid JSON
 
 ### Phase 4 Testing:
-- [x] Explanation API returns complete data structure
-- [x] Comparison API highlights correct differences
-- [x] AI recommendations generate valid text
-- [x] Precomputation completes for 50+ candidates
+- [ ] Explanation API returns complete data structure
+- [ ] Comparison API highlights correct differences
+- [ ] AI recommendations generate valid text
+- [ ] Precomputation completes for 50+ candidates
 
 ### Phase 5 Testing:
 - [ ] Skill extraction UI highlights skills correctly

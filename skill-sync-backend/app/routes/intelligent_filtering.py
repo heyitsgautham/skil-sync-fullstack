@@ -22,8 +22,6 @@ from app.services.parser_service import ResumeParser
 from app.services.resume_intelligence_service import ResumeIntelligenceService
 from app.services.rag_engine import RAGEngine
 from app.services.matching_engine import MatchingEngine
-from app.services.match_explanation_service import get_match_explanation_service
-from app.services.audit_service import get_audit_service
 from app.utils.security import get_current_user, get_current_company
 
 router = APIRouter(prefix="/api/filter", tags=["intelligent-filtering"])
@@ -1028,34 +1026,8 @@ async def get_filtered_ranked_candidates(
         
         logger.info(f"✅ Found {total} total candidates, returning page {page} ({len(results)} items)")
         
-        # PHASE 4 ENHANCEMENT: Check for precomputed explanations
-        from app.models.explainability import CandidateExplanation
-        from datetime import timedelta
-        
-        # Fetch cached explanations for all candidates in this page
-        candidate_ids = [row[1].id for row in results]
-        
-        cached_explanations = {}
-        if candidate_ids:
-            explanations_query = db.query(CandidateExplanation).filter(
-                CandidateExplanation.candidate_id.in_(candidate_ids),
-                CandidateExplanation.internship_id == internship.id
-            )
-            
-            for exp in explanations_query.all():
-                # Only use if less than 24 hours old
-                from datetime import timezone
-                now = datetime.now(timezone.utc)
-                age = now - exp.created_at
-                if age < timedelta(hours=24):
-                    cached_explanations[exp.candidate_id] = exp
-        
-        logger.info(f"📦 Found {len(cached_explanations)}/{len(results)} cached explanations")
-        
         # Build response
         ranked_candidates = []
-        match_explanation_service = get_match_explanation_service()
-        
         for row in results:
             match = row[0]
             user = row[1]
@@ -1064,7 +1036,6 @@ async def get_filtered_ranked_candidates(
             
             parsed_data = resume.parsed_data or {}
             
-            # Base candidate info
             candidate = {
                 'candidate_id': user.id,
                 'candidate_name': user.full_name,
@@ -1084,7 +1055,7 @@ async def get_filtered_ranked_candidates(
                 'applied_at': str(application.created_at) if application else None,
             }
             
-            # Add match details (basic version for backward compatibility)
+            # Add match details
             required_skills = internship.required_skills or []
             candidate_skills = parsed_data.get('all_skills', [])
             matched_skills = [s for s in candidate_skills if s.lower() in [rs.lower() for rs in required_skills]]
@@ -1096,85 +1067,9 @@ async def get_filtered_ranked_candidates(
                 'experience_gap': max(0, (internship.min_experience or 0) - candidate['total_experience_years'])
             }
             
-            # PHASE 4 ENHANCEMENT: Add full explanation if cached
-            cached_exp = cached_explanations.get(user.id)
-            if cached_exp:
-                # Include full explanation data
-                candidate['explanation'] = {
-                    'explanation_id': cached_exp.explanation_id,
-                    'overall_score': cached_exp.overall_score,
-                    'confidence': cached_exp.confidence,
-                    'recommendation': cached_exp.recommendation,
-                    'component_scores': cached_exp.component_scores,
-                    'matched_skills': cached_exp.matched_skills,
-                    'missing_skills': cached_exp.missing_skills,
-                    'experience_analysis': cached_exp.experience_analysis,
-                    'education_analysis': cached_exp.education_analysis,
-                    'project_analysis': cached_exp.project_analysis,
-                    'ai_recommendation': cached_exp.ai_recommendation,
-                    'short_reason': match_explanation_service.generate_short_reason({
-                        'recommendation': cached_exp.recommendation,
-                        'matched_skills': cached_exp.matched_skills or [],
-                        'missing_skills': cached_exp.missing_skills or [],
-                        'experience_analysis': cached_exp.experience_analysis or {'relevant_years': 0}
-                    }) if cached_exp.ai_recommendation else None,
-                    'cached': True,
-                    'cache_age_hours': round((datetime.now(timezone.utc) - cached_exp.created_at).total_seconds() / 3600, 1)
-                }
-                logger.debug(f"✅ Added cached explanation for candidate {user.id}")
-            else:
-                # Mark as needing generation
-                candidate['explanation'] = {
-                    'cached': False,
-                    'message': 'Explanation not cached. Call /api/recommendations/candidates/{candidate_id}/explanation to generate.'
-                }
-            
             ranked_candidates.append(candidate)
         
         total_pages = (total + page_size - 1) // page_size
-        
-        # PHASE 4 ENHANCEMENT: Log ranking action in audit log
-        audit_id = None
-        try:
-            audit_service = get_audit_service()
-            
-            # Build filters applied summary
-            filters_applied = {}
-            if min_score is not None:
-                filters_applied['min_score'] = min_score
-            if max_score is not None:
-                filters_applied['max_score'] = max_score
-            if skills:
-                filters_applied['skills'] = skills
-            if experience_min is not None:
-                filters_applied['experience_min'] = experience_min
-            if experience_max is not None:
-                filters_applied['experience_max'] = experience_max
-            if education_level:
-                filters_applied['education_level'] = education_level
-            if application_status:
-                filters_applied['application_status'] = application_status
-            if only_applicants:
-                filters_applied['only_applicants'] = True
-            
-            filters_applied['sort_by'] = sort_by
-            filters_applied['sort_order'] = sort_order
-            filters_applied['page'] = page
-            filters_applied['page_size'] = page_size
-            
-            audit_id = audit_service.create_audit_log(
-                user_id=current_user.id,
-                action="rank",
-                internship_id=internship.id,
-                candidate_ids=candidate_ids,
-                filters=filters_applied,
-                blind_mode=False,  # TODO: Add blind mode support in future
-                db_session=db
-            )
-            logger.info(f"📝 Ranking logged with audit ID: {audit_id}")
-        except Exception as e:
-            logger.warning(f"⚠️  Failed to log ranking in audit: {e}")
-            # Don't fail the request if audit logging fails
         
         return {
             "success": True,
@@ -1188,20 +1083,16 @@ async def get_filtered_ranked_candidates(
                 "title": internship.title,
                 "required_skills": internship.required_skills or [],
                 "min_experience": internship.min_experience or 0
-            },
-            "audit_id": audit_id,
-            "cached_explanations_count": len(cached_explanations),
-            "total_candidates_in_page": len(results)
+            }
         }
         
     except Exception as e:
         import traceback
-        tb_str = traceback.format_exc()
         logger.error(f"❌ Error filtering candidates: {str(e)}")
-        logger.error(tb_str)
+        logger.error(traceback.format_exc())
         raise HTTPException(
             status_code=500,
-            detail=f"Error filtering candidates: {str(e)}\\n{tb_str}"
+            detail=f"Error filtering candidates: {str(e)}"
         )
 
 

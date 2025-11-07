@@ -25,13 +25,6 @@ class Resume(Base):
     parsed_data = Column(JSON, nullable=True)  # Structured data from Gemini extraction
     extracted_skills = Column(JSON, nullable=True)  # List of skills extracted from resume
     
-    # Provenance and explainability fields
-    extraction_confidence = Column(JSON, nullable=True)  # Confidence per section: {skills: 0.95, experience: 0.88, education: 0.92}
-    skill_evidences = Column(JSON, nullable=True)  # Snippets proving each skill: [{skill, snippets: [{text, line_numbers}], confidence}]
-    experience_evidences = Column(JSON, nullable=True)  # Raw text snippets for each job: [{company, role, snippet, dates}]
-    project_evidences = Column(JSON, nullable=True)  # Raw text snippets for each project: [{name, snippet, technologies}]
-    extraction_metadata = Column(JSON, nullable=True)  # Model used, timestamp, version: {model, timestamp, version, source}
-    
     # Vector embedding reference (stored in ChromaDB, not in PostgreSQL)
     # REMOVED: embedding column (redundant - ChromaDB is single source of truth)
     embedding_id = Column(String(255), nullable=True, index=True)  # Reference to ChromaDB embedding

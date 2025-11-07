@@ -2,7 +2,7 @@
 Internship Model - Internship postings by companies
 """
 
-from sqlalchemy import Column, Integer, String, Text, DateTime, ForeignKey, JSON, Float, Boolean
+from sqlalchemy import Column, Integer, String, Text, DateTime, ForeignKey, JSON, Float
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 from app.database.connection import Base
@@ -24,20 +24,7 @@ class Internship(Base):
     preferred_skills = Column(JSON, nullable=True)  # List of preferred skills (nice-to-have)
     min_experience = Column(Float, nullable=True, default=0)  # Minimum years of experience
     max_experience = Column(Float, nullable=True, default=10)  # Maximum years of experience
-    preferred_years = Column(Float, nullable=True)  # Preferred years of experience (separate from min)
     required_education = Column(String(255), nullable=True)  # e.g., "Bachelor's in CS"
-    
-    # Job posting enhancement fields
-    rubric_weights = Column(JSON, nullable=True)  # Custom weights: {semantic: 0.35, skills: 0.30, experience: 0.20, education: 0.10, projects: 0.05}
-    skill_weights = Column(JSON, nullable=True)  # Individual skill importance: [{skill: "React", weight: 1.0, type: "must"}, ...]
-    top_responsibilities = Column(JSON, nullable=True)  # List of 3 key responsibilities
-    key_deliverable = Column(Text, nullable=True)  # First 3-month deliverable description
-    requires_portfolio = Column(Boolean, default=False)  # Whether portfolio/GitHub is required
-    role_level = Column(String(50), nullable=True)  # Intern/Junior/Mid/Senior
-    
-    # AI skill extraction fields
-    extracted_skills_raw = Column(JSON, nullable=True)  # Raw AI-extracted skills before HR editing
-    skills_extraction_confidence = Column(JSON, nullable=True)  # Confidence scores for each extracted skill
     
     location = Column(String(255), nullable=True)
     duration = Column(String(100), nullable=True)  # e.g., "3 months", "6 months"

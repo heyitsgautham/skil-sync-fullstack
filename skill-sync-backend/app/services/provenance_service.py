@@ -74,40 +74,25 @@ Return a JSON object in this format:
 Only include snippets that clearly demonstrate the skill. If no evidence found for a skill, use an empty array.
 """
             
-            # Define JSON schema for structured output
-            response_schema = {
-                "type": "object",
-                "additionalProperties": {
-                    "type": "array",
-                    "items": {
-                        "type": "object",
-                        "properties": {
-                            "text": {"type": "string"},
-                            "line_numbers": {
-                                "type": "array",
-                                "items": {"type": "integer"}
-                            },
-                            "confidence": {"type": "number"},
-                            "context": {"type": "string"}
-                        },
-                        "required": ["text", "line_numbers", "confidence", "context"]
-                    }
-                }
-            }
-            
             response = client.models.generate_content(
-                model="gemini-2.5-flash",  # Updated to current production model
+                model="gemini-2.0-flash-exp",
                 contents=prompt,
                 config=types.GenerateContentConfig(
                     temperature=0.1,
-                    max_output_tokens=4000,
-                    response_mime_type="application/json",
-                    response_schema=response_schema
+                    max_output_tokens=4000
                 )
             )
             
-            # Parse the JSON response - guaranteed to be valid JSON
-            evidences = json.loads(response.text)
+            # Parse the JSON response
+            response_text = response.text.strip()
+            
+            # Extract JSON from markdown code blocks if present
+            if "```json" in response_text:
+                response_text = response_text.split("```json")[1].split("```")[0].strip()
+            elif "```" in response_text:
+                response_text = response_text.split("```")[1].split("```")[0].strip()
+            
+            evidences = json.loads(response_text)
             
             logger.info(f"✅ Extracted skill provenance for {len(evidences)} skills")
             return evidences
@@ -177,50 +162,25 @@ Return a JSON array in this format:
 Extract all relevant details from the resume text.
 """
             
-            # Define JSON schema for structured output
-            response_schema = {
-                "type": "array",
-                "items": {
-                    "type": "object",
-                    "properties": {
-                        "company": {"type": "string"},
-                        "role": {"type": "string"},
-                        "snippet": {"type": "string"},
-                        "dates": {"type": "string"},
-                        "responsibilities": {
-                            "type": "array",
-                            "items": {"type": "string"}
-                        },
-                        "achievements": {
-                            "type": "array",
-                            "items": {"type": "string"}
-                        },
-                        "technologies": {
-                            "type": "array",
-                            "items": {"type": "string"}
-                        },
-                        "line_numbers": {
-                            "type": "array",
-                            "items": {"type": "integer"}
-                        }
-                    },
-                    "required": ["company", "role", "snippet", "dates", "line_numbers"]
-                }
-            }
-            
             response = client.models.generate_content(
-                model="gemini-2.5-flash",  # Updated to current production model
+                model="gemini-2.0-flash-exp",
                 contents=prompt,
                 config=types.GenerateContentConfig(
                     temperature=0.1,
-                    max_output_tokens=4000,
-                    response_mime_type="application/json",
-                    response_schema=response_schema
+                    max_output_tokens=4000
                 )
             )
             
-            # Parse the JSON response - guaranteed to be valid JSON
-            evidences = json.loads(response.text)
+            # Parse the JSON response
+            response_text = response.text.strip()
+            
+            # Extract JSON from markdown code blocks if present
+            if "```json" in response_text:
+                response_text = response_text.split("```json")[1].split("```")[0].strip()
+            elif "```" in response_text:
+                response_text = response_text.split("```")[1].split("```")[0].strip()
+            
+            evidences = json.loads(response_text)
             
             logger.info(f"✅ Extracted experience provenance for {len(evidences)} experiences")
             return evidences
@@ -289,47 +249,25 @@ Return a JSON array in this format:
 Extract all relevant technical details.
 """
             
-            # Define JSON schema for structured output
-            response_schema = {
-                "type": "array",
-                "items": {
-                    "type": "object",
-                    "properties": {
-                        "name": {"type": "string"},
-                        "snippet": {"type": "string"},
-                        "technologies": {
-                            "type": "array",
-                            "items": {"type": "string"}
-                        },
-                        "role": {"type": "string"},
-                        "duration": {"type": "string"},
-                        "outcomes": {
-                            "type": "array",
-                            "items": {"type": "string"}
-                        },
-                        "github_link": {"type": "string"},
-                        "line_numbers": {
-                            "type": "array",
-                            "items": {"type": "integer"}
-                        }
-                    },
-                    "required": ["name", "snippet", "line_numbers"]
-                }
-            }
-            
             response = client.models.generate_content(
-                model="gemini-2.5-flash",  # Updated to current production model
+                model="gemini-2.0-flash-exp",
                 contents=prompt,
                 config=types.GenerateContentConfig(
                     temperature=0.1,
-                    max_output_tokens=4000,
-                    response_mime_type="application/json",
-                    response_schema=response_schema
+                    max_output_tokens=4000
                 )
             )
             
-            # Parse the JSON response - guaranteed to be valid JSON
-            evidences = json.loads(response.text)
+            # Parse the JSON response
+            response_text = response.text.strip()
+            
+            # Extract JSON from markdown code blocks if present
+            if "```json" in response_text:
+                response_text = response_text.split("```json")[1].split("```")[0].strip()
+            elif "```" in response_text:
+                response_text = response_text.split("```")[1].split("```")[0].strip()
+            
+            evidences = json.loads(response_text)
             
             logger.info(f"✅ Extracted project provenance for {len(evidences)} projects")
             return evidences
@@ -453,7 +391,7 @@ Extract all relevant technical details.
             
             # Store extraction metadata
             resume.extraction_metadata = {
-                "model": "gemini-2.5-flash",  # Updated to current production model
+                "model": "gemini-2.0-flash-exp",
                 "timestamp": datetime.now().isoformat(),
                 "version": "1.0",
                 "source": "ProvenanceService"
