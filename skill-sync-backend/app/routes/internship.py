@@ -12,6 +12,7 @@ from app.models import User, Internship, UserRole, Resume, Application, StudentI
 from app.services.parser_service import InternshipParser
 from app.services.rag_engine import rag_engine
 from app.services.matching_engine import MatchingEngine
+from app.services.job_description_analyzer import get_job_description_analyzer
 from app.utils.security import get_current_user
 
 router = APIRouter(prefix="/internship", tags=["Internship"])
@@ -21,9 +22,19 @@ class InternshipCreate(BaseModel):
     title: str
     description: str
     required_skills: Optional[List[str]] = None
+    preferred_skills: Optional[List[str]] = None
     location: Optional[str] = None
     duration: Optional[str] = None
     stipend: Optional[str] = None
+
+
+class SkillExtractionRequest(BaseModel):
+    job_description: str
+
+
+class SkillExtractionResponse(BaseModel):
+    required_skills: List[str]
+    preferred_skills: List[str]
 
 
 class InternshipResponse(BaseModel):
@@ -33,6 +44,7 @@ class InternshipResponse(BaseModel):
     title: str
     description: str
     required_skills: Optional[List[str]] = None
+    preferred_skills: Optional[List[str]] = None
     location: Optional[str] = None
     duration: Optional[str] = None
     stipend: Optional[str] = None
@@ -46,6 +58,58 @@ class InternshipWithMatchScore(InternshipResponse):
     match_score: Optional[int] = None
     has_applied: bool = False
     application_resume_name: Optional[str] = None
+
+
+@router.post("/extract-skills", response_model=SkillExtractionResponse)
+def extract_skills_from_description(
+    request: SkillExtractionRequest,
+    current_user: User = Depends(get_current_user)
+):
+    """
+    Extract required and preferred skills from job description using AI
+    
+    - **job_description**: The full job description text
+    
+    Returns two separate lists:
+    - **required_skills**: Must-have skills
+    - **preferred_skills**: Nice-to-have skills
+    
+    This endpoint uses Google Gemini AI to intelligently categorize skills
+    based on how they are mentioned in the job description.
+    """
+    # Verify user is a company
+    if current_user.role != UserRole.company:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Only companies can use skill extraction"
+        )
+    
+    if not request.job_description or len(request.job_description.strip()) < 50:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Job description must be at least 50 characters long"
+        )
+    
+    try:
+        # Get job description analyzer instance
+        analyzer = get_job_description_analyzer()
+        
+        # Extract skills
+        result = analyzer.extract_skills(request.job_description)
+        
+        return SkillExtractionResponse(
+            required_skills=result['required_skills'],
+            preferred_skills=result['preferred_skills']
+        )
+        
+    except Exception as e:
+        import traceback
+        print(f"Error extracting skills: {str(e)}")
+        print(f"Traceback: {traceback.format_exc()}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error extracting skills: {str(e)}"
+        )
 
 
 @router.post("/post", response_model=InternshipResponse, status_code=status.HTTP_201_CREATED)
@@ -81,6 +145,7 @@ def post_internship(
             title=parsed_data['title'],
             description=parsed_data['description'],
             required_skills=parsed_data.get('required_skills'),
+            preferred_skills=parsed_data.get('preferred_skills'),
             location=parsed_data.get('location'),
             duration=parsed_data.get('duration'),
             stipend=parsed_data.get('stipend'),
@@ -140,6 +205,7 @@ def list_internships(
             "title": internship.title,
             "description": internship.description,
             "required_skills": internship.required_skills,
+            "preferred_skills": internship.preferred_skills,
             "location": internship.location,
             "duration": internship.duration,
             "stipend": internship.stipend,
@@ -179,6 +245,7 @@ def get_my_internships(
             "title": internship.title,
             "description": internship.description,
             "required_skills": internship.required_skills,
+            "preferred_skills": internship.preferred_skills,
             "location": internship.location,
             "duration": internship.duration,
             "stipend": internship.stipend,
@@ -300,6 +367,7 @@ def match_internships(
                     "title": internship.title,
                     "description": internship.description,
                     "required_skills": internship.required_skills or [],
+                    "preferred_skills": internship.preferred_skills or [],
                     "location": internship.location or "",
                     "duration": internship.duration or "",
                     "stipend": internship.stipend or "",
@@ -353,6 +421,7 @@ def get_internship(
         "title": internship.title,
         "description": internship.description,
         "required_skills": internship.required_skills,
+        "preferred_skills": internship.preferred_skills,
         "location": internship.location,
         "duration": internship.duration,
         "stipend": internship.stipend,
@@ -396,6 +465,7 @@ def update_internship(
         internship.title = parsed_data['title']
         internship.description = parsed_data['description']
         internship.required_skills = parsed_data.get('required_skills')
+        internship.preferred_skills = parsed_data.get('preferred_skills')
         internship.location = parsed_data.get('location')
         internship.duration = parsed_data.get('duration')
         internship.stipend = parsed_data.get('stipend')
