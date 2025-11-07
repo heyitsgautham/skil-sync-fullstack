@@ -40,13 +40,13 @@ class MatchingEngine:
         self.key_manager = get_gemini_key_manager()
         logger.info("✅ MatchingEngine initialized with GeminiKeyManager")
         
-        # Scoring weights
+        # Scoring weights - Rebalanced to prioritize actual qualifications over semantic similarity
         self.weights = {
-            'semantic_similarity': 0.35,      # 35% - Overall resume-JD match
-            'skills_match': 0.30,             # 30% - Specific skills required
-            'experience_match': 0.20,         # 20% - Years of experience
-            'education_match': 0.10,          # 10% - Education level
-            'projects_certifications': 0.05   # 5% - Additional credentials
+            'skills_match': 0.45,             # 45% - Specific skills required (increased from 30%)
+            'experience_match': 0.25,         # 25% - Years of experience (increased from 20%)
+            'semantic_similarity': 0.10,      # 10% - Overall resume-JD match (reduced from 35%)
+            'education_match': 0.10,          # 10% - Education level (same)
+            'projects_certifications': 0.10   # 10% - Additional credentials (increased from 5%)
         }
     
     def calculate_match_score(

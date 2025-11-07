@@ -135,7 +135,7 @@ class ResumeService:
                 parsed_content=resume_text,
                 parsed_data=structured_data,  # Store structured Gemini data
                 extracted_skills=extracted_skills,
-                embedding=embedding,  # Store embedding vector directly
+                # Note: embedding is stored in ChromaDB, not PostgreSQL
                 is_active=1 if not is_tailored else 0,  # Tailored resumes are not "active" by default
                 is_tailored=1 if is_tailored else 0,
                 tailored_for_internship_id=internship_id,
@@ -143,29 +143,37 @@ class ResumeService:
             )
             
             db.add(new_resume)
-            db.commit()
-            db.refresh(new_resume)
-            logger.info(f"✅ Resume record created with ID: {new_resume.id}")
+            db.flush()  # Flush to get ID without committing
+            logger.info(f"✅ Resume record prepared with ID: {new_resume.id}")
             
             # Store in vector DB (ChromaDB) for semantic search
             logger.info(f"📚 Storing in vector database (ChromaDB)...")
+            
+            # Build metadata (ChromaDB doesn't accept None values)
+            metadata = {
+                "student_id": student_id,
+                "file_name": file.filename,
+                "is_tailored": is_tailored
+            }
+            # Only add internship_id if this is a tailored resume
+            if is_tailored and internship_id is not None:
+                metadata["internship_id"] = internship_id
+            
             embedding_id = rag_engine.store_resume_embedding(
                 resume_id=str(new_resume.id),
                 content=resume_text,
                 skills=extracted_skills,
-                metadata={
-                    "student_id": student_id,
-                    "file_name": file.filename,
-                    "is_tailored": is_tailored,
-                    "internship_id": internship_id if is_tailored else None
-                }
+                metadata=metadata
             )
+            logger.info(f"✅ Stored in ChromaDB with ID: {embedding_id}")
             
             # Update resume with embedding ID
             new_resume.embedding_id = embedding_id
+            
+            # Commit everything together (atomic operation)
             db.commit()
             db.refresh(new_resume)
-            logger.info(f"✅ Stored in ChromaDB with ID: {embedding_id}")
+            logger.info(f"✅ All changes committed to database")
             
             logger.info(f"🎉 {resume_type.capitalize()} resume processing complete!")
             return new_resume
