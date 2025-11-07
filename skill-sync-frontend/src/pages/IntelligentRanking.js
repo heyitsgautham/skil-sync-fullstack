@@ -53,7 +53,7 @@ const IntelligentRanking = () => {
     const [exportLoading, setExportLoading] = useState(false);
     const [expandedAccordions, setExpandedAccordions] = useState({});
     const [onlyApplicants, setOnlyApplicants] = useState(false); // Default to showing all candidates
-    
+
     // Flagged candidates modal state
     const [flaggedModalOpen, setFlaggedModalOpen] = useState(false);
     const [selectedFlaggedCandidate, setSelectedFlaggedCandidate] = useState(null);
@@ -68,8 +68,9 @@ const IntelligentRanking = () => {
         // Otherwise, add https://
         return `https://${url}`;
     };
-    
+
     const [anonymizationEnabled, setAnonymizationEnabled] = useState(false); // Track anonymization status
+
 
     useEffect(() => {
         fetchInternships();
@@ -180,7 +181,7 @@ const IntelligentRanking = () => {
             toast.loading('Fetching resume...', { id: 'resume-fetch' });
 
             const token = localStorage.getItem('token');
-            
+
             // First, get resume metadata
             const metadataResponse = await axios.get(
                 `http://localhost:8000/api/recommendations/resume/${studentId}`,
@@ -204,7 +205,7 @@ const IntelligentRanking = () => {
 
             // For API storage, download PDF with authentication and display as blob
             toast.loading('Loading PDF...', { id: 'resume-fetch' });
-            
+
             const pdfResponse = await axios.get(url, {
                 headers: { Authorization: `Bearer ${token}` },
                 responseType: 'blob' // Important: get binary data
