@@ -23,6 +23,7 @@ import {
     Menu,
     ListItemIcon,
     ListItemText,
+    Checkbox,
 } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
@@ -36,8 +37,10 @@ import TableViewIcon from '@mui/icons-material/TableView';
 import LinkedInIcon from '@mui/icons-material/LinkedIn';
 import GitHubIcon from '@mui/icons-material/GitHub';
 import WarningIcon from '@mui/icons-material/Warning';
+import EmailIcon from '@mui/icons-material/Email';
 import Layout from '../components/Layout';
 import FlaggedCandidatesModal from '../components/FlaggedCandidatesModal';
+import SendEmailModal from '../components/SendEmailModal';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 
@@ -57,6 +60,11 @@ const IntelligentRanking = () => {
     // Flagged candidates modal state
     const [flaggedModalOpen, setFlaggedModalOpen] = useState(false);
     const [selectedFlaggedCandidate, setSelectedFlaggedCandidate] = useState(null);
+
+    // Email modal state
+    const [emailModalOpen, setEmailModalOpen] = useState(false);
+    const [selectedCandidates, setSelectedCandidates] = useState([]);
+    const [selectionMode, setSelectionMode] = useState(false); // Track if in selection mode
 
     // Helper function to ensure URL has proper protocol
     const ensureHttpProtocol = (url) => {
@@ -335,6 +343,64 @@ const IntelligentRanking = () => {
         setSelectedFlaggedCandidate(null);
     };
 
+    // Email sending handlers
+    const handleToggleCandidateSelection = (candidate) => {
+        setSelectedCandidates(prev => {
+            const isSelected = prev.some(c => c.candidate_id === candidate.candidate_id);
+            if (isSelected) {
+                return prev.filter(c => c.candidate_id !== candidate.candidate_id);
+            } else {
+                return [...prev, candidate];
+            }
+        });
+    };
+
+    const handleSelectAll = () => {
+        if (selectedCandidates.length === rankedCandidates.length) {
+            setSelectedCandidates([]);
+        } else {
+            setSelectedCandidates(rankedCandidates);
+        }
+    };
+
+    const handleEnableSelectionMode = () => {
+        setSelectionMode(true);
+        setSelectedCandidates([]);
+    };
+
+    const handleCancelSelection = () => {
+        setSelectionMode(false);
+        setSelectedCandidates([]);
+        toast('Selection cancelled', { icon: 'ℹ️' });
+    };
+
+    const handleOpenEmailModal = () => {
+        if (!selectionMode) {
+            // First click - enable selection mode
+            handleEnableSelectionMode();
+            toast.success('Selection mode enabled. Select candidates to send emails.');
+            return;
+        }
+
+        // Second click (when in selection mode) - open email modal
+        if (selectedCandidates.length === 0) {
+            toast.error('Please select at least one candidate');
+            return;
+        }
+        setEmailModalOpen(true);
+    };
+
+    const handleCloseEmailModal = () => {
+        setEmailModalOpen(false);
+    };
+
+    const handleEmailSendComplete = (result) => {
+        toast.success(`Successfully sent ${result.emails_sent} email(s)!`);
+        setSelectedCandidates([]);
+        setSelectionMode(false);
+        setEmailModalOpen(false);
+    };
+
     return (
         <Layout>
             <Container maxWidth="xl" sx={{ mt: 4, mb: 4 }}>
@@ -450,6 +516,39 @@ const IntelligentRanking = () => {
 
                             {/* Export and Expand/Collapse Buttons */}
                             <Box sx={{ display: 'flex', gap: 1 }}>
+                                {selectionMode && (
+                                    <Button
+                                        variant="outlined"
+                                        color="error"
+                                        startIcon={<CancelIcon />}
+                                        onClick={handleCancelSelection}
+                                        sx={{ minWidth: 120 }}
+                                    >
+                                        Cancel
+                                    </Button>
+                                )}
+                                <Button
+                                    variant="contained"
+                                    color="secondary"
+                                    startIcon={<EmailIcon />}
+                                    onClick={handleOpenEmailModal}
+                                    sx={{ 
+                                        minWidth: 200,
+                                        background: selectionMode 
+                                            ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
+                                            : 'linear-gradient(135deg, #4caf50 0%, #45a049 100%)',
+                                        '&:hover': {
+                                            background: selectionMode
+                                                ? 'linear-gradient(135deg, #5568d3 0%, #6a3f8f 100%)'
+                                                : 'linear-gradient(135deg, #45a049 0%, #3d8b40 100%)',
+                                        },
+                                    }}
+                                >
+                                    {selectionMode 
+                                        ? `Send Email (${selectedCandidates.length} selected)` 
+                                        : 'Send Clustered Email'
+                                    }
+                                </Button>
                                 <Button
                                     size="small"
                                     variant="outlined"
@@ -495,6 +594,23 @@ const IntelligentRanking = () => {
                             </Box>
                         </Box>
 
+                        {/* Select All Checkbox - Only visible in selection mode */}
+                        {selectionMode && (
+                            <Box sx={{ mb: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
+                                <Checkbox
+                                    checked={selectedCandidates.length === rankedCandidates.length && rankedCandidates.length > 0}
+                                    indeterminate={selectedCandidates.length > 0 && selectedCandidates.length < rankedCandidates.length}
+                                    onChange={handleSelectAll}
+                                />
+                                <Typography variant="body2" color="text.secondary">
+                                    {selectedCandidates.length === 0 
+                                        ? 'Select candidates to send emails'
+                                        : `${selectedCandidates.length} candidate${selectedCandidates.length > 1 ? 's' : ''} selected`
+                                    }
+                                </Typography>
+                            </Box>
+                        )}
+
                         {rankedCandidates.map((candidate, index) => (
                             <Card
                                 key={candidate.candidate_id}
@@ -505,11 +621,21 @@ const IntelligentRanking = () => {
                                         transform: 'translateY(-4px)',
                                         boxShadow: 6,
                                     },
+                                    border: selectionMode && selectedCandidates.some(c => c.candidate_id === candidate.candidate_id) 
+                                        ? '2px solid #667eea' 
+                                        : 'none',
                                 }}
                             >
                                 <CardContent>
                                     {/* Header with Rank and Score */}
                                     <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                                        {selectionMode && (
+                                            <Checkbox
+                                                checked={selectedCandidates.some(c => c.candidate_id === candidate.candidate_id)}
+                                                onChange={() => handleToggleCandidateSelection(candidate)}
+                                                sx={{ mr: 1 }}
+                                            />
+                                        )}
                                         <Box
                                             sx={{
                                                 width: 50,
@@ -866,6 +992,16 @@ const IntelligentRanking = () => {
                     flagReasons={selectedFlaggedCandidate.flag_reasons}
                 />
             )}
+
+            {/* Email Modal */}
+            <SendEmailModal
+                open={emailModalOpen}
+                onClose={handleCloseEmailModal}
+                selectedCandidates={selectedCandidates}
+                internshipTitle={selectedInternshipData?.title || 'Internship'}
+                internshipId={selectedInternship}
+                onSendComplete={handleEmailSendComplete}
+            />
         </Layout>
     );
 };

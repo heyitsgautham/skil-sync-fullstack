@@ -5,7 +5,7 @@ FastAPI application for intelligent internship matching platform
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.routes import auth, health, resume, internship, recommendations, intelligent_filtering, students, admin, notifications, profile, resume_view
+from app.routes import auth, health, resume, internship, recommendations, intelligent_filtering, students, admin, notifications, profile, resume_view, candidate_emails
 import os
 
 # Initialize FastAPI app
@@ -47,6 +47,7 @@ app.include_router(internship.router, prefix="/api", tags=["Internship"])
 app.include_router(recommendations.router, prefix="/api", tags=["Recommendations"])
 app.include_router(intelligent_filtering.router, tags=["Intelligent Filtering"])
 app.include_router(notifications.router, prefix="/api", tags=["Notifications"])
+app.include_router(candidate_emails.router, prefix="/api", tags=["Candidate Emails"])
 app.include_router(profile.router, prefix="/api", tags=["Profile"])
 
 @app.get("/")
