@@ -49,7 +49,7 @@ def find_missing_embeddings():
             })
     
     if missing_embeddings:
-        print(f"\n❌ Found {len(missing_embeddings)} resumes WITHOUT embeddings:")
+        print(f"\n  Found {len(missing_embeddings)} resumes WITHOUT embeddings:")
         for item in missing_embeddings:
             print(f"   - Student {item['student'].id} ({item['student'].full_name})")
             print(f"     Resume ID: {item['resume'].id}")
@@ -88,7 +88,7 @@ def fix_missing_embeddings(missing_embeddings):
             file_path = resume.file_path
             
             if not os.path.exists(file_path):
-                print(f"   ❌ File not found: {file_path}")
+                print(f"     File not found: {file_path}")
                 fail_count += 1
                 continue
             
@@ -97,7 +97,7 @@ def fix_missing_embeddings(missing_embeddings):
             parsed_data = parser.parse_resume(file_path)
             
             if not parsed_data:
-                print(f"   ❌ Failed to parse resume")
+                print(f"     Failed to parse resume")
                 fail_count += 1
                 continue
             
@@ -117,11 +117,11 @@ def fix_missing_embeddings(missing_embeddings):
                 print(f"   ✅ Successfully generated embedding: {embedding_id}")
                 success_count += 1
             else:
-                print(f"   ❌ Failed to generate embedding")
+                print(f"     Failed to generate embedding")
                 fail_count += 1
                 
         except Exception as e:
-            print(f"   ❌ Error: {str(e)}")
+            print(f"     Error: {str(e)}")
             fail_count += 1
             continue
     
@@ -129,7 +129,7 @@ def fix_missing_embeddings(missing_embeddings):
     print("  RESULTS")
     print("=" * 70)
     print(f"\n✅ Successfully fixed: {success_count}")
-    print(f"❌ Failed: {fail_count}")
+    print(f"  Failed: {fail_count}")
     
     return fail_count == 0
 
@@ -156,7 +156,7 @@ def main():
     response = input("   Fix them now? (yes/no): ").lower().strip()
     
     if response not in ['yes', 'y']:
-        print("\n❌ Operation cancelled.")
+        print("\n  Operation cancelled.")
         return
     
     # Step 3: Fix missing embeddings

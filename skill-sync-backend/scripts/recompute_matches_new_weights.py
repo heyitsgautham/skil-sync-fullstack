@@ -128,7 +128,7 @@ for match in all_matches:
             db.commit()
     
     except Exception as e:
-        print(f"❌ Error updating match {match.id}: {e}")
+        print(f"  Error updating match {match.id}: {e}")
         error_count += 1
         continue
 

@@ -215,7 +215,7 @@ async def parse_internship_document(
         )
     except Exception as e:
         import traceback
-        logger.error(f"❌ Error parsing document: {str(e)}")
+        logger.error(f"  Error parsing document: {str(e)}")
         logger.error(f"Traceback: {traceback.format_exc()}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -875,7 +875,7 @@ async def apply_to_internship(
         
     except Exception as e:
         import traceback
-        logger.error(f"❌ Error creating application: {str(e)}")
+        logger.error(f"  Error creating application: {str(e)}")
         logger.error(f"Traceback: {traceback.format_exc()}")
         db.rollback()
         raise HTTPException(

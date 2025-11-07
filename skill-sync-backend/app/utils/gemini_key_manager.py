@@ -103,7 +103,7 @@ class GeminiKeyManager:
                     
                     # Check if it's an invalid key
                     elif "invalid" in error_msg or "api key" in error_msg:
-                        logger.error(f"❌ Key {key_name} is invalid: {str(e)[:100]}")
+                        logger.error(f"  Key {key_name} is invalid: {str(e)[:100]}")
                         self.failed_keys.add(key_name)
                         last_error = e
                         continue
@@ -123,7 +123,7 @@ class GeminiKeyManager:
         
         # All keys failed
         error_message = f"All Gemini API keys failed after {max_retries} attempts. Last error: {last_error}"
-        logger.error(f"❌ {error_message}")
+        logger.error(f"  {error_message}")
         raise Exception(error_message)
     
     def _get_key_priority_list(self, purpose: str) -> List[str]:
@@ -181,7 +181,7 @@ class GeminiKeyManager:
                 raise Exception("No response object from API")
                 
         except Exception as e:
-            logger.error(f"❌ Client test failed for {key_name}: {str(e)}")
+            logger.error(f"  Client test failed for {key_name}: {str(e)}")
             raise
     
     def generate_content(
@@ -233,7 +233,7 @@ class GeminiKeyManager:
             
             # Check if response exists
             if not response:
-                logger.error("❌ No response object from Gemini API")
+                logger.error("  No response object from Gemini API")
                 raise Exception("No response from Gemini API")
             
             # Check for blocked content or safety issues
@@ -242,14 +242,14 @@ class GeminiKeyManager:
                 if hasattr(candidate, 'finish_reason'):
                     logger.info(f"📊 Finish reason: {candidate.finish_reason}")
                     if candidate.finish_reason == 'SAFETY':
-                        logger.error("❌ Response blocked by safety filters")
+                        logger.error("  Response blocked by safety filters")
                         raise Exception("Response blocked by Gemini safety filters")
                 if hasattr(candidate, 'safety_ratings'):
                     logger.info(f"📊 Safety ratings: {candidate.safety_ratings}")
             
             # Get response text
             if not response.text or response.text.strip() == "":
-                logger.error("❌ Empty response text from Gemini API")
+                logger.error("  Empty response text from Gemini API")
                 logger.error(f"📊 Full response: {response}")
                 raise Exception("Empty response from Gemini API")
             
@@ -257,7 +257,7 @@ class GeminiKeyManager:
             return response.text.strip()
             
         except Exception as e:
-            logger.error(f"❌ Error generating content: {str(e)}")
+            logger.error(f"  Error generating content: {str(e)}")
             raise
     
     def generate_content_stream(
@@ -311,7 +311,7 @@ class GeminiKeyManager:
             logger.info(f"✅ Streaming completed successfully")
             
         except Exception as e:
-            logger.error(f"❌ Error streaming content: {str(e)}")
+            logger.error(f"  Error streaming content: {str(e)}")
             raise
     
     def reset_failed_keys(self):

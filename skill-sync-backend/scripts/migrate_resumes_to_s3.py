@@ -20,7 +20,7 @@ def migrate_resumes_to_s3():
     """Upload all existing local resumes to S3"""
     
     if not s3_service.is_enabled():
-        print("❌ S3 service is not enabled. Please configure AWS credentials in .env file.")
+        print("  S3 service is not enabled. Please configure AWS credentials in .env file.")
         print("Required environment variables:")
         print("  - AWS_ACCESS_KEY_ID")
         print("  - AWS_SECRET_ACCESS_KEY")
@@ -74,7 +74,7 @@ def migrate_resumes_to_s3():
                 print(f"  ✅ Uploaded to S3: {s3_key}")
                 success_count += 1
             else:
-                print(f"  ❌ Failed to upload to S3")
+                print(f"    Failed to upload to S3")
                 error_count += 1
             
             print()
@@ -82,7 +82,7 @@ def migrate_resumes_to_s3():
         print("=" * 60)
         print(f"🎉 Migration completed!")
         print(f"  ✅ Successful uploads: {success_count}")
-        print(f"  ❌ Failed uploads: {error_count}")
+        print(f"    Failed uploads: {error_count}")
         print()
         
         if success_count > 0:
@@ -94,7 +94,7 @@ def migrate_resumes_to_s3():
         
     except Exception as e:
         db.rollback()
-        print(f"❌ Migration failed: {str(e)}")
+        print(f"  Migration failed: {str(e)}")
         raise
     finally:
         db.close()
@@ -120,7 +120,7 @@ def verify_s3_migration():
         print("=" * 60)
         
     except Exception as e:
-        print(f"❌ Verification failed: {str(e)}")
+        print(f"  Verification failed: {str(e)}")
     finally:
         db.close()
 

@@ -11,7 +11,7 @@ def update_env_file(password):
     env_path = Path(__file__).parent.parent / '.env'
     
     if not env_path.exists():
-        print(f"❌ .env file not found at {env_path}")
+        print(f"  .env file not found at {env_path}")
         return False
     
     # Read the file
@@ -31,7 +31,7 @@ def update_env_file(password):
             break
     
     if not updated:
-        print("❌ DATABASE_URL not found in .env file")
+        print("  DATABASE_URL not found in .env file")
         return False
     
     # Write back
@@ -57,7 +57,7 @@ def main():
     if choice == "1":
         password = input("\nEnter PostgreSQL password for user 'gauthamkrishna': ").strip()
         if not password:
-            print("❌ Password cannot be empty")
+            print("  Password cannot be empty")
             return False
         
         if update_env_file(password):
@@ -101,8 +101,8 @@ if __name__ == "__main__":
         print("\n" + "=" * 60 + "\n")
         sys.exit(0 if success else 1)
     except KeyboardInterrupt:
-        print("\n\n❌ Setup cancelled by user")
+        print("\n\n  Setup cancelled by user")
         sys.exit(1)
     except Exception as e:
-        print(f"\n❌ Error: {e}")
+        print(f"\n  Error: {e}")
         sys.exit(1)

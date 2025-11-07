@@ -13,7 +13,7 @@ LOGIN_RESPONSE=$(curl -s -X POST "$BASE_URL/api/auth/login" \
 TOKEN=$(echo $LOGIN_RESPONSE | grep -o '"access_token":"[^"]*' | sed 's/"access_token":"//')
 
 if [ -z "$TOKEN" ]; then
-  echo "❌ Failed to login as admin"
+  echo "  Failed to login as admin"
   echo "Response: $LOGIN_RESPONSE"
   exit 1
 fi

@@ -58,7 +58,7 @@ def migrate():
         
     except Exception as e:
         db.rollback()
-        print(f"❌ Migration failed: {str(e)}")
+        print(f"  Migration failed: {str(e)}")
         raise
     finally:
         db.close()

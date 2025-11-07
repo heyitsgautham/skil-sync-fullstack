@@ -20,7 +20,7 @@ echo ""
 
 # Check if .env file exists
 if [ ! -f .env ]; then
-    echo -e "${RED}❌ .env file not found!${NC}"
+    echo -e "${RED}  .env file not found!${NC}"
     echo ""
     echo "Please create a .env file with the following AWS S3 configuration:"
     echo ""
@@ -44,7 +44,7 @@ MISSING=0
 
 check_var() {
     if [ -z "${!1}" ]; then
-        echo -e "${RED}❌ $1 is not set${NC}"
+        echo -e "${RED}  $1 is not set${NC}"
         MISSING=1
     else
         # Mask sensitive values
@@ -65,7 +65,7 @@ check_var AWS_REGION
 echo ""
 
 if [ $MISSING -eq 1 ]; then
-    echo -e "${RED}❌ Missing required environment variables${NC}"
+    echo -e "${RED}  Missing required environment variables${NC}"
     echo ""
     echo "Please update your .env file with all required AWS S3 credentials"
     echo "See docs/S3_SETUP_GUIDE.md for instructions"
@@ -77,7 +77,7 @@ echo ""
 
 # Check if Python is available
 if ! command -v python3 &> /dev/null; then
-    echo -e "${RED}❌ Python 3 not found${NC}"
+    echo -e "${RED}  Python 3 not found${NC}"
     echo "Please install Python 3 to continue"
     exit 1
 fi

@@ -56,12 +56,12 @@ Answer:
 - Real recruiters expect instant results (<5 seconds)
 - This directly contradicts "efficient hiring"
 
-### 6. **Reduce Unconscious Bias** ❌
+### 6. **Reduce Unconscious Bias**  
 **Problem Statement**: "Reduce unconscious bias"
 **Your Solution**: Not explicitly addressed
 
 **Match Score**: 20%
-**❌ MAJOR GAP**:
+**  MAJOR GAP**:
 - No mention of bias mitigation strategies
 - Are you hiding names/photos during initial screening?
 - Are you ignoring demographic information?
@@ -69,12 +69,12 @@ Answer:
 
 This is explicitly called out in the problem statement: "preserving fairness"
 
-### 7. **Transparency & Auditability** ❌
+### 7. **Transparency & Auditability**  
 **Problem Statement**: "Preserving transparency and auditability"
 **Your Solution**: Not explicitly addressed
 
 **Match Score**: 30%
-**❌ COMPLIANCE GAP**:
+**  COMPLIANCE GAP**:
 - Can recruiters audit WHY a candidate was filtered out?
 - Can you trace the decision-making process?
 - Do you log ranking criteria and scores?

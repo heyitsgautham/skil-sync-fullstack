@@ -36,7 +36,7 @@ def test_resume_upload_with_s3():
     login_response = requests.post(LOGIN_ENDPOINT, json=TEST_STUDENT)
     
     if login_response.status_code != 200:
-        print(f"❌ Login failed: {login_response.json()}")
+        print(f"  Login failed: {login_response.json()}")
         return False
     
     token = login_response.json()["access_token"]
@@ -47,7 +47,7 @@ def test_resume_upload_with_s3():
     print("\n2️⃣ Uploading resume via Resume Intelligence endpoint...")
     
     if not SAMPLE_RESUME.exists():
-        print(f"❌ Sample resume not found: {SAMPLE_RESUME}")
+        print(f"  Sample resume not found: {SAMPLE_RESUME}")
         print("ℹ️  Please provide a valid resume path")
         return False
     
@@ -60,7 +60,7 @@ def test_resume_upload_with_s3():
         )
     
     if upload_response.status_code != 200:
-        print(f"❌ Upload failed: {upload_response.json()}")
+        print(f"  Upload failed: {upload_response.json()}")
         return False
     
     result = upload_response.json()
@@ -73,7 +73,7 @@ def test_resume_upload_with_s3():
     resume_id = result.get("resume_id")
     
     if not s3_key:
-        print("❌ FAIL: s3_key is NULL - resume NOT uploaded to S3!")
+        print("  FAIL: s3_key is NULL - resume NOT uploaded to S3!")
         print(f"📋 Response: {result}")
         return False
     
@@ -144,16 +144,16 @@ def main():
             print("ℹ️  Resume Intelligence now uploads to S3 automatically")
             sys.exit(0)
         else:
-            print("\n❌ Test failed!")
+            print("\n  Test failed!")
             print("ℹ️  Please check the backend logs for errors")
             sys.exit(1)
             
     except requests.exceptions.ConnectionError:
-        print("\n❌ Cannot connect to backend server")
+        print("\n  Cannot connect to backend server")
         print("ℹ️  Make sure the backend is running on http://localhost:8000")
         sys.exit(1)
     except Exception as e:
-        print(f"\n❌ Unexpected error: {e}")
+        print(f"\n  Unexpected error: {e}")
         import traceback
         traceback.print_exc()
         sys.exit(1)

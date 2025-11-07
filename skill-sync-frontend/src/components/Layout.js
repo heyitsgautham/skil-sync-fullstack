@@ -151,7 +151,7 @@ const Layout = ({ children }) => {
             <Toolbar
                 onClick={handleBrandClick}
                 sx={{
-                    background: `linear-gradient(135deg, ${currentColors.primary} 0%, ${currentColors.primary}dd 100%)`,
+                    background: currentColors.primary,
                     color: 'white',
                     py: 2.5,
                     boxShadow: '0 4px 20px rgba(0,0,0,0.1)',

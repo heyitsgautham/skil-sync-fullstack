@@ -48,7 +48,7 @@ if [ "$STUDENT_TOKEN" != "null" ] && [ -n "$STUDENT_TOKEN" ]; then
     echo $UPDATE | jq '.'
     echo "✓ Student profile test complete"
 else
-    echo "❌ Student login failed"
+    echo "  Student login failed"
 fi
 
 echo ""
@@ -86,7 +86,7 @@ if [ "$COMPANY_TOKEN" != "null" ] && [ -n "$COMPANY_TOKEN" ]; then
     echo $UPDATE | jq '.'
     echo "✓ Company profile test complete"
 else
-    echo "❌ Company login failed"
+    echo "  Company login failed"
 fi
 
 echo ""
@@ -101,7 +101,7 @@ if [ "$COMPANY_TOKEN" != "null" ] && [ -n "$COMPANY_TOKEN" ]; then
     echo $STATS | jq '.'
     echo "✓ Job email stats test complete"
 else
-    echo "❌ Company token not available"
+    echo "  Company token not available"
 fi
 
 echo ""

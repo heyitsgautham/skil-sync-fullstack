@@ -68,7 +68,7 @@ def add_anonymization_toggle():
         logger.info("🎉 Migration completed successfully!")
         
     except Exception as e:
-        logger.error(f"❌ Migration failed: {str(e)}")
+        logger.error(f"  Migration failed: {str(e)}")
         db.rollback()
         raise
     

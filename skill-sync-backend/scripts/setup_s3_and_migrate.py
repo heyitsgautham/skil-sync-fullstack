@@ -42,13 +42,13 @@ def check_s3_configuration():
             else:
                 print(f"  ✅ {var}: {value}")
         else:
-            print(f"  ❌ {var}: NOT SET")
+            print(f"    {var}: NOT SET")
             missing.append(var)
     
     print("=" * 70)
     
     if missing:
-        print(f"\n❌ Missing required environment variables: {', '.join(missing)}")
+        print(f"\n  Missing required environment variables: {', '.join(missing)}")
         print("\n📝 To configure AWS S3:")
         print("1. Create/edit .env file in skill-sync-backend directory")
         print("2. Add the following variables:")
@@ -68,7 +68,7 @@ def test_s3_connectivity():
     print("=" * 70)
     
     if not s3_service.is_enabled():
-        print("❌ S3 service is not enabled")
+        print("  S3 service is not enabled")
         return False
     
     try:
@@ -78,7 +78,7 @@ def test_s3_connectivity():
         print(f"✅ Region: {s3_service.aws_region}")
         return True
     except Exception as e:
-        print(f"❌ Failed to connect to S3: {str(e)}")
+        print(f"  Failed to connect to S3: {str(e)}")
         print("\n📝 Possible issues:")
         print("  - Incorrect AWS credentials")
         print("  - Bucket doesn't exist")
@@ -117,7 +117,7 @@ def get_migration_status():
         return total, with_s3, without_s3
         
     except Exception as e:
-        print(f"❌ Failed to check migration status: {str(e)}")
+        print(f"  Failed to check migration status: {str(e)}")
         return 0, 0, 0
     finally:
         db.close()
@@ -183,7 +183,7 @@ def migrate_resumes_to_s3(force=False):
                 print(f"  ✅ Uploaded to S3: {s3_key}")
                 success_count += 1
             else:
-                print(f"  ❌ Failed to upload to S3")
+                print(f"    Failed to upload to S3")
                 error_count += 1
             
             print()
@@ -192,7 +192,7 @@ def migrate_resumes_to_s3(force=False):
         print("🎉 Migration Completed!")
         print("=" * 70)
         print(f"  ✅ Successful uploads: {success_count}")
-        print(f"  ❌ Failed uploads: {error_count}")
+        print(f"    Failed uploads: {error_count}")
         if missing_file_count > 0:
             print(f"  ⚠️  Missing local files: {missing_file_count}")
         print("=" * 70)
@@ -208,7 +208,7 @@ def migrate_resumes_to_s3(force=False):
         
     except Exception as e:
         db.rollback()
-        print(f"❌ Migration failed: {str(e)}")
+        print(f"  Migration failed: {str(e)}")
         import traceback
         traceback.print_exc()
         return False
@@ -248,19 +248,19 @@ def verify_resume_access():
                 print(f"    🔗 {url[:80]}...")
                 success += 1
             else:
-                print(f"    ❌ Failed to generate URL")
+                print(f"      Failed to generate URL")
                 failed += 1
             print()
         
         print("=" * 70)
         print(f"  ✅ Successful: {success}/{len(sample_resumes)}")
-        print(f"  ❌ Failed: {failed}/{len(sample_resumes)}")
+        print(f"    Failed: {failed}/{len(sample_resumes)}")
         print("=" * 70)
         
         return failed == 0
         
     except Exception as e:
-        print(f"❌ Verification failed: {str(e)}")
+        print(f"  Verification failed: {str(e)}")
         return False
     finally:
         db.close()
@@ -308,12 +308,12 @@ Examples:
     
     # Step 1: Check configuration
     if not check_s3_configuration():
-        print("\n❌ S3 not configured. Please set up AWS credentials first.")
+        print("\n  S3 not configured. Please set up AWS credentials first.")
         return 1
     
     # Step 2: Test connectivity
     if not test_s3_connectivity():
-        print("\n❌ S3 connectivity test failed. Please check your configuration.")
+        print("\n  S3 connectivity test failed. Please check your configuration.")
         return 1
     
     # Step 3: Get current status
@@ -322,7 +322,7 @@ Examples:
     # Step 4: Migrate if requested
     if args.migrate or args.force:
         if not migrate_resumes_to_s3(force=args.force):
-            print("\n❌ Migration encountered errors")
+            print("\n  Migration encountered errors")
             return 1
     elif without_s3 > 0:
         print(f"\n💡 To migrate {without_s3} local resumes to S3, run:")

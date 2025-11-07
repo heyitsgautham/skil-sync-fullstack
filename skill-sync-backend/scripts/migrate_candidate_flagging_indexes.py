@@ -77,7 +77,7 @@ def add_indexes():
         logger.info("=" * 80)
         
     except Exception as e:
-        logger.error(f"❌ Error during migration: {str(e)}")
+        logger.error(f"  Error during migration: {str(e)}")
         db.rollback()
         raise
     finally:
@@ -107,7 +107,7 @@ def rollback_indexes():
         logger.info("=" * 80)
         
     except Exception as e:
-        logger.error(f"❌ Error during rollback: {str(e)}")
+        logger.error(f"  Error during rollback: {str(e)}")
         db.rollback()
         raise
     finally:

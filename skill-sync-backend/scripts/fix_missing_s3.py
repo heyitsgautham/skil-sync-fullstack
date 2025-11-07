@@ -41,7 +41,7 @@ def fix_missing_s3_uploads(student_name=None):
             ).first()
             
             if not user:
-                print(f"❌ User '{student_name}' not found")
+                print(f"  User '{student_name}' not found")
                 return
             
             query = query.filter(Resume.student_id == user.id)
@@ -99,7 +99,7 @@ def fix_missing_s3_uploads(student_name=None):
                 
                 fixed_count += 1
             else:
-                print(f"  ❌ Failed to upload to S3")
+                print(f"    Failed to upload to S3")
                 failed_count += 1
             
             print()
@@ -108,7 +108,7 @@ def fix_missing_s3_uploads(student_name=None):
         print("🎉 Fix Completed!")
         print("=" * 70)
         print(f"  ✅ Fixed: {fixed_count}")
-        print(f"  ❌ Failed: {failed_count}")
+        print(f"    Failed: {failed_count}")
         print(f"  ⚠️  Missing files: {missing_file_count}")
         print("=" * 70)
         
@@ -117,7 +117,7 @@ def fix_missing_s3_uploads(student_name=None):
         
     except Exception as e:
         db.rollback()
-        print(f"❌ Error: {str(e)}")
+        print(f"  Error: {str(e)}")
         import traceback
         traceback.print_exc()
     finally:

@@ -16,7 +16,7 @@
 | | • Component bar: [semantic 35% | skills 30% | experience 20% | edu 10%|proj 5%]
 | |   (hover segments to see numeric contribution and formula)               |
 | +--------------------------------------------------------------------------+
-| | 🎯 Matched Skills (5)        | ❌ Missing (2)                         |
+| | 🎯 Matched Skills (5)        |   Missing (2)                         |
 | | [React - Intermediate • 0.92] | REST API — High impact — No explicit  |
 | | [TypeScript - Expert • 0.95]  | evidence. Recommend mini-assignment. |
 | | [Node.js - Advanced • 0.86]   | JavaScript — low impact (has TS)     |

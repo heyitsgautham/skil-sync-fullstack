@@ -200,7 +200,7 @@ skills = data  # Already in correct format
 
 **DON'T DO THIS (manual cleanup - unnecessary with response_schema):**
 ```python
-# ❌ AVOID: Manual markdown cleanup (obsolete with response_schema)
+#   AVOID: Manual markdown cleanup (obsolete with response_schema)
 text = response.text.strip()
 text = re.sub(r'^```json\s*', '', text)
 text = re.sub(r'\s*```$', '', text)

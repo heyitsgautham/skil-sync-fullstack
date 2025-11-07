@@ -51,7 +51,7 @@ class InternshipDocumentParser:
             else:
                 raise ValueError(f"Unsupported file format: {file_extension}. Supported: PDF, DOCX, DOC, TXT")
         except Exception as e:
-            logger.error(f"❌ Error extracting text from {file_extension}: {e}")
+            logger.error(f"  Error extracting text from {file_extension}: {e}")
             raise Exception(f"Failed to extract text from document: {str(e)}")
     
     @staticmethod
@@ -184,12 +184,12 @@ Return ONLY the JSON object, no markdown, no explanation.
             return structured_data
             
         except json.JSONDecodeError as e:
-            logger.error(f"❌ JSON parsing error: {e}")
+            logger.error(f"  JSON parsing error: {e}")
             logger.error(f"Response text: {result_text if 'result_text' in locals() else 'N/A'}")
             # Return fallback structure with original text
             return self._create_fallback_structure(document_text)
         except Exception as e:
-            logger.error(f"❌ Error in internship extraction: {e}")
+            logger.error(f"  Error in internship extraction: {e}")
             import traceback
             logger.error(f"Traceback: {traceback.format_exc()}")
             return self._create_fallback_structure(document_text)

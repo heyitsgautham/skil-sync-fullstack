@@ -27,7 +27,7 @@ def check_column_exists():
         columns = [col['name'] for col in inspector.get_columns('resumes')]
         return 'embedding' in columns
     except Exception as e:
-        print(f"❌ Error checking columns: {e}")
+        print(f"  Error checking columns: {e}")
         return False
 
 
@@ -70,7 +70,7 @@ def remove_embedding_column():
     
     response = input("Continue? (yes/no): ").strip().lower()
     if response != 'yes':
-        print("❌ Migration cancelled by user")
+        print("  Migration cancelled by user")
         return
     
     # Remove the column
@@ -82,7 +82,7 @@ def remove_embedding_column():
         print("✅ Successfully removed 'embedding' column!")
     except Exception as e:
         db.rollback()
-        print(f"❌ Error removing column: {e}")
+        print(f"  Error removing column: {e}")
         return
     finally:
         db.close()
@@ -112,10 +112,10 @@ if __name__ == "__main__":
     try:
         remove_embedding_column()
     except KeyboardInterrupt:
-        print("\n\n❌ Migration cancelled by user")
+        print("\n\n  Migration cancelled by user")
         sys.exit(1)
     except Exception as e:
-        print(f"\n\n❌ Unexpected error: {e}")
+        print(f"\n\n  Unexpected error: {e}")
         import traceback
         traceback.print_exc()
         sys.exit(1)

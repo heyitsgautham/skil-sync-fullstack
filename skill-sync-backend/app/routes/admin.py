@@ -111,7 +111,7 @@ def recompute_all_embeddings_and_matches(
         )
         
     except Exception as e:
-        logger.error(f"❌ Error recomputing embeddings: {str(e)}")
+        logger.error(f"  Error recomputing embeddings: {str(e)}")
         import traceback
         logger.error(traceback.format_exc())
         raise HTTPException(
@@ -184,7 +184,7 @@ def clear_chromadb_embeddings(
         }
         
     except Exception as e:
-        logger.error(f"❌ Error clearing ChromaDB: {str(e)}")
+        logger.error(f"  Error clearing ChromaDB: {str(e)}")
         import traceback
         logger.error(traceback.format_exc())
         db.rollback()
@@ -337,7 +337,7 @@ def reindex_all_student_resumes(
                     logger.info(f"✅ Successfully processed: {file_name}")
                     
                 except Exception as e:
-                    logger.error(f"❌ Failed to process {file_name}: {str(e)}")
+                    logger.error(f"  Failed to process {file_name}: {str(e)}")
                     db.rollback()
                     failed += 1
             
@@ -349,7 +349,7 @@ def reindex_all_student_resumes(
                 match_results = EmbeddingRecomputeService.recalculate_all_matches(db)
                 logger.info(f"✅ Matches recalculated: {match_results['successful']}")
             except Exception as e:
-                logger.error(f"❌ Failed to recalculate matches: {str(e)}")
+                logger.error(f"  Failed to recalculate matches: {str(e)}")
         
         # Add to background tasks
         background_tasks.add_task(process_all_resumes)
@@ -362,7 +362,7 @@ def reindex_all_student_resumes(
         }
         
     except Exception as e:
-        logger.error(f"❌ Error starting reindexing: {str(e)}")
+        logger.error(f"  Error starting reindexing: {str(e)}")
         import traceback
         logger.error(traceback.format_exc())
         raise HTTPException(

@@ -141,7 +141,7 @@ const InternshipList = () => {
     const handleEditSubmit = async () => {
         try {
             // Convert required_skills string to array if needed
-            const skills = typeof editFormData.required_skills === 'string' 
+            const skills = typeof editFormData.required_skills === 'string'
                 ? editFormData.required_skills.split(',').map(s => s.trim()).filter(s => s)
                 : editFormData.required_skills;
 
@@ -149,7 +149,7 @@ const InternshipList = () => {
                 ...editFormData,
                 required_skills: skills
             });
-            
+
             setSuccessMessage('Internship updated successfully');
             setShowSuccess(true);
             setEditDialogOpen(false);
@@ -209,12 +209,12 @@ const InternshipList = () => {
                         sx={{
                             '& .MuiOutlinedInput-root': {
                                 borderRadius: 3,
-                                backgroundColor: 'rgba(214, 38, 26, 0.05)',
+                                backgroundColor: 'rgba(76, 175, 80, 0.05)',
                                 '&:hover fieldset': {
-                                    borderColor: '#d32f2f',
+                                    borderColor: '#4caf50',
                                 },
                                 '&.Mui-focused fieldset': {
-                                    borderColor: '#d32f2f',
+                                    borderColor: '#4caf50',
                                 },
                             },
                         }}
@@ -272,12 +272,12 @@ const InternshipList = () => {
                                                         width: 48,
                                                         height: 48,
                                                         borderRadius: 2,
-                                                        background: 'linear-gradient(135deg, #d32f2f 0%, #d32f2fdd 100%)',
+                                                        background: 'linear-gradient(135deg, #4caf50 0%, #45a049 100%)',
                                                         display: 'flex',
                                                         alignItems: 'center',
                                                         justifyContent: 'center',
                                                         mr: 2,
-                                                        boxShadow: '0 4px 12px rgba(211, 10, 10, 0.3)',
+                                                        boxShadow: '0 4px 12px rgba(76, 175, 80, 0.3)',
                                                     }}
                                                 >
                                                     <WorkIcon sx={{ color: 'white', fontSize: 28 }} />
@@ -450,16 +450,16 @@ const InternshipList = () => {
                                                     sx={{
                                                         py: 1.5,
                                                         borderRadius: 2,
-                                                        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                                                        background: 'linear-gradient(135deg, #4caf50 0%, #45a049 100%)',
                                                         fontWeight: 700,
                                                         textTransform: 'none',
                                                         fontSize: '1rem',
-                                                        boxShadow: '0 4px 16px rgba(102, 126, 234, 0.3)',
+                                                        boxShadow: '0 4px 16px rgba(76, 175, 80, 0.3)',
                                                         transition: 'all 0.3s ease',
                                                         '&:hover': {
                                                             transform: 'translateY(-2px)',
-                                                            boxShadow: '0 8px 24px rgba(102, 126, 234, 0.4)',
-                                                            background: 'linear-gradient(135deg, #764ba2 0%, #667eea 100%)',
+                                                            boxShadow: '0 8px 24px rgba(76, 175, 80, 0.4)',
+                                                            background: 'linear-gradient(135deg, #45a049 0%, #4caf50 100%)',
                                                         },
                                                     }}
                                                 >
@@ -483,13 +483,13 @@ const InternshipList = () => {
                 />
 
                 {/* Edit Internship Dialog */}
-                <Dialog 
-                    open={editDialogOpen} 
+                <Dialog
+                    open={editDialogOpen}
                     onClose={() => setEditDialogOpen(false)}
                     maxWidth="md"
                     fullWidth
                 >
-                    <DialogTitle sx={{ 
+                    <DialogTitle sx={{
                         background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
                         color: 'white',
                         fontWeight: 700
@@ -541,8 +541,8 @@ const InternshipList = () => {
                         <TextField
                             fullWidth
                             label="Required Skills (comma-separated)"
-                            value={Array.isArray(editFormData.required_skills) 
-                                ? editFormData.required_skills.join(', ') 
+                            value={Array.isArray(editFormData.required_skills)
+                                ? editFormData.required_skills.join(', ')
                                 : editFormData.required_skills}
                             onChange={(e) => setEditFormData({ ...editFormData, required_skills: e.target.value })}
                             margin="normal"
@@ -550,13 +550,13 @@ const InternshipList = () => {
                         />
                     </DialogContent>
                     <DialogActions sx={{ p: 2 }}>
-                        <Button 
+                        <Button
                             onClick={() => setEditDialogOpen(false)}
                             sx={{ color: '#666' }}
                         >
                             Cancel
                         </Button>
-                        <Button 
+                        <Button
                             onClick={handleEditSubmit}
                             variant="contained"
                             sx={{
@@ -572,13 +572,13 @@ const InternshipList = () => {
                 </Dialog>
 
                 {/* Delete Confirmation Dialog */}
-                <Dialog 
-                    open={deleteDialogOpen} 
+                <Dialog
+                    open={deleteDialogOpen}
                     onClose={() => setDeleteDialogOpen(false)}
                     maxWidth="sm"
                     fullWidth
                 >
-                    <DialogTitle sx={{ 
+                    <DialogTitle sx={{
                         background: 'linear-gradient(135deg, #f5576c 0%, #f093fb 100%)',
                         color: 'white',
                         fontWeight: 700
@@ -589,7 +589,7 @@ const InternshipList = () => {
                         <Typography variant="h6" sx={{ mb: 2 }}>
                             Are you sure you want to delete this internship?
                         </Typography>
-                        
+
                         <Paper sx={{ p: 2, mb: 2, bgcolor: 'rgba(245, 87, 108, 0.1)' }}>
                             <Typography variant="body1" sx={{ fontWeight: 600 }}>
                                 {internshipToDelete?.title}
@@ -602,11 +602,11 @@ const InternshipList = () => {
                         <Typography color="error" sx={{ mb: 1, fontWeight: 600 }}>
                             ⚠️ This action cannot be undone!
                         </Typography>
-                        
+
                         <Typography variant="body2" sx={{ mb: 1 }}>
                             The following data will be permanently deleted:
                         </Typography>
-                        
+
                         <Box component="ul" sx={{ pl: 2, mt: 1 }}>
                             <li><Typography variant="body2">Internship posting</Typography></li>
                             <li><Typography variant="body2">All student applications</Typography></li>
@@ -614,13 +614,13 @@ const InternshipList = () => {
                         </Box>
                     </DialogContent>
                     <DialogActions sx={{ p: 2 }}>
-                        <Button 
+                        <Button
                             onClick={() => setDeleteDialogOpen(false)}
                             sx={{ color: '#666' }}
                         >
                             Cancel
                         </Button>
-                        <Button 
+                        <Button
                             onClick={handleDeleteConfirm}
                             variant="contained"
                             color="error"
@@ -637,13 +637,13 @@ const InternshipList = () => {
                 </Dialog>
 
                 {/* Internship Details Dialog (for Company Users) */}
-                <Dialog 
-                    open={detailsDialogOpen} 
+                <Dialog
+                    open={detailsDialogOpen}
                     onClose={() => setDetailsDialogOpen(false)}
                     maxWidth="md"
                     fullWidth
                 >
-                    <DialogTitle sx={{ 
+                    <DialogTitle sx={{
                         background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
                         color: 'white',
                         fontWeight: 700
@@ -656,7 +656,7 @@ const InternshipList = () => {
                                 <Typography variant="h5" fontWeight="bold" gutterBottom>
                                     {selectedInternship.title}
                                 </Typography>
-                                
+
                                 <Box sx={{ mb: 3 }}>
                                     <Typography variant="body2" color="text.secondary" gutterBottom>
                                         Company: {selectedInternship.company_name || 'Your Company'}
@@ -756,7 +756,7 @@ const InternshipList = () => {
 
                                 <Box sx={{ mt: 3, p: 2, backgroundColor: '#f9fafb', borderRadius: 2 }}>
                                     <Typography variant="caption" color="text.secondary">
-                                        Posted on: {new Date(selectedInternship.created_at).toLocaleDateString()} | 
+                                        Posted on: {new Date(selectedInternship.created_at).toLocaleDateString()} |
                                         Status: {selectedInternship.is_active ? ' Active' : ' Inactive'}
                                     </Typography>
                                 </Box>
@@ -764,10 +764,10 @@ const InternshipList = () => {
                         )}
                     </DialogContent>
                     <DialogActions sx={{ p: 2 }}>
-                        <Button 
+                        <Button
                             onClick={() => setDetailsDialogOpen(false)}
                             variant="outlined"
-                            sx={{ 
+                            sx={{
                                 color: '#667eea',
                                 borderColor: '#667eea',
                                 '&:hover': {
@@ -778,7 +778,7 @@ const InternshipList = () => {
                         >
                             Close
                         </Button>
-                        <Button 
+                        <Button
                             onClick={() => {
                                 setDetailsDialogOpen(false);
                                 handleEditClick(selectedInternship);

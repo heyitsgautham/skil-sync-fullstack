@@ -38,7 +38,7 @@ def test_basic_generation():
         return True
         
     except Exception as e:
-        print(f"❌ FAILED: {str(e)}")
+        print(f"  FAILED: {str(e)}")
         return False
 
 
@@ -70,7 +70,7 @@ def test_multiple_purposes():
             print(f"✅ {purpose}: {response}")
             results.append(True)
         except Exception as e:
-            print(f"❌ {purpose} failed: {str(e)}")
+            print(f"  {purpose} failed: {str(e)}")
             results.append(False)
     
     success_rate = sum(results) / len(results) * 100
@@ -122,7 +122,7 @@ Return ONLY valid JSON in this format:
         return True
         
     except Exception as e:
-        print(f"❌ FAILED: {str(e)}")
+        print(f"  FAILED: {str(e)}")
         return False
 
 
@@ -154,7 +154,7 @@ def test_retry_mechanism():
         return True
         
     except Exception as e:
-        print(f"❌ FAILED: {str(e)}")
+        print(f"  FAILED: {str(e)}")
         return False
 
 
@@ -184,11 +184,11 @@ def test_streaming():
             print(f"✅ SUCCESS: Received {len(chunks)} chunks")
             return True
         else:
-            print("❌ FAILED: No chunks received")
+            print("  FAILED: No chunks received")
             return False
         
     except Exception as e:
-        print(f"❌ FAILED: {str(e)}")
+        print(f"  FAILED: {str(e)}")
         return False
 
 
@@ -212,7 +212,7 @@ def run_all_tests():
             result = test_func()
             results.append((test_name, result))
         except Exception as e:
-            print(f"\n❌ {test_name} crashed: {str(e)}")
+            print(f"\n  {test_name} crashed: {str(e)}")
             results.append((test_name, False))
     
     # Print summary
@@ -221,7 +221,7 @@ def run_all_tests():
     print("=" * 80)
     
     for test_name, result in results:
-        status = "✅ PASSED" if result else "❌ FAILED"
+        status = "✅ PASSED" if result else "  FAILED"
         print(f"{status}: {test_name}")
     
     passed = sum(1 for _, r in results if r)

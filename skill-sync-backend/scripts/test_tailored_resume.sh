@@ -35,7 +35,7 @@ LOGIN_RESPONSE=$(curl -s -X POST "${BASE_URL}/api/auth/login" \
 TOKEN=$(echo $LOGIN_RESPONSE | grep -o '"token":"[^"]*' | cut -d'"' -f4)
 
 if [ -z "$TOKEN" ]; then
-    echo "${RED}❌ Login failed${NC}"
+    echo "${RED}  Login failed${NC}"
     echo "Response: $LOGIN_RESPONSE"
     exit 1
 else
@@ -51,7 +51,7 @@ INTERNSHIPS=$(curl -s -X GET "${BASE_URL}/api/internship/list" \
 INTERNSHIP_ID=$(echo $INTERNSHIPS | grep -o '"id":[0-9]*' | head -1 | cut -d':' -f2)
 
 if [ -z "$INTERNSHIP_ID" ]; then
-    echo "${RED}❌ No internships found${NC}"
+    echo "${RED}  No internships found${NC}"
     exit 1
 else
     echo "${GREEN}✅ Found internship ID: ${INTERNSHIP_ID}${NC}"
@@ -73,7 +73,7 @@ if [ "$USED_TAILORED" = "0" ]; then
     echo "${GREEN}✅ Application created with base resume (used_tailored_resume=0)${NC}"
     echo "   Match Score: ${MATCH_SCORE}%"
 else
-    echo "${RED}❌ Expected used_tailored_resume=0, got ${USED_TAILORED}${NC}"
+    echo "${RED}  Expected used_tailored_resume=0, got ${USED_TAILORED}${NC}"
 fi
 echo ""
 
@@ -119,7 +119,7 @@ else
         echo "${GREEN}✅ Application created with tailored resume (used_tailored_resume=1)${NC}"
         echo "   Match Score: ${MATCH_SCORE_2}%"
     else
-        echo "${RED}❌ Expected used_tailored_resume=1, got ${USED_TAILORED_2}${NC}"
+        echo "${RED}  Expected used_tailored_resume=1, got ${USED_TAILORED_2}${NC}"
         echo "Response: $APPLY_RESPONSE_2"
     fi
 fi

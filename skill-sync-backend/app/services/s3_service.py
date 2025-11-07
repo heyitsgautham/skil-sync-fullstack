@@ -42,7 +42,7 @@ class S3Service:
                 self.enabled = True
                 logger.info("✅ S3 Service initialized successfully")
             except Exception as e:
-                logger.error(f"❌ Failed to initialize S3 client: {str(e)}")
+                logger.error(f"  Failed to initialize S3 client: {str(e)}")
                 self.s3_client = None
                 self.enabled = False
     
@@ -105,10 +105,10 @@ class S3Service:
             return s3_key
             
         except ClientError as e:
-            logger.error(f"❌ S3 upload failed: {str(e)}")
+            logger.error(f"  S3 upload failed: {str(e)}")
             return None
         except Exception as e:
-            logger.error(f"❌ Unexpected error during S3 upload: {str(e)}")
+            logger.error(f"  Unexpected error during S3 upload: {str(e)}")
             return None
     
     def generate_presigned_url(
@@ -137,7 +137,7 @@ class S3Service:
             return url
             
         except Exception as e:
-            logger.error(f"❌ Unexpected error generating URL: {str(e)}")
+            logger.error(f"  Unexpected error generating URL: {str(e)}")
             return None
     
     def delete_resume(self, s3_key: str) -> bool:
@@ -163,10 +163,10 @@ class S3Service:
             return True
             
         except ClientError as e:
-            logger.error(f"❌ Failed to delete from S3: {str(e)}")
+            logger.error(f"  Failed to delete from S3: {str(e)}")
             return False
         except Exception as e:
-            logger.error(f"❌ Unexpected error deleting from S3: {str(e)}")
+            logger.error(f"  Unexpected error deleting from S3: {str(e)}")
             return False
     
     def download_resume(self, s3_key: str, local_path: str) -> bool:
@@ -198,10 +198,10 @@ class S3Service:
             return True
             
         except ClientError as e:
-            logger.error(f"❌ Failed to download from S3: {str(e)}")
+            logger.error(f"  Failed to download from S3: {str(e)}")
             return False
         except Exception as e:
-            logger.error(f"❌ Unexpected error downloading from S3: {str(e)}")
+            logger.error(f"  Unexpected error downloading from S3: {str(e)}")
             return False
     
     def _get_content_type(self, filename: str) -> str:

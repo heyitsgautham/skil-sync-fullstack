@@ -98,12 +98,12 @@ Only include snippets that clearly demonstrate the skill. If no evidence found f
             return evidences
             
         except json.JSONDecodeError as e:
-            logger.error(f"❌ Failed to parse Gemini response as JSON: {e}")
+            logger.error(f"  Failed to parse Gemini response as JSON: {e}")
             # Return empty evidence for all skills
             return {skill: [] for skill in skills}
             
         except Exception as e:
-            logger.error(f"❌ Error extracting skill provenance: {e}")
+            logger.error(f"  Error extracting skill provenance: {e}")
             return {skill: [] for skill in skills}
     
     def extract_experience_provenance(
@@ -186,11 +186,11 @@ Extract all relevant details from the resume text.
             return evidences
             
         except json.JSONDecodeError as e:
-            logger.error(f"❌ Failed to parse Gemini response as JSON: {e}")
+            logger.error(f"  Failed to parse Gemini response as JSON: {e}")
             return []
             
         except Exception as e:
-            logger.error(f"❌ Error extracting experience provenance: {e}")
+            logger.error(f"  Error extracting experience provenance: {e}")
             return []
     
     def extract_project_provenance(
@@ -273,11 +273,11 @@ Extract all relevant technical details.
             return evidences
             
         except json.JSONDecodeError as e:
-            logger.error(f"❌ Failed to parse Gemini response as JSON: {e}")
+            logger.error(f"  Failed to parse Gemini response as JSON: {e}")
             return []
             
         except Exception as e:
-            logger.error(f"❌ Error extracting project provenance: {e}")
+            logger.error(f"  Error extracting project provenance: {e}")
             return []
     
     def calculate_extraction_confidence(
@@ -380,7 +380,7 @@ Extract all relevant technical details.
             resume = db_session.query(Resume).filter(Resume.id == resume_id).first()
             
             if not resume:
-                logger.error(f"❌ Resume {resume_id} not found")
+                logger.error(f"  Resume {resume_id} not found")
                 return False
             
             # Store provenance data
@@ -402,7 +402,7 @@ Extract all relevant technical details.
             return True
             
         except Exception as e:
-            logger.error(f"❌ Error storing provenance: {e}")
+            logger.error(f"  Error storing provenance: {e}")
             db_session.rollback()
             return False
 

@@ -32,7 +32,7 @@ def check_dependencies():
             __import__(module)
             print(f"✅ {package} installed")
         except ImportError:
-            print(f"❌ {package} NOT installed")
+            print(f"  {package} NOT installed")
             missing.append(package)
     
     if missing:
@@ -54,7 +54,7 @@ def check_env_configuration():
     DATABASE_URL = os.getenv("DATABASE_URL")
     
     if not DATABASE_URL:
-        print("❌ DATABASE_URL not found in .env file")
+        print("  DATABASE_URL not found in .env file")
         return False
     
     print(f"✅ DATABASE_URL found in .env")
@@ -120,7 +120,7 @@ def test_database_connection():
         return True
         
     except Exception as e:
-        print(f"\n❌ Connection failed!")
+        print(f"\n  Connection failed!")
         print(f"   Error: {str(e)}")
         print("\n   Common solutions:")
         print("   1. Ensure PostgreSQL is running")
@@ -167,7 +167,7 @@ def test_table_creation():
         return True
         
     except Exception as e:
-        print(f"\n❌ Table creation failed!")
+        print(f"\n  Table creation failed!")
         print(f"   Error: {str(e)}")
         return False
 
@@ -232,10 +232,10 @@ if __name__ == "__main__":
     try:
         sys.exit(main())
     except KeyboardInterrupt:
-        print("\n\n❌ Setup cancelled by user")
+        print("\n\n  Setup cancelled by user")
         sys.exit(1)
     except Exception as e:
-        print(f"\n❌ Unexpected error: {e}")
+        print(f"\n  Unexpected error: {e}")
         import traceback
         traceback.print_exc()
         sys.exit(1)

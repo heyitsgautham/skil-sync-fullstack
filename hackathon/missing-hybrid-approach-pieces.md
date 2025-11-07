@@ -16,7 +16,7 @@ We implemented the **hybrid matching infrastructure**, but only **Strategy A (Pr
 - Created batch matching service for pre-computing similarities
 - Updated ranking to use hybrid scoring
 
-❌ **What's Missing:**
+  **What's Missing:**
 - **No UI for students to upload tailored resume when applying**
 - **No backend endpoint modification to accept tailored resume during application**
 - The `used_tailored_resume` field exists but is always `False`
@@ -210,9 +210,9 @@ function InternshipApplication({ internshipId }) {
 ## Summary
 
 **Current State:** We have the database fields and infrastructure ready, but:
-- ❌ Students can only apply with their active resume
-- ❌ No UI option to upload tailored resume
-- ❌ `used_tailored_resume` is always `False`
+-   Students can only apply with their active resume
+-   No UI option to upload tailored resume
+-   `used_tailored_resume` is always `False`
 - ✅ Hybrid scoring works (but only falls back to base similarity since no tailored resumes exist)
 
 **To Complete the Full Hybrid Strategy:**

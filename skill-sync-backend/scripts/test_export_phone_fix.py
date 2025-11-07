@@ -23,7 +23,7 @@ def get_auth_token(email, password):
     if response.status_code == 200:
         return response.json()["access_token"]
     else:
-        print(f"❌ Login failed: {response.text}")
+        print(f"  Login failed: {response.text}")
         return None
 
 def get_company_internships(token):
@@ -34,7 +34,7 @@ def get_company_internships(token):
     if response.status_code == 200:
         return response.json()
     else:
-        print(f"❌ Failed to get internships: {response.text}")
+        print(f"  Failed to get internships: {response.text}")
         return []
 
 def test_export(token, internship_id, format_type):
@@ -98,7 +98,7 @@ def test_export(token, internship_id, format_type):
         
         return True
     else:
-        print(f"❌ Export failed: {response.status_code}")
+        print(f"  Export failed: {response.status_code}")
         print(f"   Response: {response.text}")
         return False
 
@@ -115,7 +115,7 @@ def main():
     token = get_auth_token(COMPANY_EMAIL, COMPANY_PASSWORD)
     
     if not token:
-        print("\n❌ Failed to authenticate. Please check credentials.")
+        print("\n  Failed to authenticate. Please check credentials.")
         return
     
     print("✅ Authentication successful!")
@@ -125,7 +125,7 @@ def main():
     internships = get_company_internships(token)
     
     if not internships:
-        print("❌ No internships found or failed to fetch")
+        print("  No internships found or failed to fetch")
         return
     
     print(f"✅ Found {len(internships)} internship(s)")
@@ -156,6 +156,6 @@ if __name__ == "__main__":
     except KeyboardInterrupt:
         print("\n\n⚠️  Test interrupted by user")
     except Exception as e:
-        print(f"\n\n❌ Error: {str(e)}")
+        print(f"\n\n  Error: {str(e)}")
         import traceback
         traceback.print_exc()

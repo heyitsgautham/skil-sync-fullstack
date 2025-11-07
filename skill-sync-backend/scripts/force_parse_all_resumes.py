@@ -66,7 +66,7 @@ def main():
                 file_path = base_path / resume.file_path
                 
                 if not file_path.exists():
-                    print(f"❌ File not found: {student.full_name} - {file_path}")
+                    print(f"  File not found: {student.full_name} - {file_path}")
                     error_count += 1
                     continue
                 
@@ -74,7 +74,7 @@ def main():
                 content = read_resume_file(file_path)
                 
                 if not content:
-                    print(f"❌ Could not read: {student.full_name}")
+                    print(f"  Could not read: {student.full_name}")
                     error_count += 1
                     continue
                 
@@ -121,7 +121,7 @@ def main():
                 db.commit()
                 
             except Exception as e:
-                print(f"❌ Error processing {student.full_name}: {str(e)[:100]}")
+                print(f"  Error processing {student.full_name}: {str(e)[:100]}")
                 error_count += 1
                 db.rollback()
                 continue
@@ -130,7 +130,7 @@ def main():
         print("PARSING COMPLETE")
         print("="*80)
         print(f"✅ Successfully parsed: {parsed_count}")
-        print(f"❌ Errors: {error_count}")
+        print(f"  Errors: {error_count}")
         print(f"📊 Total: {len(resumes)}\n")
         
         # Verify ChromaDB
@@ -138,7 +138,7 @@ def main():
         print(f"📊 Resumes in ChromaDB: {count}\n")
         
     except Exception as e:
-        print(f"\n❌ Fatal error: {e}")
+        print(f"\n  Fatal error: {e}")
         import traceback
         traceback.print_exc()
         db.rollback()
