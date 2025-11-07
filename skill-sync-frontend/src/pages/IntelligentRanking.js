@@ -962,49 +962,125 @@ const IntelligentRanking = () => {
                                             </Typography>
                                         </AccordionSummary>
                                         <AccordionDetails>
-                                            {/* Matched Skills */}
-                                            {candidate.match_details.matched_skills?.length > 0 && (
-                                                <Box sx={{ mb: 2 }}>
-                                                    <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-                                                        <CheckCircleIcon sx={{ color: 'success.main', mr: 1 }} />
-                                                        <Typography variant="subtitle2" fontWeight="bold">
-                                                            Matched Skills ({candidate.match_details.matched_skills.length})
-                                                        </Typography>
-                                                    </Box>
-                                                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
-                                                        {candidate.match_details.matched_skills.map((skill) => (
-                                                            <Chip
-                                                                key={skill}
-                                                                label={skill}
-                                                                size="small"
-                                                                sx={{ backgroundColor: '#dcfce7', color: '#166534' }}
-                                                            />
-                                                        ))}
-                                                    </Box>
-                                                </Box>
-                                            )}
+                                            <Grid container spacing={3}>
+                                                {/* Required Skills Section */}
+                                                <Grid size={{ xs: 12, md: 6 }}>
+                                                    <Typography variant="subtitle2" fontWeight="bold" sx={{ mb: 2, color: '#1976d2' }}>
+                                                        🎯 Required Skills
+                                                    </Typography>
+                                                    
+                                                    {/* Matched Required Skills */}
+                                                    {candidate.match_details.matched_required_skills?.length > 0 && (
+                                                        <Box sx={{ mb: 2 }}>
+                                                            <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+                                                                <CheckCircleIcon sx={{ color: 'success.main', mr: 1, fontSize: '1rem' }} />
+                                                                <Typography variant="body2" fontWeight="bold">
+                                                                    Matched ({candidate.match_details.matched_required_skills.length})
+                                                                </Typography>
+                                                            </Box>
+                                                            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+                                                                {candidate.match_details.matched_required_skills.map((skill) => (
+                                                                    <Chip
+                                                                        key={skill}
+                                                                        label={skill}
+                                                                        size="small"
+                                                                        sx={{ backgroundColor: '#dcfce7', color: '#166534' }}
+                                                                    />
+                                                                ))}
+                                                            </Box>
+                                                        </Box>
+                                                    )}
 
-                                            {/* Missing Skills */}
-                                            {candidate.match_details.missing_skills?.length > 0 && (
-                                                <Box>
-                                                    <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-                                                        <CancelIcon sx={{ color: 'error.main', mr: 1 }} />
-                                                        <Typography variant="subtitle2" fontWeight="bold">
-                                                            Missing Skills ({candidate.match_details.missing_skills.length})
+                                                    {/* Missing Required Skills */}
+                                                    {candidate.match_details.missing_required_skills?.length > 0 && (
+                                                        <Box>
+                                                            <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+                                                                <CancelIcon sx={{ color: 'error.main', mr: 1, fontSize: '1rem' }} />
+                                                                <Typography variant="body2" fontWeight="bold">
+                                                                    Missing ({candidate.match_details.missing_required_skills.length})
+                                                                </Typography>
+                                                            </Box>
+                                                            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+                                                                {candidate.match_details.missing_required_skills.map((skill) => (
+                                                                    <Chip
+                                                                        key={skill}
+                                                                        label={skill}
+                                                                        size="small"
+                                                                        sx={{ backgroundColor: '#fee2e2', color: '#991b1b' }}
+                                                                    />
+                                                                ))}
+                                                            </Box>
+                                                        </Box>
+                                                    )}
+                                                    
+                                                    {/* No Required Skills */}
+                                                    {(!candidate.match_details.matched_required_skills || candidate.match_details.matched_required_skills.length === 0) && 
+                                                     (!candidate.match_details.missing_required_skills || candidate.match_details.missing_required_skills.length === 0) && (
+                                                        <Typography variant="body2" color="text.secondary">
+                                                            No required skills specified
                                                         </Typography>
-                                                    </Box>
-                                                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
-                                                        {candidate.match_details.missing_skills.map((skill) => (
-                                                            <Chip
-                                                                key={skill}
-                                                                label={skill}
-                                                                size="small"
-                                                                sx={{ backgroundColor: '#fee2e2', color: '#991b1b' }}
-                                                            />
-                                                        ))}
-                                                    </Box>
-                                                </Box>
-                                            )}
+                                                    )}
+                                                </Grid>
+
+                                                {/* Preferred Skills Section */}
+                                                <Grid size={{ xs: 12, md: 6 }}>
+                                                    <Typography variant="subtitle2" fontWeight="bold" sx={{ mb: 2, color: '#9c27b0' }}>
+                                                        ⭐ Preferred Skills
+                                                    </Typography>
+                                                    
+                                                    {/* Matched Preferred Skills */}
+                                                    {candidate.match_details.matched_preferred_skills?.length > 0 && (
+                                                        <Box sx={{ mb: 2 }}>
+                                                            <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+                                                                <CheckCircleIcon sx={{ color: 'success.main', mr: 1, fontSize: '1rem' }} />
+                                                                <Typography variant="body2" fontWeight="bold">
+                                                                    Matched ({candidate.match_details.matched_preferred_skills.length})
+                                                                </Typography>
+                                                            </Box>
+                                                            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+                                                                {candidate.match_details.matched_preferred_skills.map((skill) => (
+                                                                    <Chip
+                                                                        key={skill}
+                                                                        label={skill}
+                                                                        size="small"
+                                                                        sx={{ backgroundColor: '#f3e5f5', color: '#6a1b9a' }}
+                                                                    />
+                                                                ))}
+                                                            </Box>
+                                                        </Box>
+                                                    )}
+
+                                                    {/* Missing Preferred Skills */}
+                                                    {candidate.match_details.missing_preferred_skills?.length > 0 && (
+                                                        <Box>
+                                                            <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+                                                                <CancelIcon sx={{ color: 'warning.main', mr: 1, fontSize: '1rem' }} />
+                                                                <Typography variant="body2" fontWeight="bold">
+                                                                    Missing ({candidate.match_details.missing_preferred_skills.length})
+                                                                </Typography>
+                                                            </Box>
+                                                            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+                                                                {candidate.match_details.missing_preferred_skills.map((skill) => (
+                                                                    <Chip
+                                                                        key={skill}
+                                                                        label={skill}
+                                                                        size="small"
+                                                                        sx={{ backgroundColor: '#fff3e0', color: '#e65100' }}
+                                                                    />
+                                                                ))}
+                                                            </Box>
+                                                        </Box>
+                                                    )}
+                                                    
+                                                    {/* No Preferred Skills */}
+                                                    {(!candidate.match_details.matched_preferred_skills || candidate.match_details.matched_preferred_skills.length === 0) && 
+                                                     (!candidate.match_details.missing_preferred_skills || candidate.match_details.missing_preferred_skills.length === 0) && (
+                                                        <Typography variant="body2" color="text.secondary">
+                                                            No preferred skills specified
+                                                        </Typography>
+                                                    )}
+                                                </Grid>
+                                            </Grid>
                                         </AccordionDetails>
                                     </Accordion>
 

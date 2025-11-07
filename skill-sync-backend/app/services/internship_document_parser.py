@@ -97,8 +97,8 @@ class InternshipDocumentParser:
             Dictionary with internship details:
             - title: Job title/position
             - description: Full job description
-            - required_skills: List of must-have skills
-            - preferred_skills: List of nice-to-have skills
+            - required_skills: Empty array (skills should be manually added)
+            - preferred_skills: Empty array (skills should be manually added)
             - location: Work location (city/remote/hybrid)
             - duration: Internship duration (e.g., "3 months", "Summer 2025")
             - stipend: Stipend/compensation information
@@ -108,6 +108,9 @@ class InternshipDocumentParser:
             - start_date: Expected start date
             - application_deadline: Application deadline
             - company_info: Brief company description if mentioned
+            
+        Note: Skills are NOT automatically extracted to ensure accuracy.
+              Companies should manually input required and preferred skills.
         """
         prompt = f"""
 You are an expert job description analyzer. Extract structured internship information from this document.
@@ -115,7 +118,7 @@ You are an expert job description analyzer. Extract structured internship inform
 IMPORTANT RULES:
 1. Extract the job TITLE/POSITION (e.g., "Software Engineering Intern", "Data Science Intern")
 2. Extract FULL job DESCRIPTION (include responsibilities, qualifications, benefits)
-3. Categorize skills into REQUIRED (must-have) and PREFERRED (nice-to-have)
+3. DO NOT extract or categorize skills - leave required_skills and preferred_skills as empty arrays
 4. Extract LOCATION (city, remote, hybrid, on-site)
 5. Extract DURATION (e.g., "3 months", "6 months", "Summer 2025", "Jan-May 2025")
 6. Extract STIPEND/COMPENSATION (monthly amount, total amount, or "Unpaid" if not mentioned)
@@ -128,8 +131,8 @@ Return ONLY valid JSON in this exact format:
 {{
   "title": "Job Title",
   "description": "Full job description with responsibilities and qualifications",
-  "required_skills": ["skill1", "skill2", ...],
-  "preferred_skills": ["skill1", "skill2", ...],
+  "required_skills": [],
+  "preferred_skills": [],
   "location": "City, State or Remote or Hybrid",
   "duration": "Duration string (e.g., '3 months', 'Summer 2025')",
   "stipend": "Compensation details or 'Unpaid' or null",
@@ -173,7 +176,11 @@ Return ONLY the JSON object, no markdown, no explanation.
             # Validate and set defaults
             structured_data = self._validate_and_normalize(structured_data, document_text)
             
-            logger.info(f"✅ Extracted internship: '{structured_data.get('title')}' with {len(structured_data.get('required_skills', []))} required skills")
+            # Force empty skills arrays (skills should be manually added by user)
+            structured_data['required_skills'] = []
+            structured_data['preferred_skills'] = []
+            
+            logger.info(f"✅ Extracted internship: '{structured_data.get('title')}' (skills extraction skipped - will be manually added)")
             return structured_data
             
         except json.JSONDecodeError as e:
@@ -263,12 +270,12 @@ Return ONLY the JSON object, no markdown, no explanation.
                     title = line
                     break
         
-        logger.warning("⚠️ Using fallback structure - AI parsing failed")
+        logger.warning("⚠️ Using fallback structure - AI parsing failed (skills will be manually added)")
         
         return {
             "title": title,
             "description": document_text[:2000],  # Use first 2000 chars
-            "required_skills": self._extract_skills_basic(document_text),
+            "required_skills": [],  # No auto-extraction, manual input required
             "preferred_skills": [],
             "location": None,
             "duration": None,
