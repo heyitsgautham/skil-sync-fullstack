@@ -108,11 +108,19 @@ async def rank_candidates_for_internship(
     include_explanations: bool = True,
     limit: int = 50,
     only_applicants: bool = False,
+    # Filter parameters
+    min_match_score: Optional[float] = Query(None, ge=0, le=100, description="Minimum match score percentage"),
+    max_match_score: Optional[float] = Query(None, ge=0, le=100, description="Maximum match score percentage"),
+    min_experience: Optional[float] = Query(None, ge=0, description="Minimum years of experience"),
+    max_experience: Optional[float] = Query(None, ge=0, description="Maximum years of experience"),
+    filter_skills: Optional[str] = Query(None, description="Comma-separated list of required skills"),
+    education_level: Optional[str] = Query(None, description="Minimum education level (Bachelor, Master, PhD)"),
+    exclude_flagged: bool = Query(False, description="Exclude flagged candidates from results"),
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_company)
 ):
     """
-    Rank candidates for an internship using HYBRID MATCHING strategy
+    Rank candidates for an internship using HYBRID MATCHING strategy with advanced filtering
     
     NEW HYBRID APPROACH (5-minute → seconds performance improvement):
     1. For APPLICANTS: Uses application_similarity_score (70% weight) + base_similarity (30% weight)
@@ -124,6 +132,15 @@ async def rank_candidates_for_internship(
     - **limit**: Maximum number of candidates to return (default: 50)
     - **include_explanations**: Include detailed scoring breakdown (default: True)
     
+    Filter Parameters (Slider-based filtering):
+    - **min_match_score**: Minimum match percentage (0-100)
+    - **max_match_score**: Maximum match percentage (0-100)
+    - **min_experience**: Minimum years of experience
+    - **max_experience**: Maximum years of experience
+    - **required_skills**: Filter by specific skills (comma-separated)
+    - **education_level**: Minimum education level (Bachelor, Master, PhD)
+    - **exclude_flagged**: Exclude flagged candidates
+    
     Scoring Components:
     - Application Similarity (70%): Score calculated when student applied
     - Base Similarity (30%): Pre-computed discovery score
@@ -134,6 +151,8 @@ async def rank_candidates_for_internship(
     
     try:
         logger.info(f"🔍 Ranking candidates for internship {internship_id} (only_applicants={only_applicants})")
+        logger.info(f"🚩 exclude_flagged parameter: {exclude_flagged}")
+        logger.info(f"🎯 Filter params: min_match={min_match_score}, max_match={max_match_score}, min_exp={min_experience}, max_exp={max_experience}")
         
         from app.models.student_internship_match import StudentInternshipMatch
         
@@ -385,18 +404,72 @@ async def rank_candidates_for_internship(
             
             # Sort by score
             ranked_candidates.sort(key=lambda x: x['overall_score'], reverse=True)
-            ranked_candidates = ranked_candidates[:limit]
             
-            # Count how many have tailored resumes
-            tailored_count = sum(1 for c in ranked_candidates if c['scoring_breakdown']['has_tailored'])
+            # Apply filters before limiting results
+            filtered_candidates = ranked_candidates
             
-            # ✨ ADD FLAGGING INFORMATION
+            # Filter by match score
+            if min_match_score is not None:
+                filtered_candidates = [c for c in filtered_candidates if c['match_score'] >= min_match_score]
+                logger.info(f"🔍 Filter: min_match_score >= {min_match_score} → {len(filtered_candidates)} candidates")
+            
+            if max_match_score is not None:
+                filtered_candidates = [c for c in filtered_candidates if c['match_score'] <= max_match_score]
+                logger.info(f"🔍 Filter: max_match_score <= {max_match_score} → {len(filtered_candidates)} candidates")
+            
+            # Filter by experience
+            if min_experience is not None:
+                filtered_candidates = [c for c in filtered_candidates if c['total_experience_years'] >= min_experience]
+                logger.info(f"🔍 Filter: min_experience >= {min_experience} years → {len(filtered_candidates)} candidates")
+            
+            if max_experience is not None:
+                filtered_candidates = [c for c in filtered_candidates if c['total_experience_years'] <= max_experience]
+                logger.info(f"🔍 Filter: max_experience <= {max_experience} years → {len(filtered_candidates)} candidates")
+            
+            # Filter by required skills
+            if filter_skills:
+                filter_skills_list = [s.strip().lower() for s in filter_skills.split(',')]
+                filtered_candidates = [
+                    c for c in filtered_candidates 
+                    if all(any(req_skill in skill.lower() for skill in c['skills']) for req_skill in filter_skills_list)
+                ]
+                logger.info(f"🔍 Filter: required_skills = {filter_skills_list} → {len(filtered_candidates)} candidates")
+            
+            # Filter by education level
+            if education_level:
+                education_hierarchy = {'bachelor': 1, 'master': 2, 'phd': 3, 'doctorate': 3}
+                min_level = education_hierarchy.get(education_level.lower(), 0)
+                
+                def get_highest_education(candidate):
+                    """Extract highest education level from candidate data"""
+                    personal_info = candidate.get('personal_info', {})
+                    education = personal_info.get('education', [])
+                    if not education:
+                        return 0
+                    
+                    max_level = 0
+                    for edu in education:
+                        degree = edu.get('degree', '').lower()
+                        for level_name, level_value in education_hierarchy.items():
+                            if level_name in degree:
+                                max_level = max(max_level, level_value)
+                    return max_level
+                
+                filtered_candidates = [
+                    c for c in filtered_candidates 
+                    if get_highest_education(c) >= min_level
+                ]
+                logger.info(f"🔍 Filter: education_level >= {education_level} → {len(filtered_candidates)} candidates")
+            
+            # ✨ ADD FLAGGING INFORMATION FIRST (before exclude_flagged filter)
             logger.info("🚩 Detecting flagged candidates...")
-            candidate_ids = [c['candidate_id'] for c in ranked_candidates]
+            candidate_ids = [c['candidate_id'] for c in filtered_candidates]
+            logger.info(f"🔍 Checking flag info for {len(candidate_ids)} candidates: {candidate_ids[:5]}...")
             flag_info = CandidateFlaggingService.get_flag_info_for_candidates(candidate_ids, db)
+            logger.info(f"🚩 Flag info returned for {len(flag_info)} candidates")
             
             # Add flag info to each candidate
-            for candidate in ranked_candidates:
+            for candidate in filtered_candidates:
                 candidate_id = candidate['candidate_id']
                 if candidate_id in flag_info:
                     candidate['is_flagged'] = True
@@ -405,22 +478,65 @@ async def rank_candidates_for_internship(
                     candidate['flag_reason_text'] = CandidateFlaggingService.format_flag_reason(
                         flag_info[candidate_id]['reasons']
                     )
+                    logger.info(f"✅ Candidate {candidate_id} is FLAGGED: {candidate['flag_reason_text']}")
                 else:
                     candidate['is_flagged'] = False
                     candidate['flag_reasons'] = []
                     candidate['flagged_with'] = {}
                     candidate['flag_reason_text'] = None
             
-            flagged_count = sum(1 for c in ranked_candidates if c['is_flagged'])
-            logger.info(f"🚩 Found {flagged_count} flagged candidates out of {len(ranked_candidates)}")
+            total_flagged_count = sum(1 for c in filtered_candidates if c['is_flagged'])
+            logger.info(f"🚩 Found {total_flagged_count} flagged candidates out of {len(filtered_candidates)} total")
+            
+            # NOW filter out flagged candidates if requested (is_flagged property exists now)
+            if exclude_flagged:
+                pre_filter_count = len(filtered_candidates)
+                # Log which candidates are being filtered out
+                flagged_to_remove = [c for c in filtered_candidates if c.get('is_flagged', False)]
+                logger.info(f"🚫 About to filter out {len(flagged_to_remove)} flagged candidates: {[c['candidate_id'] for c in flagged_to_remove]}")
+                
+                filtered_candidates = [c for c in filtered_candidates if not c.get('is_flagged', False)]
+                logger.info(f"🔍 Filter: exclude_flagged=True → removed {pre_filter_count - len(filtered_candidates)} flagged candidates → {len(filtered_candidates)} remaining")
+                logger.info(f"🚫 Excluded candidates with is_flagged=True")
+            else:
+                logger.info(f"🔍 Filter: exclude_flagged=False → keeping all candidates including {total_flagged_count} flagged")
+            
+            # Now apply limit
+            filtered_candidates = filtered_candidates[:limit]
+            
+            # Count how many have tailored resumes
+            tailored_count = sum(1 for c in filtered_candidates if c['scoring_breakdown']['has_tailored'])
+            
+            # Count flagged in final results
+            flagged_count = sum(1 for c in filtered_candidates if c['is_flagged'])
+            logger.info(f"🚩 Final results contain {flagged_count} flagged candidates out of {len(filtered_candidates)}")
+            
+            # Prepare filter summary
+            filters_applied = []
+            if min_match_score is not None:
+                filters_applied.append(f"match_score >= {min_match_score}%")
+            if max_match_score is not None:
+                filters_applied.append(f"match_score <= {max_match_score}%")
+            if min_experience is not None:
+                filters_applied.append(f"experience >= {min_experience} years")
+            if max_experience is not None:
+                filters_applied.append(f"experience <= {max_experience} years")
+            if filter_skills:
+                filters_applied.append(f"skills contain: {filter_skills}")
+            if education_level:
+                filters_applied.append(f"education >= {education_level}")
+            if exclude_flagged:
+                filters_applied.append("excluding flagged candidates")
             
             return {
                 "success": True,
-                "message": f"Ranked {len(ranked_candidates)} applicants using dual resume analysis",
-                "total_candidates": len(ranked_candidates),
-                "ranked_candidates": ranked_candidates,
+                "message": f"Ranked {len(filtered_candidates)} applicants using dual resume analysis",
+                "total_candidates": len(filtered_candidates),
+                "total_before_filter": len(ranked_candidates),
+                "filters_applied": filters_applied,
+                "ranked_candidates": filtered_candidates,
                 "anonymization_enabled": current_user.anonymization_enabled if hasattr(current_user, 'anonymization_enabled') else False,
-                "performance_note": f"✨ Dual resume analysis: {tailored_count} with tailored resumes, {len(ranked_candidates) - tailored_count} with base only",
+                "performance_note": f"✨ Dual resume analysis: {tailored_count} with tailored resumes, {len(filtered_candidates) - tailored_count} with base only",
                 "methodology": "Combines base resume (20%) + tailored resume (80%) when available",
                 "flagged_candidates_count": flagged_count
             }
@@ -543,13 +659,69 @@ async def rank_candidates_for_internship(
                 else:
                     candidate['scoring_breakdown']['has_tailored'] = False
             
-            # ✨ ADD FLAGGING INFORMATION
+            # Apply filters before limiting results
+            filtered_candidates = ranked_candidates
+            
+            # Filter by match score
+            if min_match_score is not None:
+                filtered_candidates = [c for c in filtered_candidates if c['match_score'] >= min_match_score]
+                logger.info(f"🔍 Filter: min_match_score >= {min_match_score} → {len(filtered_candidates)} candidates")
+            
+            if max_match_score is not None:
+                filtered_candidates = [c for c in filtered_candidates if c['match_score'] <= max_match_score]
+                logger.info(f"🔍 Filter: max_match_score <= {max_match_score} → {len(filtered_candidates)} candidates")
+            
+            # Filter by experience
+            if min_experience is not None:
+                filtered_candidates = [c for c in filtered_candidates if c['total_experience_years'] >= min_experience]
+                logger.info(f"🔍 Filter: min_experience >= {min_experience} years → {len(filtered_candidates)} candidates")
+            
+            if max_experience is not None:
+                filtered_candidates = [c for c in filtered_candidates if c['total_experience_years'] <= max_experience]
+                logger.info(f"🔍 Filter: max_experience <= {max_experience} years → {len(filtered_candidates)} candidates")
+            
+            # Filter by required skills
+            if filter_skills:
+                filter_skills_list = [s.strip().lower() for s in filter_skills.split(',')]
+                filtered_candidates = [
+                    c for c in filtered_candidates 
+                    if all(any(req_skill in skill.lower() for skill in c['skills']) for req_skill in filter_skills_list)
+                ]
+                logger.info(f"🔍 Filter: required_skills = {filter_skills_list} → {len(filtered_candidates)} candidates")
+            
+            # Filter by education level
+            if education_level:
+                education_hierarchy = {'bachelor': 1, 'master': 2, 'phd': 3, 'doctorate': 3}
+                min_level = education_hierarchy.get(education_level.lower(), 0)
+                
+                def get_highest_education(candidate):
+                    """Extract highest education level from candidate data"""
+                    personal_info = candidate.get('personal_info', {})
+                    education = personal_info.get('education', [])
+                    if not education:
+                        return 0
+                    
+                    max_level = 0
+                    for edu in education:
+                        degree = edu.get('degree', '').lower()
+                        for level_name, level_value in education_hierarchy.items():
+                            if level_name in degree:
+                                max_level = max(max_level, level_value)
+                    return max_level
+                
+                filtered_candidates = [
+                    c for c in filtered_candidates 
+                    if get_highest_education(c) >= min_level
+                ]
+                logger.info(f"🔍 Filter: education_level >= {education_level} → {len(filtered_candidates)} candidates")
+            
+            # ✨ ADD FLAGGING INFORMATION FIRST (before exclude_flagged filter)
             logger.info("🚩 Detecting flagged candidates...")
-            candidate_ids = [c['candidate_id'] for c in ranked_candidates]
+            candidate_ids = [c['candidate_id'] for c in filtered_candidates]
             flag_info = CandidateFlaggingService.get_flag_info_for_candidates(candidate_ids, db)
             
             # Add flag info to each candidate
-            for candidate in ranked_candidates:
+            for candidate in filtered_candidates:
                 candidate_id = candidate['candidate_id']
                 if candidate_id in flag_info:
                     candidate['is_flagged'] = True
@@ -564,14 +736,53 @@ async def rank_candidates_for_internship(
                     candidate['flagged_with'] = {}
                     candidate['flag_reason_text'] = None
             
-            flagged_count = sum(1 for c in ranked_candidates if c['is_flagged'])
-            logger.info(f"🚩 Found {flagged_count} flagged candidates out of {len(ranked_candidates)}")
+            total_flagged_count = sum(1 for c in filtered_candidates if c['is_flagged'])
+            logger.info(f"🚩 Found {total_flagged_count} flagged candidates out of {len(filtered_candidates)} total")
+            
+            # NOW filter out flagged candidates if requested (is_flagged property exists now)
+            if exclude_flagged:
+                pre_filter_count = len(filtered_candidates)
+                # Log which candidates are being filtered out
+                flagged_to_remove = [c for c in filtered_candidates if c.get('is_flagged', False)]
+                logger.info(f"🚫 About to filter out {len(flagged_to_remove)} flagged candidates: {[c['candidate_id'] for c in flagged_to_remove]}")
+                
+                filtered_candidates = [c for c in filtered_candidates if not c.get('is_flagged', False)]
+                logger.info(f"🔍 Filter: exclude_flagged=True → removed {pre_filter_count - len(filtered_candidates)} flagged candidates → {len(filtered_candidates)} remaining")
+                logger.info(f"🚫 Excluded candidates with is_flagged=True")
+            else:
+                logger.info(f"🔍 Filter: exclude_flagged=False → keeping all candidates including {total_flagged_count} flagged")
+            
+            # Now apply limit
+            filtered_candidates = filtered_candidates[:limit]
+            
+            # Count flagged in final results
+            flagged_count = sum(1 for c in filtered_candidates if c['is_flagged'])
+            logger.info(f"🚩 Final results contain {flagged_count} flagged candidates out of {len(filtered_candidates)}")
+            
+            # Prepare filter summary
+            filters_applied = []
+            if min_match_score is not None:
+                filters_applied.append(f"match_score >= {min_match_score}%")
+            if max_match_score is not None:
+                filters_applied.append(f"match_score <= {max_match_score}%")
+            if min_experience is not None:
+                filters_applied.append(f"experience >= {min_experience} years")
+            if max_experience is not None:
+                filters_applied.append(f"experience <= {max_experience} years")
+            if filter_skills:
+                filters_applied.append(f"skills contain: {filter_skills}")
+            if education_level:
+                filters_applied.append(f"education >= {education_level}")
+            if exclude_flagged:
+                filters_applied.append("excluding flagged candidates")
             
             return {
                 "success": True,
-                "message": f"Ranked {len(ranked_candidates)} candidates using pre-computed similarity (instant!)",
-                "total_candidates": len(ranked_candidates),
-                "ranked_candidates": ranked_candidates,
+                "message": f"Ranked {len(filtered_candidates)} candidates using pre-computed similarity (instant!)",
+                "total_candidates": len(filtered_candidates),
+                "total_before_filter": len(ranked_candidates),
+                "filters_applied": filters_applied,
+                "ranked_candidates": filtered_candidates,
                 "anonymization_enabled": current_user.anonymization_enabled if hasattr(current_user, 'anonymization_enabled') else False,
                 "performance_note": "⚡ Pre-computed base similarity: <200ms response time",
                 "methodology": "Base similarity from batch computation",
