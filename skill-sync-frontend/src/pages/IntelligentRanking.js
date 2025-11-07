@@ -41,6 +41,8 @@ import EmailIcon from '@mui/icons-material/Email';
 import Layout from '../components/Layout';
 import FlaggedCandidatesModal from '../components/FlaggedCandidatesModal';
 import SendEmailModal from '../components/SendEmailModal';
+import CandidateFilters from '../components/CandidateFilters';
+import ActiveFilters from '../components/ActiveFilters';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 
@@ -79,6 +81,15 @@ const IntelligentRanking = () => {
 
     const [anonymizationEnabled, setAnonymizationEnabled] = useState(false); // Track anonymization status
 
+    // Filter state
+    const [activeFilters, setActiveFilters] = useState({});
+    const [totalBeforeFilter, setTotalBeforeFilter] = useState(0);
+    
+    // Pagination state
+    const [page, setPage] = useState(1);
+    const [pageSize, setPageSize] = useState(5);
+    const [paginatedCandidates, setPaginatedCandidates] = useState([]);
+
 
     useEffect(() => {
         fetchInternships();
@@ -90,6 +101,13 @@ const IntelligentRanking = () => {
             handleRankCandidates();
         }
     }, [onlyApplicants]); // eslint-disable-line react-hooks/exhaustive-deps
+    
+    // Pagination effect - update displayed candidates when page or pageSize changes
+    useEffect(() => {
+        const startIndex = (page - 1) * pageSize;
+        const endIndex = startIndex + pageSize;
+        setPaginatedCandidates(rankedCandidates.slice(startIndex, endIndex));
+    }, [rankedCandidates, page, pageSize]);
 
     const fetchInternships = async () => {
         try {
@@ -112,7 +130,33 @@ const IntelligentRanking = () => {
         }
     };
 
-    const handleRankCandidates = async () => {
+    const fetchInternshipSkills = async (internshipId) => {
+        try {
+            const token = localStorage.getItem('token');
+            const response = await axios.get(`http://localhost:8000/api/internship/${internshipId}`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+
+            if (response.data) {
+                // const allSkills = [...new Set([...required, ...preferred])]; // Remove duplicates - not used
+            }
+        } catch (error) {
+            console.error('Error fetching internship skills:', error);
+            // Don't show error toast, just use default skills
+        }
+    };
+
+    const handleApplyFilters = (filters) => {
+        setActiveFilters(filters);
+        handleRankCandidates(filters);
+    };
+
+    const handleResetFilters = () => {
+        setActiveFilters({});
+        handleRankCandidates({});
+    };
+
+    const handleRankCandidates = async (filters = {}) => {
         if (!selectedInternship) {
             toast.error('Please select an internship');
             return;
@@ -123,20 +167,57 @@ const IntelligentRanking = () => {
             const token = localStorage.getItem('token');
             console.log('🚀 Calling rank-candidates API with internship ID:', selectedInternship);
             console.log('👥 Only applicants mode:', onlyApplicants);
+            console.log('🔍 Filters:', filters);
+
+            // Build query parameters
+            const params = new URLSearchParams({
+                limit: '50',
+                only_applicants: onlyApplicants.toString()
+            });
+
+            // Add filter parameters
+            Object.keys(filters).forEach(key => {
+                const value = filters[key];
+                console.log(`🔍 Filter param: ${key} = ${value} (type: ${typeof value})`);
+                // Handle boolean values explicitly
+                if (typeof value === 'boolean') {
+                    params.append(key, value.toString());
+                    console.log(`✅ Added boolean filter: ${key}=${value.toString()}`);
+                } else if (value !== undefined && value !== null && value !== '') {
+                    params.append(key, value.toString());
+                    console.log(`✅ Added filter: ${key}=${value.toString()}`);
+                }
+            });
+            
+            console.log(`🌐 Full API URL: http://localhost:8000/api/filter/rank-candidates/${selectedInternship}?${params.toString()}`);
+
             const response = await axios.post(
-                `http://localhost:8000/api/filter/rank-candidates/${selectedInternship}?limit=50&only_applicants=${onlyApplicants}`,
+                `http://localhost:8000/api/filter/rank-candidates/${selectedInternship}?${params.toString()}`,
                 {},
                 { headers: { Authorization: `Bearer ${token}` } }
             );
 
             console.log('📊 Rank candidates response:', response.data);
             console.log('👥 Total candidates:', response.data.total_candidates);
+            console.log('📊 Total before filter:', response.data.total_before_filter);
             console.log('🏆 Ranked candidates count:', response.data.ranked_candidates?.length);
             console.log('🔒 Anonymization enabled:', response.data.anonymization_enabled);
+            
+            // Log flagged candidates in results
+            const flaggedInResults = response.data.ranked_candidates?.filter(c => c.is_flagged) || [];
+            console.log(`🚩 Flagged candidates in results: ${flaggedInResults.length}`);
+            if (flaggedInResults.length > 0) {
+                console.log('🚩 Flagged candidate IDs:', flaggedInResults.map(c => c.candidate_id));
+            }
 
             setRankedCandidates(response.data.ranked_candidates || []);
             setScoringInfo(response.data.scoring_info || null);
             setAnonymizationEnabled(response.data.anonymization_enabled || false);
+            setActiveFilters(filters);
+            setTotalBeforeFilter(response.data.total_before_filter || response.data.total_candidates);
+            
+            // Reset to first page when new results come in
+            setPage(1);
 
             // Reset accordion state - ALL COLLAPSED by default
             const initialState = {};
@@ -149,7 +230,10 @@ const IntelligentRanking = () => {
             setExpandedAccordions(initialState);
 
             if (response.data.ranked_candidates?.length > 0) {
-                toast.success(`✨ Ranked ${response.data.ranked_candidates.length} candidates successfully!`);
+                const filterInfo = response.data.filters_applied?.length > 0
+                    ? ` (${response.data.filters_applied.length} filters applied)`
+                    : '';
+                toast.success(`✨ Ranked ${response.data.ranked_candidates.length} candidates successfully!${filterInfo}`);
             } else {
                 const message = response.data.total_candidates === 0
                     ? 'No candidates found with uploaded resumes'
@@ -199,7 +283,7 @@ const IntelligentRanking = () => {
                 }
             );
 
-            const { resume_id, anonymized, storage_type, url } = metadataResponse.data;
+            const { anonymized, storage_type, url } = metadataResponse.data;
             const isAnonymized = anonymized === true;
 
             // If it's S3 storage (old flow), use direct URL
@@ -432,6 +516,10 @@ const IntelligentRanking = () => {
                                         // Store the full internship data for later use
                                         const internshipData = internships.find(i => i.internship_id === value);
                                         setSelectedInternshipData(internshipData);
+                                        // Fetch skills for this internship for filter autocomplete
+                                        if (value) {
+                                            fetchInternshipSkills(value);
+                                        }
                                     }}
                                     disabled={loadingInternships}
                                 >
@@ -448,7 +536,7 @@ const IntelligentRanking = () => {
                                 variant="contained"
                                 size="large"
                                 fullWidth
-                                onClick={handleRankCandidates}
+                                onClick={() => handleRankCandidates(activeFilters)}
                                 disabled={!selectedInternship || loading}
                                 startIcon={loading ? <CircularProgress size={20} /> : <TrendingUpIcon />}
                                 sx={{ height: 56 }}
@@ -492,6 +580,23 @@ const IntelligentRanking = () => {
                         </Alert>
                     )}
                 </Paper>
+
+                {/* Candidate Filters - Always visible when internship selected */}
+                {selectedInternship && (
+                    <CandidateFilters
+                        onApplyFilters={handleApplyFilters}
+                        onReset={handleResetFilters}
+                    />
+                )}
+
+                {/* Active Filters Display */}
+                {rankedCandidates.length > 0 && Object.keys(activeFilters).length > 0 && (
+                    <ActiveFilters
+                        filters={activeFilters}
+                        totalCandidates={rankedCandidates.length}
+                        totalBeforeFilter={totalBeforeFilter}
+                    />
+                )}
 
                 {/* Ranked Candidates List */}
                 {rankedCandidates.length > 0 && (
@@ -611,7 +716,9 @@ const IntelligentRanking = () => {
                             </Box>
                         )}
 
-                        {rankedCandidates.map((candidate, index) => (
+                        {paginatedCandidates.map((candidate, index) => {
+                            const actualIndex = (page - 1) * pageSize + index; // Calculate actual index in full list
+                            return (
                             <Card
                                 key={candidate.candidate_id}
                                 sx={{
@@ -651,12 +758,12 @@ const IntelligentRanking = () => {
                                                 mr: 2,
                                             }}
                                         >
-                                            #{index + 1}
+                                            #{actualIndex + 1}
                                         </Box>
                                         <Box sx={{ flex: 1 }}>
                                             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}>
                                                 <Typography variant="h6" fontWeight="bold">
-                                                    {anonymizationEnabled ? `Candidate #${index + 1}` : candidate.candidate_name}
+                                                    {anonymizationEnabled ? `Candidate #${actualIndex + 1}` : candidate.candidate_name}
                                                 </Typography>
                                                 {anonymizationEnabled && (
                                                     <Chip
@@ -790,8 +897,8 @@ const IntelligentRanking = () => {
 
                                     {/* Component Scores */}
                                     <Accordion
-                                        expanded={expandedAccordions[`score-${index}`] || false}
-                                        onChange={handleAccordionChange(`score-${index}`)}
+                                        expanded={expandedAccordions[`score-${actualIndex}`] || false}
+                                        onChange={handleAccordionChange(`score-${actualIndex}`)}
                                         TransitionProps={{ timeout: 200, unmountOnExit: true }}
                                     >
                                         <AccordionSummary expandIcon={<ExpandMoreIcon />}>
@@ -845,8 +952,8 @@ const IntelligentRanking = () => {
 
                                     {/* Skills Match Details */}
                                     <Accordion
-                                        expanded={expandedAccordions[`skills-${index}`] || false}
-                                        onChange={handleAccordionChange(`skills-${index}`)}
+                                        expanded={expandedAccordions[`skills-${actualIndex}`] || false}
+                                        onChange={handleAccordionChange(`skills-${actualIndex}`)}
                                         TransitionProps={{ timeout: 200, unmountOnExit: true }}
                                     >
                                         <AccordionSummary expandIcon={<ExpandMoreIcon />}>
@@ -903,8 +1010,8 @@ const IntelligentRanking = () => {
 
                                     {/* AI Explanation */}
                                     <Accordion
-                                        expanded={expandedAccordions[`ai-${index}`] || false}
-                                        onChange={handleAccordionChange(`ai-${index}`)}
+                                        expanded={expandedAccordions[`ai-${actualIndex}`] || false}
+                                        onChange={handleAccordionChange(`ai-${actualIndex}`)}
                                         TransitionProps={{ timeout: 200, unmountOnExit: true }}
                                     >
                                         <AccordionSummary expandIcon={<ExpandMoreIcon />}>
@@ -964,7 +1071,56 @@ const IntelligentRanking = () => {
                                     </Grid>
                                 </CardContent>
                             </Card>
-                        ))}
+                        )})}
+                        
+                        {/* Pagination Controls */}
+                        {rankedCandidates.length > 0 && (
+                            <Box sx={{ mt: 4, mb: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                                    <Typography variant="body2" color="text.secondary">
+                                        Showing {((page - 1) * pageSize) + 1} - {Math.min(page * pageSize, rankedCandidates.length)} of {rankedCandidates.length} candidates
+                                    </Typography>
+                                    <FormControl size="small" sx={{ minWidth: 120 }}>
+                                        <InputLabel>Per Page</InputLabel>
+                                        <Select
+                                            value={pageSize}
+                                            onChange={(e) => {
+                                                setPageSize(e.target.value);
+                                                setPage(1); // Reset to first page
+                                            }}
+                                            label="Per Page"
+                                        >
+                                            <MenuItem value={5}>5 per page</MenuItem>
+                                            <MenuItem value={10}>10 per page</MenuItem>
+                                            <MenuItem value={25}>25 per page</MenuItem>
+                                        </Select>
+                                    </FormControl>
+                                </Box>
+                                <Box sx={{ display: 'flex', gap: 1 }}>
+                                    <Button
+                                        variant="outlined"
+                                        size="small"
+                                        disabled={page === 1}
+                                        onClick={() => setPage(page - 1)}
+                                    >
+                                        Previous
+                                    </Button>
+                                    <Box sx={{ display: 'flex', alignItems: 'center', px: 2 }}>
+                                        <Typography variant="body2">
+                                            Page {page} of {Math.ceil(rankedCandidates.length / pageSize)}
+                                        </Typography>
+                                    </Box>
+                                    <Button
+                                        variant="outlined"
+                                        size="small"
+                                        disabled={page >= Math.ceil(rankedCandidates.length / pageSize)}
+                                        onClick={() => setPage(page + 1)}
+                                    >
+                                        Next
+                                    </Button>
+                                </Box>
+                            </Box>
+                        )}
                     </Box>
                 )}
 
