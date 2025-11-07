@@ -330,6 +330,14 @@ async def rank_candidates_for_internship(
                 preferred_skills = internship.preferred_skills or []
                 all_internship_skills = required_skills + preferred_skills
                 
+                # Separate matching for required and preferred skills
+                matched_required_skills = [s for s in all_candidate_skills if s.lower() in [rs.lower() for rs in required_skills]]
+                missing_required_skills = [s for s in required_skills if s.lower() not in [cs.lower() for cs in all_candidate_skills]]
+                
+                matched_preferred_skills = [s for s in all_candidate_skills if s.lower() in [ps.lower() for ps in preferred_skills]]
+                missing_preferred_skills = [s for s in preferred_skills if s.lower() not in [cs.lower() for cs in all_candidate_skills]]
+                
+                # Legacy fields for backward compatibility
                 matched_skills = [s for s in all_candidate_skills if s.lower() in [rs.lower() for rs in all_internship_skills]]
                 missing_skills = [s for s in required_skills if s.lower() not in [cs.lower() for cs in all_candidate_skills]]
                 
@@ -342,8 +350,12 @@ async def rank_candidates_for_internship(
                 experience_gap = max(0, min_exp - candidate_exp)
                 
                 match_details = {
-                    'matched_skills': matched_skills,
-                    'missing_skills': missing_skills,
+                    'matched_skills': matched_skills,  # Legacy - all matched skills
+                    'missing_skills': missing_skills,  # Legacy - missing required skills
+                    'matched_required_skills': matched_required_skills,
+                    'missing_required_skills': missing_required_skills,
+                    'matched_preferred_skills': matched_preferred_skills,
+                    'missing_preferred_skills': missing_preferred_skills,
                     'experience_gap': experience_gap,
                     'has_tailored_resume': tailored_is_different,
                     'base_resume_id': base_resume.id if base_resume else None,
@@ -580,6 +592,14 @@ async def rank_candidates_for_internship(
                 preferred_skills = internship.preferred_skills or []
                 all_internship_skills = required_skills + preferred_skills
                 
+                # Separate matching for required and preferred skills
+                matched_required_skills = [s for s in candidate_skills if s.lower() in [rs.lower() for rs in required_skills]]
+                missing_required_skills = [s for s in required_skills if s.lower() not in [cs.lower() for cs in candidate_skills]]
+                
+                matched_preferred_skills = [s for s in candidate_skills if s.lower() in [ps.lower() for ps in preferred_skills]]
+                missing_preferred_skills = [s for s in preferred_skills if s.lower() not in [cs.lower() for cs in candidate_skills]]
+                
+                # Legacy fields for backward compatibility
                 matched_skills = [s for s in candidate_skills if s.lower() in [rs.lower() for rs in all_internship_skills]]
                 missing_skills = [s for s in required_skills if s.lower() not in [cs.lower() for cs in candidate_skills]]
                 
@@ -588,8 +608,12 @@ async def rank_candidates_for_internship(
                 experience_gap = max(0, min_exp - candidate_exp)
                 
                 match_details = {
-                    'matched_skills': matched_skills,
-                    'missing_skills': missing_skills,
+                    'matched_skills': matched_skills,  # Legacy - all matched skills
+                    'missing_skills': missing_skills,  # Legacy - missing required skills
+                    'matched_required_skills': matched_required_skills,
+                    'missing_required_skills': missing_required_skills,
+                    'matched_preferred_skills': matched_preferred_skills,
+                    'missing_preferred_skills': missing_preferred_skills,
                     'experience_gap': experience_gap
                 }
                 
