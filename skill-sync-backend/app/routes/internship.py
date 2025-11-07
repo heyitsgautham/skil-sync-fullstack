@@ -370,17 +370,22 @@ def update_internship(
     current_user: User = Depends(get_current_user)
 ):
     """
-    Update an internship posting
+    Update an internship posting (Company owners and Admins only)
     """
-    internship = db.query(Internship).filter(
-        Internship.id == internship_id,
-        Internship.company_id == current_user.id
-    ).first()
+    # Get internship
+    internship = db.query(Internship).filter(Internship.id == internship_id).first()
     
     if not internship:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Internship not found"
+        )
+    
+    # Check permissions - only company owner or admin can update
+    if current_user.role != UserRole.admin and internship.company_id != current_user.id:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="You don't have permission to update this internship"
         )
     
     try:
@@ -405,7 +410,7 @@ def update_internship(
             description=internship.description,
             required_skills=internship.required_skills or [],
             metadata={
-                "company_id": current_user.id,
+                "company_id": internship.company_id,
                 "location": internship.location,
                 "duration": internship.duration
             }
@@ -428,17 +433,22 @@ def delete_internship(
     current_user: User = Depends(get_current_user)
 ):
     """
-    Delete/deactivate an internship posting
+    Delete/deactivate an internship posting (Company owners and Admins only)
     """
-    internship = db.query(Internship).filter(
-        Internship.id == internship_id,
-        Internship.company_id == current_user.id
-    ).first()
+    # Get internship
+    internship = db.query(Internship).filter(Internship.id == internship_id).first()
     
     if not internship:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Internship not found"
+        )
+    
+    # Check permissions - only company owner or admin can delete
+    if current_user.role != UserRole.admin and internship.company_id != current_user.id:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="You don't have permission to delete this internship"
         )
     
     # Soft delete - just deactivate
