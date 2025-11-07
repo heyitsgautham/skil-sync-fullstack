@@ -89,6 +89,9 @@ const IntelligentRanking = () => {
     const [page, setPage] = useState(1);
     const [pageSize, setPageSize] = useState(5);
     const [paginatedCandidates, setPaginatedCandidates] = useState([]);
+    
+    // Track if all are expanded
+    const [allExpanded, setAllExpanded] = useState(false);
 
 
     useEffect(() => {
@@ -397,6 +400,7 @@ const IntelligentRanking = () => {
             allExpanded[`ai-${index}`] = true;
         });
         setExpandedAccordions(allExpanded);
+        setAllExpanded(true);
     }, [rankedCandidates]);
 
     const handleCollapseAll = useCallback(() => {
@@ -407,7 +411,16 @@ const IntelligentRanking = () => {
             allCollapsed[`ai-${index}`] = false;
         });
         setExpandedAccordions(allCollapsed);
+        setAllExpanded(false);
     }, [rankedCandidates]);
+
+    const handleToggleExpandAll = useCallback(() => {
+        if (allExpanded) {
+            handleCollapseAll();
+        } else {
+            handleExpandAll();
+        }
+    }, [allExpanded, handleExpandAll, handleCollapseAll]);
 
     // Optimized toggle handler
     const handleAccordionChange = useCallback((key) => (e, isExpanded) => {
@@ -488,24 +501,11 @@ const IntelligentRanking = () => {
     return (
         <Layout>
             <Container maxWidth="xl" sx={{ mt: 4, mb: 4 }}>
-                {/* Header */}
-                <Box sx={{ mb: 4 }}>
-                    <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                        <PsychologyIcon sx={{ fontSize: 40, mr: 2, color: 'primary.main' }} />
-                        <Typography variant="h4" component="h1" fontWeight="bold">
-                            AI-Powered Candidate Ranking
-                        </Typography>
-                    </Box>
-                    <Typography variant="body1" color="text.secondary">
-                        Intelligent resume filtering system powered by Google Gemini AI and semantic matching
-                    </Typography>
-                </Box>
-
                 {/* Internship Selector */}
-                <Paper sx={{ p: 3, mb: 4 }}>
+                <Paper sx={{ p: 2.5, mb: 3, borderRadius: 2 }}>
                     <Grid container spacing={2} alignItems="center">
-                        <Grid size={{ xs: 12, md: 8 }}>
-                            <FormControl fullWidth>
+                        <Grid size={{ xs: 12, md: 9 }}>
+                            <FormControl fullWidth size="medium">
                                 <InputLabel>Select Internship</InputLabel>
                                 <Select
                                     value={selectedInternship || ''}
@@ -513,25 +513,47 @@ const IntelligentRanking = () => {
                                     onChange={(e) => {
                                         const value = e.target.value || '';
                                         setSelectedInternship(value);
-                                        // Store the full internship data for later use
                                         const internshipData = internships.find(i => i.internship_id === value);
                                         setSelectedInternshipData(internshipData);
-                                        // Fetch skills for this internship for filter autocomplete
                                         if (value) {
                                             fetchInternshipSkills(value);
                                         }
                                     }}
                                     disabled={loadingInternships}
+                                    sx={{
+                                        '& .MuiOutlinedInput-notchedOutline': {
+                                            borderWidth: 2,
+                                        },
+                                        '&:hover .MuiOutlinedInput-notchedOutline': {
+                                            borderColor: 'primary.main',
+                                        },
+                                    }}
                                 >
                                     {internships.map((internship) => (
-                                        <MenuItem key={internship.internship_id} value={internship.internship_id}>
-                                            {internship.title} - {internship.location || 'Remote'}
+                                        <MenuItem 
+                                            key={internship.internship_id} 
+                                            value={internship.internship_id}
+                                            sx={{ 
+                                                py: 1.5,
+                                                '&:hover': {
+                                                    backgroundColor: 'rgba(25, 118, 210, 0.08)',
+                                                }
+                                            }}
+                                        >
+                                            <Box>
+                                                <Typography variant="body1" fontWeight="600">
+                                                    {internship.title}
+                                                </Typography>
+                                                <Typography variant="caption" color="text.secondary">
+                                                    {internship.location || 'Remote'}
+                                                </Typography>
+                                            </Box>
                                         </MenuItem>
                                     ))}
                                 </Select>
                             </FormControl>
                         </Grid>
-                        <Grid size={{ xs: 12, md: 4 }}>
+                        <Grid size={{ xs: 12, md: 3 }}>
                             <Button
                                 variant="contained"
                                 size="large"
@@ -545,49 +567,14 @@ const IntelligentRanking = () => {
                             </Button>
                         </Grid>
                     </Grid>
-
-                    {/* View Mode Toggle */}
-                    <Box sx={{ mt: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
-                        <Chip
-                            label={onlyApplicants ? "👥 Applicants Only" : "🌐 All Candidates"}
-                            color={onlyApplicants ? "primary" : "default"}
-                            onClick={() => setOnlyApplicants(!onlyApplicants)}
-                            sx={{ fontWeight: 'bold', cursor: 'pointer' }}
-                        />
-                        <Typography variant="caption" color="text.secondary">
-                            {onlyApplicants
-                                ? "Showing only students who applied (includes tailored resumes)"
-                                : "Showing all potential candidates (discovery mode)"}
-                        </Typography>
-                    </Box>
-
-                    {/* Scoring Methodology Info */}
-                    {scoringInfo && (
-                        <Alert severity="info" sx={{ mt: 2 }}>
-                            <Typography variant="body2" fontWeight="bold" gutterBottom>
-                                Scoring Methodology: {scoringInfo.methodology}
-                            </Typography>
-                            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mt: 1 }}>
-                                {Object.entries(scoringInfo.components).map(([key, value]) => (
-                                    <Chip
-                                        key={key}
-                                        label={`${key.replace(/_/g, ' ')}: ${value}`}
-                                        size="small"
-                                        variant="outlined"
-                                    />
-                                ))}
-                            </Box>
-                        </Alert>
-                    )}
                 </Paper>
 
-                {/* Candidate Filters - Always visible when internship selected */}
-                {selectedInternship && (
-                    <CandidateFilters
-                        onApplyFilters={handleApplyFilters}
-                        onReset={handleResetFilters}
-                    />
-                )}
+                {/* Advanced Filters - Always visible and collapsible */}
+                <CandidateFilters
+                    onApplyFilters={handleApplyFilters}
+                    onReset={handleResetFilters}
+                    scoringInfo={scoringInfo}
+                />
 
                 {/* Active Filters Display */}
                 {rankedCandidates.length > 0 && Object.keys(activeFilters).length > 0 && (
@@ -633,19 +620,16 @@ const IntelligentRanking = () => {
                                     </Button>
                                 )}
                                 <Button
-                                    variant="contained"
-                                    color="secondary"
+                                    variant="outlined"
                                     startIcon={<EmailIcon />}
                                     onClick={handleOpenEmailModal}
                                     sx={{ 
                                         minWidth: 200,
-                                        background: selectionMode 
-                                            ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
-                                            : 'linear-gradient(135deg, #4caf50 0%, #45a049 100%)',
+                                        borderColor: selectionMode ? '#667eea' : '#4caf50',
+                                        color: selectionMode ? '#667eea' : '#4caf50',
                                         '&:hover': {
-                                            background: selectionMode
-                                                ? 'linear-gradient(135deg, #5568d3 0%, #6a3f8f 100%)'
-                                                : 'linear-gradient(135deg, #45a049 0%, #3d8b40 100%)',
+                                            borderColor: selectionMode ? '#5568d3' : '#45a049',
+                                            backgroundColor: selectionMode ? 'rgba(102, 126, 234, 0.04)' : 'rgba(76, 175, 80, 0.04)',
                                         },
                                     }}
                                 >
@@ -657,26 +641,26 @@ const IntelligentRanking = () => {
                                 <Button
                                     size="small"
                                     variant="outlined"
-                                    onClick={handleExpandAll}
+                                    onClick={handleToggleExpandAll}
                                 >
-                                    Expand All
+                                    {allExpanded ? 'Collapse All' : 'Expand All'}
                                 </Button>
                                 <Button
-                                    size="small"
                                     variant="outlined"
-                                    onClick={handleCollapseAll}
-                                >
-                                    Collapse All
-                                </Button>
-                                <Button
-                                    variant="contained"
-                                    color="success"
-                                    startIcon={exportLoading ? <CircularProgress size={20} color="inherit" /> : <FileDownloadIcon />}
                                     onClick={handleExportClick}
                                     disabled={exportLoading || rankedCandidates.length === 0}
-                                    sx={{ minWidth: 150 }}
+                                    sx={{ 
+                                        minWidth: 40,
+                                        px: 1,
+                                        borderColor: '#4caf50',
+                                        color: '#4caf50',
+                                        '&:hover': {
+                                            borderColor: '#45a049',
+                                            backgroundColor: 'rgba(76, 175, 80, 0.04)',
+                                        },
+                                    }}
                                 >
-                                    {exportLoading ? 'Exporting...' : 'Export Data'}
+                                    {exportLoading ? <CircularProgress size={20} color="inherit" /> : <FileDownloadIcon />}
                                 </Button>
                                 <Menu
                                     anchorEl={exportMenuAnchor}
@@ -723,192 +707,263 @@ const IntelligentRanking = () => {
                                 key={candidate.candidate_id}
                                 sx={{
                                     mb: 3,
-                                    transition: 'all 0.3s',
-                                    '&:hover': {
-                                        transform: 'translateY(-4px)',
-                                        boxShadow: 6,
-                                    },
                                     border: selectionMode && selectedCandidates.some(c => c.candidate_id === candidate.candidate_id) 
                                         ? '2px solid #667eea' 
-                                        : 'none',
+                                        : '1px solid #e0e0e0',
+                                    boxShadow: 1,
+                                    borderRadius: 3,
                                 }}
                             >
-                                <CardContent>
-                                    {/* Header with Rank and Score */}
-                                    <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                                        {selectionMode && (
-                                            <Checkbox
-                                                checked={selectedCandidates.some(c => c.candidate_id === candidate.candidate_id)}
-                                                onChange={() => handleToggleCandidateSelection(candidate)}
-                                                sx={{ mr: 1 }}
-                                            />
-                                        )}
-                                        <Box
-                                            sx={{
-                                                width: 50,
-                                                height: 50,
-                                                borderRadius: '50%',
-                                                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                                                color: 'white',
-                                                display: 'flex',
-                                                alignItems: 'center',
-                                                justifyContent: 'center',
-                                                fontWeight: 'bold',
-                                                fontSize: '1.5rem',
-                                                mr: 2,
-                                            }}
-                                        >
-                                            #{actualIndex + 1}
-                                        </Box>
-                                        <Box sx={{ flex: 1 }}>
-                                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}>
-                                                <Typography variant="h6" fontWeight="bold">
-                                                    {anonymizationEnabled ? `Candidate #${actualIndex + 1}` : candidate.candidate_name}
-                                                </Typography>
-                                                {anonymizationEnabled && (
-                                                    <Chip
-                                                        label="🔒 Anonymous"
-                                                        size="small"
-                                                        sx={{
-                                                            backgroundColor: '#ff9800',
-                                                            color: 'white',
-                                                            fontWeight: 'bold',
-                                                            fontSize: '0.75rem',
-                                                            height: 24,
-                                                        }}
-                                                    />
-                                                )}
-                                                {candidate.scoring_breakdown?.has_tailored && (
-                                                    <Chip
-                                                        label="✨ Tailored Resume"
-                                                        size="small"
-                                                        sx={{
-                                                            backgroundColor: '#9c27b0',
-                                                            color: 'white',
-                                                            fontWeight: 'bold',
-                                                            fontSize: '0.75rem',
-                                                            height: 24,
-                                                        }}
-                                                    />
-                                                )}
-                                                {/* FLAGGED BADGE */}
-                                                {candidate.is_flagged && (
-                                                    <>
+                                <CardContent sx={{ py: 2 }}>
+                                    {/* Header with Rank, Name and View Resume Button */}
+                                    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                                        {/* Left side: Rank, Name, Buttons */}
+                                        <Box sx={{ display: 'flex', alignItems: 'center', flex: 1 }}>
+                                            {selectionMode && (
+                                                <Checkbox
+                                                    checked={selectedCandidates.some(c => c.candidate_id === candidate.candidate_id)}
+                                                    onChange={() => handleToggleCandidateSelection(candidate)}
+                                                    sx={{ mr: 1 }}
+                                                />
+                                            )}
+                                            {/* Rank Badge - Vertically centered */}
+                                            <Box
+                                                sx={{
+                                                    width: 40,
+                                                    height: 40,
+                                                    borderRadius: '50%',
+                                                    background: 'linear-gradient(135deg, #4caf50 0%, #45a049 100%)',
+                                                    color: 'white',
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    justifyContent: 'center',
+                                                    fontWeight: 'bold',
+                                                    fontSize: '1.2rem',
+                                                    mr: 2,
+                                                    flexShrink: 0,
+                                                    alignSelf: 'center',
+                                                }}
+                                            >
+                                                #{actualIndex + 1}
+                                            </Box>
+                                            
+                                            {/* Name, Badges, and Buttons stacked */}
+                                            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
+                                                {/* Name and status badges row */}
+                                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                                    <Typography variant="h6" fontWeight="bold">
+                                                        {anonymizationEnabled ? `Candidate #${actualIndex + 1}` : candidate.candidate_name}
+                                                    </Typography>
+                                                    {anonymizationEnabled && (
                                                         <Chip
-                                                            icon={<WarningIcon sx={{ color: 'white !important' }} />}
-                                                            label="FLAGGED"
+                                                            label="🔒 Anonymous"
                                                             size="small"
                                                             sx={{
-                                                                backgroundColor: '#f44336',
+                                                                backgroundColor: '#ff9800',
                                                                 color: 'white',
                                                                 fontWeight: 'bold',
-                                                                fontSize: '0.75rem',
-                                                                height: 24,
+                                                                fontSize: '0.7rem',
+                                                                height: 22,
                                                             }}
                                                         />
-                                                        <Typography
-                                                            variant="caption"
+                                                    )}
+                                                    {candidate.scoring_breakdown?.has_tailored && (
+                                                        <Chip
+                                                            label="✨ Tailored"
+                                                            size="small"
                                                             sx={{
-                                                                color: '#f44336',
-                                                                cursor: anonymizationEnabled ? 'default' : 'pointer',
-                                                                textDecoration: anonymizationEnabled ? 'none' : 'underline',
+                                                                backgroundColor: '#9c27b0',
+                                                                color: 'white',
                                                                 fontWeight: 'bold',
-                                                                '&:hover': anonymizationEnabled ? {} : {
-                                                                    color: '#d32f2f',
-                                                                }
+                                                                fontSize: '0.7rem',
+                                                                height: 22,
                                                             }}
-                                                            onClick={anonymizationEnabled ? undefined : () => handleFlaggedClick(candidate)}
+                                                        />
+                                                    )}
+                                                    {/* FLAGGED BADGE */}
+                                                    {candidate.is_flagged && (
+                                                        <>
+                                                            <Box
+                                                                sx={{
+                                                                    display: 'inline-flex',
+                                                                    alignItems: 'center',
+                                                                    justifyContent: 'center',
+                                                                    width: 22,
+                                                                    height: 22,
+                                                                    borderRadius: '50%',
+                                                                    backgroundColor: '#f44336',
+                                                                    cursor: anonymizationEnabled ? 'default' : 'pointer',
+                                                                    '&:hover': anonymizationEnabled ? {} : {
+                                                                        backgroundColor: '#d32f2f',
+                                                                    }
+                                                                }}
+                                                                onClick={anonymizationEnabled ? undefined : () => handleFlaggedClick(candidate)}
+                                                            >
+                                                                <WarningIcon sx={{ color: 'white', fontSize: '0.9rem' }} />
+                                                            </Box>
+                                                            <Typography
+                                                                variant="caption"
+                                                                sx={{
+                                                                    color: '#f44336',
+                                                                    cursor: anonymizationEnabled ? 'default' : 'pointer',
+                                                                    textDecoration: anonymizationEnabled ? 'none' : 'underline',
+                                                                    fontWeight: 'bold',
+                                                                    '&:hover': anonymizationEnabled ? {} : {
+                                                                        color: '#d32f2f',
+                                                                    }
+                                                                }}
+                                                                onClick={anonymizationEnabled ? undefined : () => handleFlaggedClick(candidate)}
+                                                            >
+                                                                {candidate.flag_reason_text}
+                                                            </Typography>
+                                                        </>
+                                                    )}
+                                                </Box>
+                                                
+                                                {/* Action buttons row */}
+                                                <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
+                                                    <Button
+                                                        variant="outlined"
+                                                        size="small"
+                                                        onClick={() => handleViewResume(candidate.student_id, candidate.student_name)}
+                                                        startIcon={<DescriptionIcon />}
+                                                    >
+                                                        Resume
+                                                    </Button>
+                                                    {!anonymizationEnabled && candidate.github_url && (
+                                                        <Button
+                                                            variant="outlined"
+                                                            size="small"
+                                                            startIcon={<GitHubIcon />}
+                                                            href={ensureHttpProtocol(candidate.github_url)}
+                                                            target="_blank"
+                                                            rel="noopener noreferrer"
+                                                            sx={{
+                                                                borderColor: '#333',
+                                                                color: '#333',
+                                                                minWidth: 'auto',
+                                                                '&:hover': {
+                                                                    borderColor: '#000',
+                                                                    backgroundColor: 'rgba(0, 0, 0, 0.04)',
+                                                                },
+                                                            }}
                                                         >
-                                                            {candidate.flag_reason_text}
-                                                        </Typography>
-                                                    </>
-                                                )}
+                                                            GitHub
+                                                        </Button>
+                                                    )}
+                                                    {!anonymizationEnabled && candidate.linkedin_url && (
+                                                        <Button
+                                                            variant="outlined"
+                                                            size="small"
+                                                            startIcon={<LinkedInIcon />}
+                                                            href={ensureHttpProtocol(candidate.linkedin_url)}
+                                                            target="_blank"
+                                                            rel="noopener noreferrer"
+                                                            sx={{
+                                                                borderColor: '#0077B5',
+                                                                color: '#0077B5',
+                                                                minWidth: 'auto',
+                                                                '&:hover': {
+                                                                    borderColor: '#005582',
+                                                                    backgroundColor: 'rgba(0, 119, 181, 0.04)',
+                                                                },
+                                                            }}
+                                                        >
+                                                            LinkedIn
+                                                        </Button>
+                                                    )}
+                                                </Box>
                                             </Box>
-                                            <Typography variant="body2" color="text.secondary">
-                                                ID: {candidate.candidate_id}
-                                            </Typography>
                                         </Box>
 
-                                        {/* Social Profile Links */}
-                                        {!anonymizationEnabled && (
-                                            <Box sx={{ display: 'flex', gap: 1, mr: 2 }}>
-                                                {candidate.linkedin_url && (
-                                                    <Button
-                                                        variant="outlined"
-                                                        size="small"
-                                                        startIcon={<LinkedInIcon />}
-                                                        href={ensureHttpProtocol(candidate.linkedin_url)}
-                                                        target="_blank"
-                                                        rel="noopener noreferrer"
-                                                        sx={{
-                                                            borderColor: '#0077B5',
-                                                            color: '#0077B5',
-                                                            '&:hover': {
-                                                                borderColor: '#005582',
-                                                                backgroundColor: 'rgba(0, 119, 181, 0.04)',
-                                                            },
-                                                        }}
-                                                    >
-                                                        LinkedIn
-                                                    </Button>
-                                                )}
-                                                {candidate.github_url && (
-                                                    <Button
-                                                        variant="outlined"
-                                                        size="small"
-                                                        startIcon={<GitHubIcon />}
-                                                        href={ensureHttpProtocol(candidate.github_url)}
-                                                        target="_blank"
-                                                        rel="noopener noreferrer"
-                                                        sx={{
-                                                            borderColor: '#333',
-                                                            color: '#333',
-                                                            '&:hover': {
-                                                                borderColor: '#000',
-                                                                backgroundColor: 'rgba(0, 0, 0, 0.04)',
-                                                            },
-                                                        }}
-                                                    >
-                                                        GitHub
-                                                    </Button>
-                                                )}
-                                            </Box>
-                                        )}
+                                        {/* Right side: Experience, Skills and Score buttons */}
+                                        <Box sx={{ display: 'flex', gap: 1, alignItems: 'center', ml: 2 }}>
+                                            {/* Send Mail Button - Individual Email */}
+                                            <Button
+                                                variant="outlined"
+                                                startIcon={<EmailIcon />}
+                                                onClick={() => {
+                                                    setSelectedCandidates([candidate]);
+                                                    setEmailModalOpen(true);
+                                                }}
+                                                sx={{
+                                                    minWidth: 80,
+                                                    height: 40,
+                                                    borderRadius: 2,
+                                                    borderColor: '#4caf50',
+                                                    color: '#4caf50',
+                                                    fontWeight: 'bold',
+                                                    fontSize: '0.875rem',
+                                                    '&:hover': {
+                                                        borderColor: '#45a049',
+                                                        backgroundColor: 'rgba(76, 175, 80, 0.04)',
+                                                    },
+                                                }}
+                                            >
+                                                Mail
+                                            </Button>
 
-                                        <Chip
-                                            label={`${candidate.match_score.toFixed(1)}% Match`}
-                                            sx={{
-                                                backgroundColor: getScoreColor(candidate.match_score),
-                                                color: 'white',
-                                                fontWeight: 'bold',
-                                                fontSize: '1rem',
-                                                px: 2,
-                                            }}
-                                        />
+                                            {/* Skills Button - Outlined Box */}
+                                            <Button
+                                                variant="outlined"
+                                                onClick={() => {
+                                                    setExpandedAccordions(prev => ({
+                                                        ...prev,
+                                                        [`skills-${actualIndex}`]: !prev[`skills-${actualIndex}`]
+                                                    }));
+                                                }}
+                                                sx={{
+                                                    minWidth: 80,
+                                                    height: 40,
+                                                    borderRadius: 2,
+                                                    borderColor: '#2196f3',
+                                                    color: '#2196f3',
+                                                    fontWeight: 'bold',
+                                                    fontSize: '0.875rem',
+                                                    '&:hover': {
+                                                        borderColor: '#1976d2',
+                                                        backgroundColor: 'rgba(33, 150, 243, 0.04)',
+                                                    },
+                                                }}
+                                            >
+                                                Skills
+                                            </Button>
+
+                                            {/* Score Button - Outlined Box */}
+                                            <Button
+                                                variant="outlined"
+                                                onClick={() => {
+                                                    setExpandedAccordions(prev => ({
+                                                        ...prev,
+                                                        [`score-${actualIndex}`]: !prev[`score-${actualIndex}`]
+                                                    }));
+                                                }}
+                                                sx={{
+                                                    minWidth: 100,
+                                                    height: 40,
+                                                    borderRadius: 2,
+                                                    borderColor: getScoreColor(candidate.match_score),
+                                                    color: getScoreColor(candidate.match_score),
+                                                    fontWeight: 'bold',
+                                                    fontSize: '0.875rem',
+                                                    '&:hover': {
+                                                        borderColor: getScoreColor(candidate.match_score),
+                                                        backgroundColor: `${getScoreColor(candidate.match_score)}10`,
+                                                    },
+                                                }}
+                                            >
+                                                {candidate.match_score.toFixed(0)}% Match
+                                            </Button>
+                                        </Box>
                                     </Box>
 
-                                    {/* Match Label */}
-                                    <Alert
-                                        severity={candidate.match_score >= 80 ? 'success' : candidate.match_score >= 60 ? 'warning' : 'error'}
-                                        sx={{ mb: 2 }}
-                                    >
-                                        <Typography variant="subtitle2" fontWeight="bold">
-                                            {getMatchLabel(candidate.match_score)}
-                                        </Typography>
-                                    </Alert>
-
-                                    {/* Component Scores */}
-                                    <Accordion
-                                        expanded={expandedAccordions[`score-${actualIndex}`] || false}
-                                        onChange={handleAccordionChange(`score-${actualIndex}`)}
-                                        TransitionProps={{ timeout: 200, unmountOnExit: true }}
-                                    >
-                                        <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                                            <Typography variant="subtitle1" fontWeight="bold">
-                                                📊 Score Breakdown
+                                    {/* Score Breakdown - Controlled by Score Button */}
+                                    {expandedAccordions[`score-${actualIndex}`] && (
+                                        <Paper sx={{ p: 2, mb: 2, mt: 2, backgroundColor: '#f5f5f5' }}>
+                                            <Typography variant="subtitle1" fontWeight="bold" sx={{ mb: 2 }}>
+                                                Score Breakdown
                                             </Typography>
-                                        </AccordionSummary>
-                                        <AccordionDetails>
+                                            
                                             {/* Tailored Resume Info */}
                                             {candidate.scoring_breakdown?.has_tailored && (
                                                 <Alert severity="info" sx={{ mb: 2 }}>
@@ -949,44 +1004,38 @@ const IntelligentRanking = () => {
                                                     </Grid>
                                                 ))}
                                             </Grid>
-                                        </AccordionDetails>
-                                    </Accordion>
+                                        </Paper>
+                                    )}
 
-                                    {/* Skills Match Details */}
-                                    <Accordion
-                                        expanded={expandedAccordions[`skills-${actualIndex}`] || false}
-                                        onChange={handleAccordionChange(`skills-${actualIndex}`)}
-                                        TransitionProps={{ timeout: 200, unmountOnExit: true }}
-                                    >
-                                        <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                                            <Typography variant="subtitle1" fontWeight="bold">
-                                                💼 Skills Analysis
-                                            </Typography>
-                                        </AccordionSummary>
-                                        <AccordionDetails>
-                                            <Grid container spacing={3}>
-                                                {/* Required Skills Section */}
+                                    {/* Skills Analysis - Controlled by Skills Button */}
+                                    {expandedAccordions[`skills-${actualIndex}`] && (
+                                        <Paper sx={{ p: 3, mb: 2, mt: 2, backgroundColor: '#f5f5f5' }}>
+                                            <Grid container spacing={4}>
+                                                {/* Required Skills Section - Top Left */}
                                                 <Grid size={{ xs: 12, md: 6 }}>
-                                                    <Typography variant="subtitle2" fontWeight="bold" sx={{ mb: 2, color: '#1976d2' }}>
-                                                        🎯 Required Skills
+                                                    <Typography variant="h6" fontWeight="bold" sx={{ mb: 2, color: '#1976d2' }}>
+                                                        Required Skills
                                                     </Typography>
                                                     
                                                     {/* Matched Required Skills */}
                                                     {candidate.match_details.matched_required_skills?.length > 0 && (
-                                                        <Box sx={{ mb: 2 }}>
-                                                            <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-                                                                <CheckCircleIcon sx={{ color: 'success.main', mr: 1, fontSize: '1rem' }} />
-                                                                <Typography variant="body2" fontWeight="bold">
-                                                                    Matched ({candidate.match_details.matched_required_skills.length})
-                                                                </Typography>
-                                                            </Box>
-                                                            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+                                                        <Box sx={{ mb: 3 }}>
+                                                            <Typography variant="body1" fontWeight="600" sx={{ mb: 1.5, color: '#2e7d32' }}>
+                                                                ✓ Has ({candidate.match_details.matched_required_skills.length})
+                                                            </Typography>
+                                                            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1.5 }}>
                                                                 {candidate.match_details.matched_required_skills.map((skill) => (
                                                                     <Chip
                                                                         key={skill}
                                                                         label={skill}
-                                                                        size="small"
-                                                                        sx={{ backgroundColor: '#dcfce7', color: '#166534' }}
+                                                                        size="medium"
+                                                                        sx={{ 
+                                                                            backgroundColor: '#dcfce7', 
+                                                                            color: '#166534',
+                                                                            fontWeight: '600',
+                                                                            fontSize: '0.9rem',
+                                                                            py: 2
+                                                                        }}
                                                                     />
                                                                 ))}
                                                             </Box>
@@ -996,19 +1045,22 @@ const IntelligentRanking = () => {
                                                     {/* Missing Required Skills */}
                                                     {candidate.match_details.missing_required_skills?.length > 0 && (
                                                         <Box>
-                                                            <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-                                                                <CancelIcon sx={{ color: 'error.main', mr: 1, fontSize: '1rem' }} />
-                                                                <Typography variant="body2" fontWeight="bold">
-                                                                    Missing ({candidate.match_details.missing_required_skills.length})
-                                                                </Typography>
-                                                            </Box>
-                                                            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+                                                            <Typography variant="body1" fontWeight="600" sx={{ mb: 1.5, color: '#d32f2f' }}>
+                                                                ✗ Missing ({candidate.match_details.missing_required_skills.length})
+                                                            </Typography>
+                                                            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1.5 }}>
                                                                 {candidate.match_details.missing_required_skills.map((skill) => (
                                                                     <Chip
                                                                         key={skill}
                                                                         label={skill}
-                                                                        size="small"
-                                                                        sx={{ backgroundColor: '#fee2e2', color: '#991b1b' }}
+                                                                        size="medium"
+                                                                        sx={{ 
+                                                                            backgroundColor: '#fee2e2', 
+                                                                            color: '#991b1b',
+                                                                            fontWeight: '600',
+                                                                            fontSize: '0.9rem',
+                                                                            py: 2
+                                                                        }}
                                                                     />
                                                                 ))}
                                                             </Box>
@@ -1018,34 +1070,37 @@ const IntelligentRanking = () => {
                                                     {/* No Required Skills */}
                                                     {(!candidate.match_details.matched_required_skills || candidate.match_details.matched_required_skills.length === 0) && 
                                                      (!candidate.match_details.missing_required_skills || candidate.match_details.missing_required_skills.length === 0) && (
-                                                        <Typography variant="body2" color="text.secondary">
+                                                        <Typography variant="body1" color="text.secondary">
                                                             No required skills specified
                                                         </Typography>
                                                     )}
                                                 </Grid>
 
-                                                {/* Preferred Skills Section */}
+                                                {/* Preferred Skills Section - Top Right */}
                                                 <Grid size={{ xs: 12, md: 6 }}>
-                                                    <Typography variant="subtitle2" fontWeight="bold" sx={{ mb: 2, color: '#9c27b0' }}>
-                                                        ⭐ Preferred Skills
+                                                    <Typography variant="h6" fontWeight="bold" sx={{ mb: 2, color: '#9c27b0' }}>
+                                                        Preferred Skills
                                                     </Typography>
                                                     
                                                     {/* Matched Preferred Skills */}
                                                     {candidate.match_details.matched_preferred_skills?.length > 0 && (
-                                                        <Box sx={{ mb: 2 }}>
-                                                            <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-                                                                <CheckCircleIcon sx={{ color: 'success.main', mr: 1, fontSize: '1rem' }} />
-                                                                <Typography variant="body2" fontWeight="bold">
-                                                                    Matched ({candidate.match_details.matched_preferred_skills.length})
-                                                                </Typography>
-                                                            </Box>
-                                                            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+                                                        <Box sx={{ mb: 3 }}>
+                                                            <Typography variant="body1" fontWeight="600" sx={{ mb: 1.5, color: '#7b1fa2' }}>
+                                                                ✓ Has ({candidate.match_details.matched_preferred_skills.length})
+                                                            </Typography>
+                                                            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1.5 }}>
                                                                 {candidate.match_details.matched_preferred_skills.map((skill) => (
                                                                     <Chip
                                                                         key={skill}
                                                                         label={skill}
-                                                                        size="small"
-                                                                        sx={{ backgroundColor: '#f3e5f5', color: '#6a1b9a' }}
+                                                                        size="medium"
+                                                                        sx={{ 
+                                                                            backgroundColor: '#f3e5f5', 
+                                                                            color: '#6a1b9a',
+                                                                            fontWeight: '600',
+                                                                            fontSize: '0.9rem',
+                                                                            py: 2
+                                                                        }}
                                                                     />
                                                                 ))}
                                                             </Box>
@@ -1055,19 +1110,22 @@ const IntelligentRanking = () => {
                                                     {/* Missing Preferred Skills */}
                                                     {candidate.match_details.missing_preferred_skills?.length > 0 && (
                                                         <Box>
-                                                            <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-                                                                <CancelIcon sx={{ color: 'warning.main', mr: 1, fontSize: '1rem' }} />
-                                                                <Typography variant="body2" fontWeight="bold">
-                                                                    Missing ({candidate.match_details.missing_preferred_skills.length})
-                                                                </Typography>
-                                                            </Box>
-                                                            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+                                                            <Typography variant="body1" fontWeight="600" sx={{ mb: 1.5, color: '#f57c00' }}>
+                                                                ✗ Missing ({candidate.match_details.missing_preferred_skills.length})
+                                                            </Typography>
+                                                            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1.5 }}>
                                                                 {candidate.match_details.missing_preferred_skills.map((skill) => (
                                                                     <Chip
                                                                         key={skill}
                                                                         label={skill}
-                                                                        size="small"
-                                                                        sx={{ backgroundColor: '#fff3e0', color: '#e65100' }}
+                                                                        size="medium"
+                                                                        sx={{ 
+                                                                            backgroundColor: '#fff3e0', 
+                                                                            color: '#e65100',
+                                                                            fontWeight: '600',
+                                                                            fontSize: '0.9rem',
+                                                                            py: 2
+                                                                        }}
                                                                     />
                                                                 ))}
                                                             </Box>
@@ -1077,76 +1135,15 @@ const IntelligentRanking = () => {
                                                     {/* No Preferred Skills */}
                                                     {(!candidate.match_details.matched_preferred_skills || candidate.match_details.matched_preferred_skills.length === 0) && 
                                                      (!candidate.match_details.missing_preferred_skills || candidate.match_details.missing_preferred_skills.length === 0) && (
-                                                        <Typography variant="body2" color="text.secondary">
+                                                        <Typography variant="body1" color="text.secondary">
                                                             No preferred skills specified
                                                         </Typography>
                                                     )}
                                                 </Grid>
                                             </Grid>
-                                        </AccordionDetails>
-                                    </Accordion>
+                                        </Paper>
+                                    )}
 
-                                    {/* AI Explanation */}
-                                    <Accordion
-                                        expanded={expandedAccordions[`ai-${actualIndex}`] || false}
-                                        onChange={handleAccordionChange(`ai-${actualIndex}`)}
-                                        TransitionProps={{ timeout: 200, unmountOnExit: true }}
-                                    >
-                                        <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                                            <Typography variant="subtitle1" fontWeight="bold">
-                                                🤖 AI Analysis & Recommendation
-                                            </Typography>
-                                        </AccordionSummary>
-                                        <AccordionDetails>
-                                            <Paper
-                                                sx={{
-                                                    p: 2,
-                                                    backgroundColor: '#f9fafb',
-                                                    borderLeft: '4px solid #667eea',
-                                                }}
-                                            >
-                                                <Typography variant="body2" sx={{ whiteSpace: 'pre-line', lineHeight: 1.8 }}>
-                                                    {candidate.explanation}
-                                                </Typography>
-                                            </Paper>
-                                        </AccordionDetails>
-                                    </Accordion>
-
-                                    <Divider sx={{ my: 2 }} />
-
-                                    {/* Action Buttons */}
-                                    <Grid container spacing={2}>
-                                        <Grid size={{ xs: 12, sm: 4 }}>
-                                            <Button
-                                                variant="outlined"
-                                                fullWidth
-                                                onClick={() => handleViewResume(candidate.student_id, candidate.student_name)}
-                                                startIcon={<DescriptionIcon />}
-                                            >
-                                                View Resume
-                                            </Button>
-                                        </Grid>
-                                        <Grid size={{ xs: 12, sm: 4 }}>
-                                            <Button
-                                                variant="contained"
-                                                fullWidth
-                                                color="primary"
-                                                onClick={() => toast.success('Candidate shortlisted!')}
-                                            >
-                                                Shortlist
-                                            </Button>
-                                        </Grid>
-                                        <Grid size={{ xs: 12, sm: 4 }}>
-                                            <Button
-                                                variant="contained"
-                                                fullWidth
-                                                color="success"
-                                                onClick={() => toast.success('Interview scheduling feature coming soon!')}
-                                            >
-                                                Schedule Interview
-                                            </Button>
-                                        </Grid>
-                                    </Grid>
                                 </CardContent>
                             </Card>
                         )})}
