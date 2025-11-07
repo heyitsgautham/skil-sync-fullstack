@@ -10,11 +10,16 @@ const CreateInternshipForm = () => {
     preferred_skills: [],
     location: '',
     duration: '',
-    stipend: ''
+    stipend: '',
+    min_experience: 0,
+    max_experience: 5,
+    required_education: ''
   });
 
   const [loading, setLoading] = useState(false);
   const [extracting, setExtracting] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [uploadMethod, setUploadMethod] = useState('document'); // 'document' or 'manual'
   const [newSkill, setNewSkill] = useState({ required: '', preferred: '' });
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
@@ -24,6 +29,81 @@ const CreateInternshipForm = () => {
 
   // Get auth token from localStorage
   const getAuthToken = () => localStorage.getItem('token');
+
+  /**
+   * Handle document upload and parse internship details
+   */
+  const handleDocumentUpload = async (event) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    // Validate file type
+    const allowedTypes = ['.pdf', '.docx', '.doc', '.txt'];
+    const fileExt = file.name.substring(file.name.lastIndexOf('.')).toLowerCase();
+    
+    if (!allowedTypes.includes(fileExt)) {
+      setError('Invalid file type. Please upload PDF, DOCX, DOC, or TXT files.');
+      setTimeout(() => setError(''), 5000);
+      return;
+    }
+
+    // Validate file size (10MB limit)
+    const maxSize = 10 * 1024 * 1024; // 10MB
+    if (file.size > maxSize) {
+      setError('File is too large. Maximum size is 10MB.');
+      setTimeout(() => setError(''), 5000);
+      return;
+    }
+
+    setUploading(true);
+    setError('');
+
+    try {
+      const formDataUpload = new FormData();
+      formDataUpload.append('file', file);
+
+      const response = await axios.post(
+        `${API_BASE_URL}/internship/parse-document`,
+        formDataUpload,
+        {
+          headers: {
+            'Authorization': `Bearer ${getAuthToken()}`,
+            'Content-Type': 'multipart/form-data'
+          }
+        }
+      );
+
+      const extractedData = response.data;
+
+      // Pre-fill form with extracted data
+      setFormData({
+        title: extractedData.title || '',
+        description: extractedData.description || '',
+        required_skills: extractedData.required_skills || [],
+        preferred_skills: extractedData.preferred_skills || [],
+        location: extractedData.location || '',
+        duration: extractedData.duration || '',
+        stipend: extractedData.stipend || '',
+        min_experience: extractedData.min_experience || 0,
+        max_experience: extractedData.max_experience || 5,
+        required_education: extractedData.required_education || ''
+      });
+
+      setSuccess('✅ Document parsed successfully! Please review and edit the details below.');
+      setTimeout(() => setSuccess(''), 5000);
+
+    } catch (err) {
+      console.error('Error uploading document:', err);
+      setError(
+        err.response?.data?.detail || 
+        'Failed to parse document. Please try manual entry or try again.'
+      );
+    } finally {
+      setUploading(false);
+      // Reset file input
+      event.target.value = '';
+    }
+  };
 
   /**
    * Extract skills from job description using AI
@@ -162,7 +242,10 @@ const CreateInternshipForm = () => {
           preferred_skills: [],
           location: '',
           duration: '',
-          stipend: ''
+          stipend: '',
+          min_experience: 0,
+          max_experience: 5,
+          required_education: ''
         });
         setSuccess('');
       }, 2000);
@@ -194,6 +277,74 @@ const CreateInternshipForm = () => {
 
       {error && <div className="alert alert-error">{error}</div>}
       {success && <div className="alert alert-success">{success}</div>}
+
+      {/* Upload Method Toggle */}
+      <div className="upload-method-selector">
+        <h3>Choose Input Method:</h3>
+        <div className="method-buttons">
+          <button
+            type="button"
+            className={`method-btn ${uploadMethod === 'document' ? 'active' : ''}`}
+            onClick={() => setUploadMethod('document')}
+          >
+            <span className="method-icon">📄</span>
+            <span className="method-text">Upload Document</span>
+            <small>AI auto-fills all details</small>
+          </button>
+          <button
+            type="button"
+            className={`method-btn ${uploadMethod === 'manual' ? 'active' : ''}`}
+            onClick={() => setUploadMethod('manual')}
+          >
+            <span className="method-icon">✍️</span>
+            <span className="method-text">Enter Manually</span>
+            <small>Fill form by hand</small>
+          </button>
+        </div>
+      </div>
+
+      {/* Document Upload Section */}
+      {uploadMethod === 'document' && (
+        <div className="document-upload-section">
+          <div className="upload-area">
+            <h3>📄 Upload Job Description</h3>
+            <p className="upload-description">
+              Upload a PDF, DOCX, DOC, or TXT file containing the job description. 
+              Our AI will automatically extract all details including title, description, 
+              skills, location, duration, and compensation.
+            </p>
+            <div className="file-input-wrapper">
+              <input
+                type="file"
+                id="document-upload"
+                accept=".pdf,.docx,.doc,.txt"
+                onChange={handleDocumentUpload}
+                disabled={uploading}
+                className="file-input"
+              />
+              <label htmlFor="document-upload" className={`file-input-label ${uploading ? 'uploading' : ''}`}>
+                {uploading ? (
+                  <>
+                    <span className="spinner"></span>
+                    <span>Parsing document...</span>
+                  </>
+                ) : (
+                  <>
+                    <span className="upload-icon">⬆️</span>
+                    <span>Click to upload or drag & drop</span>
+                    <small>PDF, DOCX, DOC, TXT (Max 10MB)</small>
+                  </>
+                )}
+              </label>
+            </div>
+            {uploading && (
+              <p className="upload-status">
+                🔄 Uploading and parsing document... This may take a few seconds.
+              </p>
+            )}
+          </div>
+        </div>
+      )}
 
       <form onSubmit={handleSubmit}>
         {/* Title Field */}
@@ -382,6 +533,49 @@ const CreateInternshipForm = () => {
             onChange={(e) => setFormData({ ...formData, stipend: e.target.value })}
             placeholder="e.g., $1500/month, Unpaid, Negotiable"
           />
+        </div>
+
+        {/* Experience Range Fields */}
+        <div className="form-group-row">
+          <div className="form-group">
+            <label htmlFor="min_experience">Min Experience (years)</label>
+            <input
+              type="number"
+              id="min_experience"
+              step="0.5"
+              min="0"
+              value={formData.min_experience}
+              onChange={(e) => setFormData({ ...formData, min_experience: parseFloat(e.target.value) || 0 })}
+              placeholder="0"
+            />
+          </div>
+          <div className="form-group">
+            <label htmlFor="max_experience">Max Experience (years)</label>
+            <input
+              type="number"
+              id="max_experience"
+              step="0.5"
+              min="0"
+              value={formData.max_experience}
+              onChange={(e) => setFormData({ ...formData, max_experience: parseFloat(e.target.value) || 5 })}
+              placeholder="5"
+            />
+          </div>
+        </div>
+
+        {/* Required Education Field */}
+        <div className="form-group">
+          <label htmlFor="required_education">Required Education</label>
+          <input
+            type="text"
+            id="required_education"
+            value={formData.required_education}
+            onChange={(e) => setFormData({ ...formData, required_education: e.target.value })}
+            placeholder="e.g., Currently pursuing Bachelor's in Computer Science"
+          />
+          <small className="form-hint">
+            Specify education level, degree, or field of study requirements
+          </small>
         </div>
 
         {/* Submit Buttons */}
