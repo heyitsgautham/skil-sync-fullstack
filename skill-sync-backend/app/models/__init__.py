@@ -5,7 +5,6 @@ from app.models.internship import Internship
 from app.models.resume import Resume
 from app.models.application import Application, ApplicationStatus
 from app.models.student_internship_match import StudentInternshipMatch
-from app.models.explainability import CandidateExplanation, AuditLog, FairnessCheck
 
 __all__ = [
     "User", 
@@ -14,8 +13,5 @@ __all__ = [
     "Resume", 
     "Application", 
     "ApplicationStatus",
-    "StudentInternshipMatch",
-    "CandidateExplanation",
-    "AuditLog",
-    "FairnessCheck"
+    "StudentInternshipMatch"
 ]

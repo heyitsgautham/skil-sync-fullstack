@@ -75,22 +75,9 @@ class MatchExplanationService:
                 logger.error(f"❌ No active resume found for candidate {candidate_id}")
                 return None
             
-            # Extract data from resume - handle both dict and JSON string
+            # Extract data from resume
             parsed_data = resume.parsed_data or {}
-            if isinstance(parsed_data, str):
-                try:
-                    import json
-                    parsed_data = json.loads(parsed_data)
-                except:
-                    parsed_data = {}
-            
             candidate_skills = resume.extracted_skills or []
-            if isinstance(candidate_skills, str):
-                try:
-                    import json
-                    candidate_skills = json.loads(candidate_skills)
-                except:
-                    candidate_skills = []
             candidate_experience = parsed_data.get('work_experience', [])
             candidate_education = parsed_data.get('education', [])
             candidate_projects = parsed_data.get('projects', [])
@@ -98,9 +85,9 @@ class MatchExplanationService:
             # Extract data from internship
             required_skills = internship.required_skills or []
             preferred_skills = internship.preferred_skills or []
-            min_years = internship.min_experience or 0
+            min_years = internship.min_years_experience or 0
             preferred_years = internship.preferred_years or min_years
-            required_education = internship.required_education or 'Bachelor'
+            required_education = internship.education_level or 'Bachelor'
             skill_weights = internship.skill_weights or []
             rubric_weights = internship.rubric_weights or {}
             
@@ -237,10 +224,10 @@ class MatchExplanationService:
                 'project_analysis': project_analysis,
                 'ai_recommendation': ai_recommendation,
                 'provenance': {
-                    'extraction_model': 'gemini-2.5-flash',  # Updated to current production model
+                    'extraction_model': 'gemini-2.0-flash-exp',
                     'extract_time': datetime.now().isoformat(),
                     'data_sources': ['resume', 'internship_posting'],
-                    'llm_model': 'gemini-2.5-flash'  # Updated to current production model
+                    'llm_model': 'gemini-2.0-flash-exp'
                 },
                 'created_at': datetime.now().isoformat()
             }
@@ -301,13 +288,10 @@ class MatchExplanationService:
             matched_skills_str = ", ".join([s['skill'] for s in matched_skills[:10]])
             missing_skills_str = ", ".join([s['skill'] for s in missing_skills[:5]])
             
-            # Get company name safely
-            company_name = getattr(internship.company, 'company_name', None) or getattr(internship.company, 'full_name', 'Unknown Company')
-            
             prompt = f"""Analyze this candidate for the internship role and provide a detailed recommendation.
 
 **Candidate:** {candidate.full_name}
-**Role:** {internship.title} at {company_name}
+**Role:** {internship.title} at {internship.company_name}
 
 **Component Scores:**
 - Semantic Match: {component_scores['semantic']:.1f}%
@@ -342,48 +326,25 @@ Return as JSON:
 }}
 """
             
-            # Define JSON schema for structured output
-            response_schema = {
-                "type": "object",
-                "properties": {
-                    "action": {"type": "string", "enum": ["SHORTLIST", "MAYBE", "REJECT"]},
-                    "priority": {"type": "string", "enum": ["High", "Medium", "Low"]},
-                    "strengths": {
-                        "type": "array",
-                        "items": {"type": "string"},
-                        "minItems": 3,
-                        "maxItems": 3
-                    },
-                    "concerns": {
-                        "type": "array",
-                        "items": {"type": "string"},
-                        "minItems": 2,
-                        "maxItems": 2
-                    },
-                    "interview_questions": {
-                        "type": "array",
-                        "items": {"type": "string"},
-                        "minItems": 3,
-                        "maxItems": 3
-                    },
-                    "justification": {"type": "string"}
-                },
-                "required": ["action", "priority", "strengths", "concerns", "interview_questions", "justification"]
-            }
-            
             response = client.models.generate_content(
-                model="gemini-2.5-flash",  # Updated to current production model
+                model="gemini-2.0-flash-exp",
                 contents=prompt,
                 config=types.GenerateContentConfig(
                     temperature=0.3,
-                    max_output_tokens=2000,
-                    response_mime_type="application/json",
-                    response_schema=response_schema
+                    max_output_tokens=2000
                 )
             )
             
-            # Parse response - guaranteed to be valid JSON
-            ai_rec = json.loads(response.text)
+            # Parse response
+            response_text = response.text.strip()
+            
+            # Extract JSON
+            if "```json" in response_text:
+                response_text = response_text.split("```json")[1].split("```")[0].strip()
+            elif "```" in response_text:
+                response_text = response_text.split("```")[1].split("```")[0].strip()
+            
+            ai_rec = json.loads(response_text)
             
             # Add prompt and response for provenance
             ai_rec['prompt'] = prompt
@@ -569,15 +530,7 @@ Return as JSON:
         elif explanation['recommendation'] == 'MAYBE':
             return f"Potential fit: {matched_count}/{total_required} skills matched, needs skills assessment"
         else:
-            # Handle both dict and string formats for missing_skills
-            missing_critical = []
-            for s in explanation['missing_skills']:
-                if isinstance(s, dict) and s.get('impact') == 'critical':
-                    missing_critical.append(s)
-                elif isinstance(s, str):
-                    # Legacy format: skills are strings
-                    continue
-            
+            missing_critical = [s for s in explanation['missing_skills'] if s.get('impact') == 'critical']
             if missing_critical:
                 return f"Missing critical skills: {', '.join([s['skill'] for s in missing_critical[:2]])}"
             return f"Limited match: {matched_count}/{total_required} skills, insufficient experience"

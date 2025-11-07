@@ -16,7 +16,6 @@ import ResumeIntelligence from './pages/ResumeIntelligence';
 import StudentProfile from './pages/student/StudentProfile';
 import CompanyProfile from './pages/company/CompanyProfile';
 import AdminProfile from './pages/admin/AdminProfile';
-import EnhancedCandidateRanking from './pages/company/EnhancedCandidateRanking';
 import PrivateRoute from './components/PrivateRoute';
 import authService from './services/authService';
 
@@ -132,14 +131,6 @@ function App() {
             element={
               <PrivateRoute>
                 <IntelligentRanking />
-              </PrivateRoute>
-            }
-          />
-          <Route
-            path="/enhanced-ranking"
-            element={
-              <PrivateRoute>
-                <EnhancedCandidateRanking />
               </PrivateRoute>
             }
           />

@@ -2,7 +2,6 @@
 Internship API Routes
 """
 
-import hashlib
 from typing import List, Optional
 from fastapi import APIRouter, Depends, HTTPException, status, UploadFile, File, Form
 from sqlalchemy.orm import Session
@@ -13,58 +12,18 @@ from app.models import User, Internship, UserRole, Resume, Application, StudentI
 from app.services.parser_service import InternshipParser
 from app.services.rag_engine import rag_engine
 from app.services.matching_engine import MatchingEngine
-from app.services.skill_extraction_service import get_skill_extraction_service
 from app.utils.security import get_current_user
 
 router = APIRouter(prefix="/internship", tags=["Internship"])
 
 # Pydantic schemas
-class SkillExtractionRequest(BaseModel):
-    title: str
-    description: str
-    num_suggestions: Optional[int] = 15
-
-
-class ExtractedSkill(BaseModel):
-    skill: str
-    original_name: str
-    category: str
-    confidence: float
-    span: List[int]
-    in_taxonomy: bool
-
-
-class SkillExtractionResponse(BaseModel):
-    skills: List[ExtractedSkill]
-    suggested_must_have: List[str]
-    suggested_preferred: List[str]
-    highlighted_html: str
-
-
 class InternshipCreate(BaseModel):
     title: str
     description: str
     required_skills: Optional[List[str]] = None
-    preferred_skills: Optional[List[str]] = None
-    min_experience: Optional[float] = 0.0
-    max_experience: Optional[float] = 10.0
-    preferred_years: Optional[float] = None
-    required_education: Optional[str] = None
     location: Optional[str] = None
     duration: Optional[str] = None
     stipend: Optional[str] = None
-    
-    # Job posting enhancement fields
-    rubric_weights: Optional[dict] = None  # {semantic: 0.35, skills: 0.30, experience: 0.20, education: 0.10, projects: 0.05}
-    skill_weights: Optional[List[dict]] = None  # [{skill: "React", weight: 1.0, type: "must"}, ...]
-    top_responsibilities: Optional[List[str]] = None  # List of 3 key responsibilities
-    key_deliverable: Optional[str] = None  # First 3-month deliverable description
-    requires_portfolio: Optional[bool] = False
-    role_level: Optional[str] = None  # Intern/Junior/Mid/Senior
-    
-    # AI skill extraction fields
-    extracted_skills_raw: Optional[List[dict]] = None  # Raw AI-extracted skills before HR editing
-    skills_extraction_confidence: Optional[dict] = None  # Confidence scores for each extracted skill
 
 
 class InternshipResponse(BaseModel):
@@ -74,25 +33,10 @@ class InternshipResponse(BaseModel):
     title: str
     description: str
     required_skills: Optional[List[str]] = None
-    preferred_skills: Optional[List[str]] = None
-    min_experience: Optional[float] = None
-    max_experience: Optional[float] = None
-    preferred_years: Optional[float] = None
-    required_education: Optional[str] = None
     location: Optional[str] = None
     duration: Optional[str] = None
     stipend: Optional[str] = None
     is_active: int
-    
-    # Job posting enhancement fields
-    rubric_weights: Optional[dict] = None
-    skill_weights: Optional[List[dict]] = None
-    top_responsibilities: Optional[List[str]] = None
-    key_deliverable: Optional[str] = None
-    requires_portfolio: Optional[bool] = None
-    role_level: Optional[str] = None
-    extracted_skills_raw: Optional[List[dict]] = None
-    skills_extraction_confidence: Optional[dict] = None
     
     class Config:
         from_attributes = True
@@ -102,70 +46,6 @@ class InternshipWithMatchScore(InternshipResponse):
     match_score: Optional[int] = None
     has_applied: bool = False
     application_resume_name: Optional[str] = None
-
-
-@router.post("/extract-skills", response_model=SkillExtractionResponse)
-def extract_skills_from_job_description(
-    request: SkillExtractionRequest,
-    current_user: User = Depends(get_current_user)
-):
-    """
-    Extract skills from job description using AI (Company only)
-    
-    Uses Gemini AI to analyze the job title and description, extracting:
-    - Technical and soft skills
-    - Confidence scores for each skill
-    - Text spans showing where skills appear
-    - Auto-categorization into must-have and preferred skills
-    
-    Returns:
-    - skills: List of extracted skills with metadata
-    - suggested_must_have: Skills with confidence > 0.8
-    - suggested_preferred: Skills with confidence 0.6-0.8
-    - highlighted_html: HTML version of description with skills highlighted
-    """
-    # Verify user is a company
-    if current_user.role != UserRole.company:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Only companies can use skill extraction"
-        )
-    
-    try:
-        # Get skill extraction service
-        extraction_service = get_skill_extraction_service()
-        
-        # Extract skills
-        extracted_skills = extraction_service.extract_skills_from_description(
-            title=request.title,
-            description=request.description,
-            num_suggestions=request.num_suggestions
-        )
-        
-        # Categorize into must-have and preferred
-        categorized = extraction_service.categorize_extracted_skills(
-            skills=extracted_skills,
-            required_threshold=0.8
-        )
-        
-        # Generate highlighted HTML
-        highlighted_html = extraction_service.highlight_skills_in_text(
-            description=request.description,
-            extracted_skills=extracted_skills
-        )
-        
-        return {
-            "skills": extracted_skills,
-            "suggested_must_have": categorized["must_have"],
-            "suggested_preferred": categorized["preferred"],
-            "highlighted_html": highlighted_html
-        }
-        
-    except Exception as e:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Error extracting skills: {str(e)}"
-        )
 
 
 @router.post("/post", response_model=InternshipResponse, status_code=status.HTTP_201_CREATED)
@@ -195,50 +75,17 @@ def post_internship(
         # Parse internship data to extract skills if not provided
         parsed_data = InternshipParser.parse_internship(internship_data.dict())
         
-        # Validate rubric_weights if provided
-        if internship_data.rubric_weights:
-            weights = internship_data.rubric_weights
-            total = sum([
-                weights.get('semantic', 0),
-                weights.get('skills', 0),
-                weights.get('experience', 0),
-                weights.get('education', 0),
-                weights.get('projects', 0)
-            ])
-            if abs(total - 1.0) > 0.01:  # Allow small floating point errors
-                raise HTTPException(
-                    status_code=status.HTTP_400_BAD_REQUEST,
-                    detail=f"Rubric weights must sum to 1.0, got {total}"
-                )
-        
-        # Create internship record with all fields
+        # Create internship record
         new_internship = Internship(
             company_id=current_user.id,
             title=parsed_data['title'],
             description=parsed_data['description'],
-            required_skills=parsed_data.get('required_skills') or internship_data.required_skills,
-            preferred_skills=internship_data.preferred_skills,
-            min_experience=internship_data.min_experience,
-            max_experience=internship_data.max_experience,
-            preferred_years=internship_data.preferred_years,
-            required_education=internship_data.required_education,
+            required_skills=parsed_data.get('required_skills'),
             location=parsed_data.get('location'),
             duration=parsed_data.get('duration'),
             stipend=parsed_data.get('stipend'),
-            rubric_weights=internship_data.rubric_weights,
-            skill_weights=internship_data.skill_weights,
-            top_responsibilities=internship_data.top_responsibilities,
-            key_deliverable=internship_data.key_deliverable,
-            requires_portfolio=internship_data.requires_portfolio,
-            role_level=internship_data.role_level,
-            extracted_skills_raw=internship_data.extracted_skills_raw,
-            skills_extraction_confidence=internship_data.skills_extraction_confidence,
             is_active=1
         )
-        
-        # Calculate content hash for change detection
-        content_for_hash = f"{new_internship.title}|{new_internship.description}|{new_internship.required_skills}"
-        new_internship.content_hash = hashlib.sha256(content_for_hash.encode()).hexdigest()
         
         db.add(new_internship)
         db.commit()
@@ -851,175 +698,3 @@ def get_my_applications(
         )
         for app in applications
     ]
-
-
-# ==========================================
-# PHASE 4: PRECOMPUTATION ENDPOINTS
-# ==========================================
-
-@router.post("/{internship_id}/precompute")
-def precompute_candidate_explanations(
-    internship_id: int,
-    top_n: int = 50,
-    force_refresh: bool = False,
-    db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user)
-):
-    """
-    **Task 4.4: Precompute explanations for top N candidates (Admin/Company endpoint)**
-    
-    Generates explanations in batch for all matched candidates to improve response times
-    when HR reviews the candidate list. This is useful for:
-    - Background processing after new internship posting
-    - Batch updates when resume parsing completes
-    - Reducing initial load time in candidate review UI
-    
-    **Access Control:**
-    - Companies can precompute for their own internships
-    - Admins can precompute for any internship
-    
-    **Query Parameters:**
-    - `top_n`: Number of top candidates to precompute (default: 50, max: 200)
-    - `force_refresh`: Force regeneration even if cache exists (default: false)
-    
-    **Cache Invalidation:**
-    Cached explanations are automatically invalidated when:
-    - More than 24 hours old
-    - Internship requirements are updated
-    - Candidate resume is updated
-    
-    **Example Response:**
-    ```json
-    {
-      "internship_id": 456,
-      "requested_count": 50,
-      "processed": 48,
-      "cached": 25,
-      "new": 23,
-      "errors": 2,
-      "error_details": ["Failed to generate explanation for candidate 789"],
-      "duration_seconds": 45.2,
-      "message": "Precomputation complete. 48/50 candidates processed."
-    }
-    ```
-    """
-    import logging
-    logger = logging.getLogger(__name__)
-    
-    # Verify access permissions
-    if current_user.role == UserRole.company:
-        # Verify internship belongs to current company
-        internship = db.query(Internship).filter(
-            Internship.id == internship_id,
-            Internship.company_id == current_user.id
-        ).first()
-        
-        if not internship:
-            raise HTTPException(
-                status_code=status.HTTP_403_FORBIDDEN,
-                detail="You don't have access to this internship"
-            )
-    elif current_user.role == UserRole.student:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Students cannot trigger precomputation"
-        )
-    # Admins have full access
-    
-    # Limit top_n to reasonable bounds
-    if top_n > 200:
-        top_n = 200
-        logger.warning(f"⚠️  Limiting top_n to 200 (requested: {top_n})")
-    
-    logger.info(f"🔄 Starting precomputation for internship {internship_id} (top {top_n} candidates)")
-    
-    # Trigger precomputation
-    from app.services.precompute_service import get_precompute_service
-    
-    precompute_service = get_precompute_service()
-    
-    results = precompute_service.precompute_explanations_for_internship(
-        internship_id=internship_id,
-        db_session=db,
-        top_n=top_n,
-        force_refresh=force_refresh
-    )
-    
-    # Build response message
-    success_rate = (results['processed'] / results['requested_count'] * 100) if results['requested_count'] > 0 else 0
-    
-    results['message'] = (
-        f"Precomputation complete. {results['processed']}/{results['requested_count']} candidates processed "
-        f"({results['new']} new, {results['cached']} cached, {results['errors']} errors) "
-        f"in {results['duration_seconds']}s. Success rate: {success_rate:.1f}%"
-    )
-    
-    logger.info(f"✅ {results['message']}")
-    
-    return results
-
-
-@router.get("/{internship_id}/precompute-status")
-def get_precompute_status(
-    internship_id: int,
-    db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user)
-):
-    """
-    **Get status of precomputed explanations for an internship**
-    
-    Returns information about cache coverage and freshness to help decide
-    when to trigger precomputation.
-    
-    **Access Control:**
-    - Companies can check status for their own internships
-    - Admins can check status for any internship
-    
-    **Example Response:**
-    ```json
-    {
-      "internship_id": 456,
-      "total_matches": 120,
-      "precomputed_count": 50,
-      "fresh_count": 45,
-      "stale_count": 5,
-      "coverage_percent": 41.67,
-      "needs_refresh": true
-    }
-    ```
-    """
-    import logging
-    logger = logging.getLogger(__name__)
-    
-    # Verify access permissions
-    if current_user.role == UserRole.company:
-        # Verify internship belongs to current company
-        internship = db.query(Internship).filter(
-            Internship.id == internship_id,
-            Internship.company_id == current_user.id
-        ).first()
-        
-        if not internship:
-            raise HTTPException(
-                status_code=status.HTTP_403_FORBIDDEN,
-                detail="You don't have access to this internship"
-            )
-    elif current_user.role == UserRole.student:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Students cannot check precompute status"
-        )
-    # Admins have full access
-    
-    logger.info(f"📊 Checking precompute status for internship {internship_id}")
-    
-    from app.services.precompute_service import get_precompute_service
-    
-    precompute_service = get_precompute_service()
-    
-    status_report = precompute_service.get_precompute_status(
-        internship_id=internship_id,
-        db_session=db
-    )
-    
-    return status_report

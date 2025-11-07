@@ -45,6 +45,3 @@ sentence-transformers
 transformers
 torch
 numpy
-fuzzywuzzy
-python-Levenshtein  # For faster fuzzy matching
-python-dateutil  # For date parsing
