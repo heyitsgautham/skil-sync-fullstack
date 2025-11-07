@@ -14,7 +14,7 @@ echo "1️⃣ Testing Backend Server..."
 if curl -s "${API_URL}/docs" | grep -q "FastAPI"; then
     echo "   ✅ Backend server is running"
 else
-    echo "   ❌ Backend server is not responding"
+    echo "     Backend server is not responding"
     exit 1
 fi
 echo ""
@@ -38,9 +38,9 @@ try:
     if result.fetchone():
         print("✅ mailing_email column exists")
     else:
-        print("❌ mailing_email column not found")
+        print("  mailing_email column not found")
 except Exception as e:
-    print(f"❌ Database check failed: {e}")
+    print(f"  Database check failed: {e}")
 finally:
     db.close()
 EOF
@@ -74,7 +74,7 @@ if echo "$COMPANY_REGISTER" | grep -q "token"; then
     if echo "$PROFILE_GET" | grep -q "mailing_email"; then
         echo "   ✅ Profile GET returns mailing_email field"
     else
-        echo "   ❌ Profile GET missing mailing_email field"
+        echo "     Profile GET missing mailing_email field"
         echo "   Response: $PROFILE_GET"
     fi
     
@@ -93,7 +93,7 @@ if echo "$COMPANY_REGISTER" | grep -q "token"; then
     if echo "$PROFILE_UPDATE" | grep -q "notifications@testcompany.com"; then
         echo "   ✅ Profile UPDATE successfully saved mailing_email"
     else
-        echo "   ❌ Profile UPDATE failed to save mailing_email"
+        echo "     Profile UPDATE failed to save mailing_email"
         echo "   Response: $PROFILE_UPDATE"
     fi
     
@@ -128,7 +128,7 @@ if echo "$STUDENT_REGISTER" | grep -q "token"; then
     if echo "$STUDENT_PROFILE" | grep -q "email"; then
         echo "   ✅ Student profile GET successful"
     else
-        echo "   ❌ Student profile GET failed"
+        echo "     Student profile GET failed"
     fi
 else
     echo "   ⚠️  Could not create test student (may already exist)"

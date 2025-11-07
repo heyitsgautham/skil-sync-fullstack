@@ -97,7 +97,7 @@ async def parse_and_extract_resume(
         
     except Exception as e:
         import traceback
-        logger.error(f"[RESUME UPLOAD] ❌ Error processing resume: {str(e)}")
+        logger.error(f"[RESUME UPLOAD]   Error processing resume: {str(e)}")
         logger.error(f"[RESUME UPLOAD] Traceback: {traceback.format_exc()}")
         raise HTTPException(status_code=500, detail=f"Error processing resume: {str(e)}")
 
@@ -241,7 +241,7 @@ async def rank_candidates_for_internship(
                         tailored_embedding = retrieved_tailored_embedding if retrieved_tailored_embedding is not None else []
                         logger.info(f"📊 Tailored resume embedding: {len(tailored_embedding)} dimensions")
                     except Exception as e:
-                        logger.error(f"❌ Error retrieving tailored embedding: {e}")
+                        logger.error(f"  Error retrieving tailored embedding: {e}")
                         tailored_embedding = []
                     
                     try:
@@ -249,7 +249,7 @@ async def rank_candidates_for_internship(
                         internship_embedding = retrieved_internship_embedding if retrieved_internship_embedding is not None else []
                         logger.info(f"📊 Internship embedding: {len(internship_embedding)} dimensions")
                     except Exception as e:
-                        logger.error(f"❌ Error retrieving internship embedding: {e}")
+                        logger.error(f"  Error retrieving internship embedding: {e}")
                         internship_embedding = []
                     
                     # Check if tailored embedding is missing - fall back to base resume
@@ -291,7 +291,7 @@ async def rank_candidates_for_internship(
                             skills_match = base_match.skills_match_score
                             experience_match = base_match.experience_match_score
                         else:
-                            logger.error(f"❌ No base match for student {student.id} with missing tailored embedding")
+                            logger.error(f"  No base match for student {student.id} with missing tailored embedding")
                             raise ValueError(f"No scoring data available for student {student.id}")
                 else:
                     # No tailored resume or same as base, use base match only
@@ -301,7 +301,7 @@ async def rank_candidates_for_internship(
                         skills_match = base_match.skills_match_score
                         experience_match = base_match.experience_match_score
                     else:
-                        logger.error(f"❌ No base match or tailored resume for student {student.id}")
+                        logger.error(f"  No base match or tailored resume for student {student.id}")
                         raise ValueError(f"No scoring data available for student {student.id}")
                 
                 # Build component_scores for frontend display (using computed/combined scores)
@@ -815,7 +815,7 @@ async def rank_candidates_for_internship(
         
     except Exception as e:
         import traceback
-        logger.error(f"❌ Error ranking candidates: {str(e)}")
+        logger.error(f"  Error ranking candidates: {str(e)}")
         logger.error(traceback.format_exc())
         raise HTTPException(status_code=500, detail=f"Error ranking candidates: {str(e)}")
 
@@ -894,7 +894,7 @@ async def get_flagged_candidates_details(
         raise
     except Exception as e:
         import traceback
-        logger.error(f"❌ Error fetching flagged candidate details: {str(e)}")
+        logger.error(f"  Error fetching flagged candidate details: {str(e)}")
         logger.error(traceback.format_exc())
         raise HTTPException(status_code=500, detail=f"Error fetching candidate details: {str(e)}")
 
@@ -1140,7 +1140,7 @@ async def compute_batch_similarity_matches(
         
     except Exception as e:
         import traceback
-        logger.error(f"❌ Error computing batch matches: {str(e)}")
+        logger.error(f"  Error computing batch matches: {str(e)}")
         logger.error(traceback.format_exc())
         raise HTTPException(
             status_code=500,
@@ -1408,7 +1408,7 @@ async def get_filtered_ranked_candidates(
         
     except Exception as e:
         import traceback
-        logger.error(f"❌ Error filtering candidates: {str(e)}")
+        logger.error(f"  Error filtering candidates: {str(e)}")
         logger.error(traceback.format_exc())
         raise HTTPException(
             status_code=500,
@@ -1810,7 +1810,7 @@ async def export_candidate_rankings(
     except Exception as e:
         import traceback
         error_trace = traceback.format_exc()
-        logger.error(f"❌ Error exporting candidates: {str(e)}")
+        logger.error(f"  Error exporting candidates: {str(e)}")
         logger.error(error_trace)
         
         # Provide more detailed error message

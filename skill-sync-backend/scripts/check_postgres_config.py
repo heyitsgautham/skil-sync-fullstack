@@ -16,7 +16,7 @@ def check_env_file():
     
     env_path = os.path.join(os.path.dirname(__file__), '..', '.env')
     if not os.path.exists(env_path):
-        print("❌ .env file not found!")
+        print("  .env file not found!")
         print(f"   Expected location: {os.path.abspath(env_path)}")
         return False
     
@@ -24,7 +24,7 @@ def check_env_file():
     
     DATABASE_URL = os.getenv("DATABASE_URL")
     if not DATABASE_URL:
-        print("❌ DATABASE_URL not set in .env file")
+        print("  DATABASE_URL not set in .env file")
         return False
     
     print(f"✅ DATABASE_URL is set")
@@ -39,7 +39,7 @@ def check_env_file():
     
     # Check URL format
     if not DATABASE_URL.startswith("postgresql://"):
-        print(f"❌ Invalid DATABASE_URL format: {DATABASE_URL}")
+        print(f"  Invalid DATABASE_URL format: {DATABASE_URL}")
         print("   Should start with: postgresql://")
         return False
     
@@ -47,7 +47,7 @@ def check_env_file():
     try:
         url_parts = DATABASE_URL.replace("postgresql://", "").split("@")
         if len(url_parts) != 2:
-            print("❌ Invalid URL format - missing @ separator")
+            print("  Invalid URL format - missing @ separator")
             return False
         
         auth_part = url_parts[0]
@@ -64,7 +64,7 @@ def check_env_file():
         print(f"   Server: {server_part}")
         
     except Exception as e:
-        print(f"❌ Error parsing DATABASE_URL: {e}")
+        print(f"  Error parsing DATABASE_URL: {e}")
         return False
     
     return True

@@ -172,8 +172,8 @@ Loading:   [⏳ Reindexing...]       (Gray, disabled)
 
 ### Error Notifications (Red Snackbar)
 ```
-❌ Failed to clear ChromaDB. Please try again.
-❌ Failed to start reindexing. Please try again.
+  Failed to clear ChromaDB. Please try again.
+  Failed to start reindexing. Please try again.
 ```
 
 ### Info Notifications (Blue Snackbar)

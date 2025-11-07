@@ -27,7 +27,7 @@ def test_smtp_credentials():
     print()
     
     if not email_service.smtp_username or not email_service.smtp_password:
-        print("❌ SMTP credentials not configured in .env file")
+        print("  SMTP credentials not configured in .env file")
         print("\nPlease add these to your .env file:")
         print("SMTP_USERNAME=your-email@gmail.com")
         print("SMTP_PASSWORD=your-app-password")
@@ -179,7 +179,7 @@ def test_smtp_credentials():
             return True
         else:
             print("=" * 60)
-            print("❌ FAILED to send email")
+            print("  FAILED to send email")
             print("=" * 60)
             print("\nPossible issues:")
             print("1. Invalid SMTP credentials")
@@ -195,7 +195,7 @@ def test_smtp_credentials():
             
     except Exception as e:
         print("=" * 60)
-        print("❌ ERROR sending email")
+        print("  ERROR sending email")
         print("=" * 60)
         print(f"\nError details: {str(e)}")
         print("\nCommon issues:")

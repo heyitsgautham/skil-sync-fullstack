@@ -55,7 +55,7 @@ const SendEmailModal = ({ open, onClose, selectedCandidates, internshipTitle, in
                     success: true,
                     data: data
                 });
-                
+
                 // Call the callback after successful send
                 if (onSendComplete) {
                     setTimeout(() => {
@@ -101,7 +101,7 @@ const SendEmailModal = ({ open, onClose, selectedCandidates, internshipTitle, in
                 }
             }}
         >
-            <DialogTitle sx={{ 
+            <DialogTitle sx={{
                 background: 'linear-gradient(135deg, #4caf50 0%, #45a049 100%)',
                 color: 'white',
                 display: 'flex',
@@ -114,9 +114,9 @@ const SendEmailModal = ({ open, onClose, selectedCandidates, internshipTitle, in
                         Send Email to Selected Candidates
                     </Typography>
                 </Box>
-                <Chip 
+                <Chip
                     label={`${selectedCandidates.length} Selected`}
-                    sx={{ 
+                    sx={{
                         backgroundColor: 'white',
                         color: '#4caf50',
                         fontWeight: 'bold'
@@ -130,8 +130,8 @@ const SendEmailModal = ({ open, onClose, selectedCandidates, internshipTitle, in
                     <Typography variant="subtitle2" fontWeight="bold" gutterBottom>
                         Recipients:
                     </Typography>
-                    <List dense sx={{ 
-                        maxHeight: 150, 
+                    <List dense sx={{
+                        maxHeight: 150,
                         overflow: 'auto',
                         bgcolor: '#f5f5f5',
                         borderRadius: 1,
@@ -175,7 +175,7 @@ const SendEmailModal = ({ open, onClose, selectedCandidates, internshipTitle, in
 
                 {/* Send Result */}
                 {sendResult && (
-                    <Alert 
+                    <Alert
                         severity={sendResult.success ? "success" : "error"}
                         icon={sendResult.success ? <CheckCircleIcon /> : <ErrorIcon />}
                         sx={{ mt: 2 }}
@@ -193,7 +193,7 @@ const SendEmailModal = ({ open, onClose, selectedCandidates, internshipTitle, in
                             </Box>
                         ) : (
                             <Typography variant="body2">
-                                ❌ {sendResult.error}
+                                {sendResult.error}
                             </Typography>
                         )}
                     </Alert>

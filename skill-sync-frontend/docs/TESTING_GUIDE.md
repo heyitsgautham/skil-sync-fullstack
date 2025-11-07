@@ -114,7 +114,7 @@ curl -X GET "http://localhost:8000/api/admin/system-status" \
 
 ---
 
-### Test 5: Clear ChromaDB Error Handling ❌
+### Test 5: Clear ChromaDB Error Handling  
 **Steps:**
 1. Stop backend server
 2. Click "Clear ChromaDB"
@@ -186,7 +186,7 @@ tail -f logs/app.log
 
 ---
 
-### Test 8: Reindex Error Handling ❌
+### Test 8: Reindex Error Handling  
 **Steps:**
 1. Stop backend server
 2. Click "Re-index Resumes"

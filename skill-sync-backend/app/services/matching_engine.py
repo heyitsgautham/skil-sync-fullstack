@@ -140,7 +140,7 @@ class MatchingEngine:
         """Calculate cosine similarity between two vectors"""
         # DO NOT USE FALLBACK SCORES - Log error and raise exception instead
         if vec1 is None or vec2 is None or len(vec1) == 0 or len(vec2) == 0:
-            error_msg = "❌ CRITICAL: Missing embeddings detected! Cannot calculate similarity."
+            error_msg = "  CRITICAL: Missing embeddings detected! Cannot calculate similarity."
             logger.error(error_msg)
             logger.error(f"   vec1 present: {vec1 is not None and len(vec1) > 0}")
             logger.error(f"   vec2 present: {vec2 is not None and len(vec2) > 0}")
@@ -156,7 +156,7 @@ class MatchingEngine:
         norm2 = np.linalg.norm(vec2_np)
         
         if norm1 == 0 or norm2 == 0:
-            logger.error("❌ Zero vector detected - cannot calculate similarity")
+            logger.error("  Zero vector detected - cannot calculate similarity")
             raise ValueError("Cannot calculate similarity: zero vector detected")
         
         similarity = float(dot_product / (norm1 * norm2))
@@ -411,7 +411,7 @@ Format as bullet points. Be specific and reference actual skills/experience.
             logger.info("✅ Match explanation generated")
             return result
         except Exception as e:
-            logger.error(f"❌ Error generating explanation: {e}")
+            logger.error(f"  Error generating explanation: {e}")
             return self._generate_fallback_explanation(match_result)
     
     def _generate_fallback_explanation(self, match_result: Dict) -> str:

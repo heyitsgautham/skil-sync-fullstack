@@ -52,22 +52,22 @@ The performance bottleneck likely comes from:
 
 **Potential Problems:**
 
-❌ **1. Storage Explosion**
+  **1. Storage Explosion**
 - Currently: 1 resume per student
 - New: N resumes per student (where N = applications)
 - If a student applies to 20 internships with slightly different resumes, you're storing 20 copies
 - **Solution**: Store resume variants as diffs or templates with variable sections
 
-❌ **2. What About Discovery/Recommendations?**
+  **2. What About Discovery/Recommendations?**
 - Companies still want to "discover" candidates who haven't applied yet
 - If similarity is only calculated on application, how do you show "Top 50 matching candidates" for a new internship posting?
 - **This is a critical flaw**: You lose the ability to proactively recommend internships to students OR recommend students to companies
 
-❌ **3. Application Spam**
+  **3. Application Spam**
 - Students might apply to everything with generic resumes just to get in the door
 - You lose quality control
 
-❌ **4. When Does Student Know to Tailor?**
+  **4. When Does Student Know to Tailor?**
 - Before applying, student needs to see the internship details
 - But without similarity score, how do you recommend which internships to apply to?
 

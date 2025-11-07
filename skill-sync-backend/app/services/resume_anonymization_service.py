@@ -163,7 +163,7 @@ class ResumeAnonymizationService:
             return pdf_bytes
             
         except Exception as e:
-            logger.error(f"❌ Anonymization failed: {str(e)}")
+            logger.error(f"  Anonymization failed: {str(e)}")
             raise Exception(f"Failed to anonymize resume: {str(e)}")
     
     def _build_redaction_patterns(
@@ -276,7 +276,7 @@ class ResumeAnonymizationService:
             return found_pii
             
         except Exception as e:
-            logger.error(f"❌ Verification failed: {str(e)}")
+            logger.error(f"  Verification failed: {str(e)}")
             return {
                 "error": str(e),
                 "is_anonymized": False

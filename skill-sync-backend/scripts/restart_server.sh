@@ -12,7 +12,7 @@ echo ""
 BACKEND_DIR="/Users/gauthamkrishna/Projects/presidio/skill-sync/skill-sync-backend"
 
 if [ ! -d "$BACKEND_DIR" ]; then
-    echo "❌ Backend directory not found: $BACKEND_DIR"
+    echo "  Backend directory not found: $BACKEND_DIR"
     exit 1
 fi
 

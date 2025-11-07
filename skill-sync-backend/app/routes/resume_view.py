@@ -197,7 +197,7 @@ async def view_resume(
     except HTTPException:
         raise
     except Exception as e:
-        logger.error(f"❌ Error viewing resume: {str(e)}")
+        logger.error(f"  Error viewing resume: {str(e)}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Error viewing resume: {str(e)}"
@@ -326,7 +326,7 @@ async def download_resume(
     except HTTPException:
         raise
     except Exception as e:
-        logger.error(f"❌ Error downloading resume: {str(e)}")
+        logger.error(f"  Error downloading resume: {str(e)}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Error downloading resume: {str(e)}"

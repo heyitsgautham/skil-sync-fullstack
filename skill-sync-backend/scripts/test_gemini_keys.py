@@ -29,7 +29,7 @@ api_keys = {
 api_keys = {k: v for k, v in api_keys.items() if v}
 
 if not api_keys:
-    print("❌ ERROR: No API keys found in .env file!")
+    print("  ERROR: No API keys found in .env file!")
     print("Please set GEMINI_KEY_* variables in your .env file")
     sys.exit(1)
 
@@ -74,10 +74,10 @@ for username, api_key in api_keys.items():
             print("🔴 RATE LIMITED")
             rate_limited_keys.append((username, api_key, error_msg[:100]))
         elif "invalid" in error_msg.lower() or "api key" in error_msg.lower():
-            print("❌ INVALID KEY")
+            print("  INVALID KEY")
             invalid_keys.append((username, api_key, error_msg[:100]))
         else:
-            print(f"❌ ERROR: {error_msg[:50]}")
+            print(f"  ERROR: {error_msg[:50]}")
             invalid_keys.append((username, api_key, error_msg[:100]))
     
     # Small delay to avoid hitting rate limits during testing
@@ -99,7 +99,7 @@ for username, key, error in rate_limited_keys:
     print(f"   - {username}: {error}")
 
 print()
-print(f"❌ Invalid/Error Keys: {len(invalid_keys)}")
+print(f"  Invalid/Error Keys: {len(invalid_keys)}")
 for username, key, error in invalid_keys:
     print(f"   - {username}: {error}")
 

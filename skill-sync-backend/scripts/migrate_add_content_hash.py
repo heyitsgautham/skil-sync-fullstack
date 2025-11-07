@@ -60,7 +60,7 @@ def migrate_add_content_hash():
                 print(f"  ✅ Column '{col_name}' exists in table '{table_name}'")
         
     except Exception as e:
-        print(f"❌ Migration failed: {str(e)}")
+        print(f"  Migration failed: {str(e)}")
         raise
 
 

@@ -189,7 +189,7 @@ def main():
             print(f"   ✅ SUCCESS: Parsed {result['skills_count']} skills")
             results["success"].append(result)
         else:
-            print(f"   ❌ ERROR: {result['error_type']} - {result['error'][:100]}")
+            print(f"     ERROR: {result['error_type']} - {result['error'][:100]}")
             results["error"].append(result)
         
         # Rotate to next key for next resume
@@ -206,7 +206,7 @@ def main():
     print()
     
     print(f"✅ Successfully Parsed: {len(results['success'])}/{total_resumes}")
-    print(f"❌ Errors: {len(results['error'])}/{total_resumes}")
+    print(f"  Errors: {len(results['error'])}/{total_resumes}")
     print(f"🔴 Rate Limited Attempts: {len(results['rate_limited'])}")
     print()
     
@@ -216,7 +216,7 @@ def main():
             print(f"   - Resume {r['resume_id']}: {r['file_name']} ({r['skills_count']} skills) [Key: {r['api_key']}]")
     
     if results["error"]:
-        print(f"\n❌ FAILED PARSES ({len(results['error'])}):")
+        print(f"\n  FAILED PARSES ({len(results['error'])}):")
         for r in results["error"]:
             print(f"   - Resume {r['resume_id']}: {r['file_name']}")
             print(f"     Error Type: {r['error_type']}")
@@ -242,5 +242,5 @@ if __name__ == "__main__":
     except KeyboardInterrupt:
         print("\n\n⚠️  Process interrupted by user")
     except Exception as e:
-        print(f"\n\n❌ Fatal Error: {str(e)}")
+        print(f"\n\n  Fatal Error: {str(e)}")
         traceback.print_exc()

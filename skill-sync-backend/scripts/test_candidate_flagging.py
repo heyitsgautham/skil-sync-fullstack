@@ -31,7 +31,7 @@ def test_url_normalization():
     
     for input_url, expected in test_cases:
         result = CandidateFlaggingService.normalize_url(input_url)
-        status = "✅ PASS" if result == expected else "❌ FAIL"
+        status = "✅ PASS" if result == expected else "  FAIL"
         print(f"{status}: '{input_url}' -> '{result}' (expected: '{expected}')")
     
     print()
@@ -54,7 +54,7 @@ def test_phone_normalization():
     
     for input_phone, expected in test_cases:
         result = CandidateFlaggingService.normalize_phone(input_phone)
-        status = "✅ PASS" if result == expected else "❌ FAIL"
+        status = "✅ PASS" if result == expected else "  FAIL"
         print(f"{status}: '{input_phone}' -> '{result}' (expected: '{expected}')")
     
     print()

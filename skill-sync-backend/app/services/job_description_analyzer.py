@@ -108,13 +108,13 @@ Return JSON only (no markdown, no explanation):
             return result
             
         except json.JSONDecodeError as e:
-            logger.error(f"❌ JSON parsing error: {e}")
+            logger.error(f"  JSON parsing error: {e}")
             logger.error(f"Response text: {result_text if 'result_text' in locals() else 'N/A'}")
             logger.info("🔄 Using fallback keyword extraction...")
             return self._fallback_keyword_extraction(job_description)
             
         except Exception as e:
-            logger.error(f"❌ Error extracting skills: {e}")
+            logger.error(f"  Error extracting skills: {e}")
             import traceback
             logger.error(f"Traceback: {traceback.format_exc()}")
             logger.info("🔄 Using fallback keyword extraction...")
@@ -296,7 +296,7 @@ Return ONLY the JSON object, no markdown, no explanation.
             return validated_data
             
         except Exception as e:
-            logger.error(f"❌ Error validating skills: {e}")
+            logger.error(f"  Error validating skills: {e}")
             # Return original data on error
             return {
                 'required_skills': required_skills,

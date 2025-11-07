@@ -126,7 +126,7 @@ class BatchMatchingService:
                         matches_computed += 1
                     
                 except Exception as e:
-                    logger.error(f"❌ Error computing match for student {student.id} and internship {internship.id}: {str(e)}")
+                    logger.error(f"  Error computing match for student {student.id} and internship {internship.id}: {str(e)}")
                     matches_failed += 1
                     continue
             

@@ -58,12 +58,12 @@ class MatchExplanationService:
             # Fetch candidate, resume, and internship data
             candidate = db_session.query(User).filter(User.id == candidate_id).first()
             if not candidate:
-                logger.error(f"❌ Candidate {candidate_id} not found")
+                logger.error(f"  Candidate {candidate_id} not found")
                 return None
             
             internship = db_session.query(Internship).filter(Internship.id == internship_id).first()
             if not internship:
-                logger.error(f"❌ Internship {internship_id} not found")
+                logger.error(f"  Internship {internship_id} not found")
                 return None
             
             resume = db_session.query(Resume).filter(
@@ -72,7 +72,7 @@ class MatchExplanationService:
             ).first()
             
             if not resume:
-                logger.error(f"❌ No active resume found for candidate {candidate_id}")
+                logger.error(f"  No active resume found for candidate {candidate_id}")
                 return None
             
             # Extract data from resume
@@ -259,7 +259,7 @@ class MatchExplanationService:
             return explanation
             
         except Exception as e:
-            logger.error(f"❌ Error generating explanation: {e}", exc_info=True)
+            logger.error(f"  Error generating explanation: {e}", exc_info=True)
             db_session.rollback()
             return None
     
@@ -353,7 +353,7 @@ Return as JSON:
             return ai_rec
             
         except Exception as e:
-            logger.error(f"❌ Error generating AI recommendation: {e}")
+            logger.error(f"  Error generating AI recommendation: {e}")
             # Return default recommendation
             return {
                 'action': 'MAYBE',
@@ -397,7 +397,7 @@ Return as JSON:
             explanation_2 = self.generate_explanation(candidate_id_2, internship_id, db_session)
             
             if not explanation_1 or not explanation_2:
-                logger.error("❌ Failed to generate explanations for comparison")
+                logger.error("  Failed to generate explanations for comparison")
                 return None
             
             # Build comparison structure
@@ -451,7 +451,7 @@ Return as JSON:
             return comparison
             
         except Exception as e:
-            logger.error(f"❌ Error generating comparison: {e}", exc_info=True)
+            logger.error(f"  Error generating comparison: {e}", exc_info=True)
             return None
     
     def _generate_comparison_summary(

@@ -21,7 +21,7 @@ LOGIN_RESPONSE=$(curl -s -X POST "$BASE_URL/auth/login" \
 TOKEN=$(echo $LOGIN_RESPONSE | jq -r '.access_token')
 
 if [ "$TOKEN" = "null" ] || [ -z "$TOKEN" ]; then
-    echo "❌ Login failed"
+    echo "  Login failed"
     echo "Response: $LOGIN_RESPONSE"
     exit 1
 fi

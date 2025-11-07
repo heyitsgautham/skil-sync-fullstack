@@ -54,7 +54,7 @@ def demonstrate_flagging_logic():
         
         if students_no_resume:
             example_no_resume = students_no_resume[0]
-            print(f"\n❌ Student WITHOUT Resume (Will NOT be checked for duplicates):")
+            print(f"\n  Student WITHOUT Resume (Will NOT be checked for duplicates):")
             print(f"   ID: {example_no_resume.id}")
             print(f"   Name: {example_no_resume.full_name}")
             print(f"   Phone: {example_no_resume.phone or 'Not set'}")
@@ -81,7 +81,7 @@ def demonstrate_flagging_logic():
         print("EXAMPLE OUTCOMES:")
         print("-" * 80)
         print("Case 1: Student A (NO resume) + Student B (has resume) - Same phone")
-        print("   Result: NOT FLAGGED ❌ (one student has no resume)")
+        print("   Result: NOT FLAGGED   (one student has no resume)")
         print()
         print("Case 2: Student A (has resume) + Student B (has resume) - Same phone")
         print("   Result: BOTH FLAGGED ✅ (both have resumes)")

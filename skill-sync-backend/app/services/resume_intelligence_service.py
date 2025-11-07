@@ -149,12 +149,12 @@ Return ONLY the JSON object, no markdown, no explanation.
             return structured_data
             
         except json.JSONDecodeError as e:
-            logger.error(f"❌ JSON parsing error: {e}")
+            logger.error(f"  JSON parsing error: {e}")
             logger.error(f"Response text: {result_text}")
             # Return minimal valid structure
             return self._create_fallback_structure(resume_text)
         except Exception as e:
-            logger.error(f"❌ Error in structured extraction: {e}")
+            logger.error(f"  Error in structured extraction: {e}")
             return self._create_fallback_structure(resume_text)
     
     def _calculate_total_experience(self, experiences: List[Dict]) -> int:
@@ -295,7 +295,7 @@ Write in third person. Be specific and highlight key strengths.
             logger.info("✅ Candidate summary generated")
             return result
         except Exception as e:
-            logger.error(f"❌ Error generating summary: {e}")
+            logger.error(f"  Error generating summary: {e}")
             return f"Candidate with {structured_data.get('total_experience_years', 0)} years of experience"
     
     def extract_key_achievements(self, structured_data: Dict) -> List[str]:
@@ -347,5 +347,5 @@ Format: ["achievement 1", "achievement 2", ...]
             logger.info(f"✅ Extracted {len(top_achievements)} key achievements")
             return top_achievements[:5]
         except Exception as e:
-            logger.error(f"❌ Error extracting achievements: {e}")
+            logger.error(f"  Error extracting achievements: {e}")
             return all_achievements[:5]

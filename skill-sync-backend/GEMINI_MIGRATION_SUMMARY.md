@@ -57,7 +57,7 @@ Each purpose gets its own primary key + 3 fallback keys:
 
 ## Benefits
 
-### 1. **No More Fallback Scores** ❌
+### 1. **No More Fallback Scores**  
 - Old behavior: When API failed, system used 50.0% for all components
 - New behavior: **Raises exceptions immediately** so you can see what's failing
 

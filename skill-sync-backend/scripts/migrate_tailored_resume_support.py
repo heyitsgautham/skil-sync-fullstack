@@ -69,7 +69,7 @@ def migrate_add_tailored_resume_support():
                     print(f"  ⚠️ Column '{col}' might not exist (check manually)")
         
     except Exception as e:
-        print(f"❌ Migration failed: {str(e)}")
+        print(f"  Migration failed: {str(e)}")
         raise
 
 

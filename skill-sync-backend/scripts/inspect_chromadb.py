@@ -20,7 +20,7 @@ def inspect_sqlite():
     db_path = Path("data/chroma_db/chroma.sqlite3")
     
     if not db_path.exists():
-        print("❌ ChromaDB SQLite file not found!")
+        print("  ChromaDB SQLite file not found!")
         return
     
     print(f"📊 Inspecting SQLite database: {db_path}")
@@ -142,7 +142,7 @@ def inspect_filesystem():
     chroma_dir = Path("data/chroma_db")
     
     if not chroma_dir.exists():
-        print("❌ ChromaDB directory not found!")
+        print("  ChromaDB directory not found!")
         return
     
     print(f"\n📍 Location: {chroma_dir.absolute()}")
@@ -211,7 +211,7 @@ def check_database_embeddings():
         db.close()
         
     except Exception as e:
-        print(f"   ❌ Error checking database: {e}")
+        print(f"     Error checking database: {e}")
 
 
 def main():
