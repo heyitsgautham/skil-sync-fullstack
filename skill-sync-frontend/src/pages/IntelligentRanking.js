@@ -810,14 +810,14 @@ const IntelligentRanking = () => {
                                                             variant="caption"
                                                             sx={{
                                                                 color: '#f44336',
-                                                                cursor: 'pointer',
-                                                                textDecoration: 'underline',
+                                                                cursor: anonymizationEnabled ? 'default' : 'pointer',
+                                                                textDecoration: anonymizationEnabled ? 'none' : 'underline',
                                                                 fontWeight: 'bold',
-                                                                '&:hover': {
+                                                                '&:hover': anonymizationEnabled ? {} : {
                                                                     color: '#d32f2f',
                                                                 }
                                                             }}
-                                                            onClick={() => handleFlaggedClick(candidate)}
+                                                            onClick={anonymizationEnabled ? undefined : () => handleFlaggedClick(candidate)}
                                                         >
                                                             {candidate.flag_reason_text}
                                                         </Typography>
@@ -830,48 +830,50 @@ const IntelligentRanking = () => {
                                         </Box>
 
                                         {/* Social Profile Links */}
-                                        <Box sx={{ display: 'flex', gap: 1, mr: 2 }}>
-                                            {candidate.linkedin_url && (
-                                                <Button
-                                                    variant="outlined"
-                                                    size="small"
-                                                    startIcon={<LinkedInIcon />}
-                                                    href={ensureHttpProtocol(candidate.linkedin_url)}
-                                                    target="_blank"
-                                                    rel="noopener noreferrer"
-                                                    sx={{
-                                                        borderColor: '#0077B5',
-                                                        color: '#0077B5',
-                                                        '&:hover': {
-                                                            borderColor: '#005582',
-                                                            backgroundColor: 'rgba(0, 119, 181, 0.04)',
-                                                        },
-                                                    }}
-                                                >
-                                                    LinkedIn
-                                                </Button>
-                                            )}
-                                            {candidate.github_url && (
-                                                <Button
-                                                    variant="outlined"
-                                                    size="small"
-                                                    startIcon={<GitHubIcon />}
-                                                    href={ensureHttpProtocol(candidate.github_url)}
-                                                    target="_blank"
-                                                    rel="noopener noreferrer"
-                                                    sx={{
-                                                        borderColor: '#333',
-                                                        color: '#333',
-                                                        '&:hover': {
-                                                            borderColor: '#000',
-                                                            backgroundColor: 'rgba(0, 0, 0, 0.04)',
-                                                        },
-                                                    }}
-                                                >
-                                                    GitHub
-                                                </Button>
-                                            )}
-                                        </Box>
+                                        {!anonymizationEnabled && (
+                                            <Box sx={{ display: 'flex', gap: 1, mr: 2 }}>
+                                                {candidate.linkedin_url && (
+                                                    <Button
+                                                        variant="outlined"
+                                                        size="small"
+                                                        startIcon={<LinkedInIcon />}
+                                                        href={ensureHttpProtocol(candidate.linkedin_url)}
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                        sx={{
+                                                            borderColor: '#0077B5',
+                                                            color: '#0077B5',
+                                                            '&:hover': {
+                                                                borderColor: '#005582',
+                                                                backgroundColor: 'rgba(0, 119, 181, 0.04)',
+                                                            },
+                                                        }}
+                                                    >
+                                                        LinkedIn
+                                                    </Button>
+                                                )}
+                                                {candidate.github_url && (
+                                                    <Button
+                                                        variant="outlined"
+                                                        size="small"
+                                                        startIcon={<GitHubIcon />}
+                                                        href={ensureHttpProtocol(candidate.github_url)}
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                        sx={{
+                                                            borderColor: '#333',
+                                                            color: '#333',
+                                                            '&:hover': {
+                                                                borderColor: '#000',
+                                                                backgroundColor: 'rgba(0, 0, 0, 0.04)',
+                                                            },
+                                                        }}
+                                                    >
+                                                        GitHub
+                                                    </Button>
+                                                )}
+                                            </Box>
+                                        )}
 
                                         <Chip
                                             label={`${candidate.match_score.toFixed(1)}% Match`}
