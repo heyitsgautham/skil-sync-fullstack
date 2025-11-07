@@ -69,3 +69,6 @@ data/chroma_db
 
 # resumes
 app/public/resumes
+
+
+*.ps1

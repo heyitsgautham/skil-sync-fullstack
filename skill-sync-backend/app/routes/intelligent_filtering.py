@@ -419,6 +419,7 @@ async def rank_candidates_for_internship(
                 "message": f"Ranked {len(ranked_candidates)} applicants using dual resume analysis",
                 "total_candidates": len(ranked_candidates),
                 "ranked_candidates": ranked_candidates,
+                "anonymization_enabled": current_user.anonymization_enabled if hasattr(current_user, 'anonymization_enabled') else False,
                 "performance_note": f"✨ Dual resume analysis: {tailored_count} with tailored resumes, {len(ranked_candidates) - tailored_count} with base only",
                 "methodology": "Combines base resume (20%) + tailored resume (80%) when available",
                 "flagged_candidates_count": flagged_count
@@ -571,6 +572,7 @@ async def rank_candidates_for_internship(
                 "message": f"Ranked {len(ranked_candidates)} candidates using pre-computed similarity (instant!)",
                 "total_candidates": len(ranked_candidates),
                 "ranked_candidates": ranked_candidates,
+                "anonymization_enabled": current_user.anonymization_enabled if hasattr(current_user, 'anonymization_enabled') else False,
                 "performance_note": "⚡ Pre-computed base similarity: <200ms response time",
                 "methodology": "Base similarity from batch computation",
                 "flagged_candidates_count": flagged_count

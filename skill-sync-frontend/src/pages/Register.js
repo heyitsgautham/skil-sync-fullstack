@@ -131,6 +131,7 @@ const Register = () => {
                             value={formData.full_name}
                             onChange={handleChange}
                             disabled={loading}
+                            helperText="⚠️ Enter your full name EXACTLY as it appears on your resume"
                         />
                         <TextField
                             margin="normal"
