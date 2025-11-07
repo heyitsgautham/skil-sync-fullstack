@@ -34,45 +34,43 @@ class JobDescriptionAnalyzer:
             - required_skills: List of must-have skills
             - preferred_skills: List of nice-to-have skills
         """
-        prompt = f"""
-You are an expert HR analyst. Analyze this job description and extract skills into two categories:
+        prompt = f"""Extract technical skills from this job description.
 
-1. **REQUIRED SKILLS** - Must-have skills that are explicitly stated as required, mandatory, or essential
-2. **PREFERRED SKILLS** - Nice-to-have skills that are mentioned as preferred, desirable, or a plus
+REQUIRED SKILLS = Explicitly required/mandatory/must-have
+PREFERRED SKILLS = Nice-to-have/preferred/bonus/plus
 
-IMPORTANT RULES:
-1. Extract ONLY technical skills, tools, frameworks, programming languages, and methodologies
-2. Do NOT include soft skills (communication, teamwork, etc.) unless they're highly specific technical certifications
-3. Normalize skill names (e.g., "React.js" → "React", "Node" → "Node.js")
-4. Include years of experience as a separate item if specified (e.g., "3+ years Python")
-5. If a skill is mentioned without clear categorization, put it in PREFERRED
-6. Be concise - extract 5-15 required skills and 5-10 preferred skills typically
-7. Remove duplicates between required and preferred (keep in required if it appears in both)
-
-Return ONLY valid JSON in this exact format:
-{{
-  "required_skills": ["skill1", "skill2", "skill3", ...],
-  "preferred_skills": ["skill1", "skill2", "skill3", ...]
-}}
+Extract ONLY: programming languages, frameworks, tools, platforms, databases, methodologies
+Normalize names: "React.js"→"React", "nodejs"→"Node.js"
+If unclear, classify as REQUIRED
 
 Job Description:
 {job_description}
 
-Return ONLY the JSON object, no markdown, no explanation.
-"""
+Return JSON only (no markdown, no explanation):
+{{"required_skills":["skill1","skill2"],"preferred_skills":["skill3","skill4"]}}"""
         
         try:
             logger.info("📤 Extracting skills from job description using Gemini...")
             
-            # Use key manager with retry logic
-            result_text = self.key_manager.generate_content(
-                prompt=prompt,
-                model="gemini-2.5-flash",
-                purpose="job_description_analysis",
-                temperature=0.1,
-                max_output_tokens=2000,
-                max_retries=3
-            )
+            # Try primary extraction
+            try:
+                result_text = self.key_manager.generate_content(
+                    prompt=prompt,
+                    model="gemini-2.5-flash",
+                    purpose="job_description_analysis",
+                    temperature=0.1,
+                    max_output_tokens=4000,  # Increased for large job descriptions
+                    max_retries=3
+                )
+                
+                if not result_text or result_text.strip() == "":
+                    logger.warning("⚠️ Empty response from Gemini, trying fallback method...")
+                    raise Exception("Empty response from primary method")
+                    
+            except Exception as primary_error:
+                logger.warning(f"⚠️ Primary extraction failed: {primary_error}")
+                logger.info("🔄 Attempting fallback keyword extraction...")
+                return self._fallback_keyword_extraction(job_description)
             
             # Clean up markdown code blocks if present
             result_text = re.sub(r'^```json\s*', '', result_text)
@@ -80,12 +78,19 @@ Return ONLY the JSON object, no markdown, no explanation.
             result_text = re.sub(r'\s*```$', '', result_text)
             result_text = result_text.strip()
             
+            logger.info(f"📝 Response text: {result_text[:200]}...")
+            
             # Parse JSON response
             extracted_data = json.loads(result_text)
             
             # Validate and clean data
             required_skills = extracted_data.get('required_skills', [])
             preferred_skills = extracted_data.get('preferred_skills', [])
+            
+            # If empty, try fallback
+            if not required_skills and not preferred_skills:
+                logger.warning("⚠️ No skills extracted, using fallback method...")
+                return self._fallback_keyword_extraction(job_description)
             
             # Remove duplicates (case-insensitive)
             required_skills_lower = {s.lower(): s for s in required_skills}
@@ -104,20 +109,124 @@ Return ONLY the JSON object, no markdown, no explanation.
             
         except json.JSONDecodeError as e:
             logger.error(f"❌ JSON parsing error: {e}")
-            logger.error(f"Response text: {result_text}")
-            # Return empty structure on error
-            return {
-                'required_skills': [],
-                'preferred_skills': []
-            }
+            logger.error(f"Response text: {result_text if 'result_text' in locals() else 'N/A'}")
+            logger.info("🔄 Using fallback keyword extraction...")
+            return self._fallback_keyword_extraction(job_description)
+            
         except Exception as e:
             logger.error(f"❌ Error extracting skills: {e}")
             import traceback
             logger.error(f"Traceback: {traceback.format_exc()}")
-            return {
-                'required_skills': [],
-                'preferred_skills': []
-            }
+            logger.info("🔄 Using fallback keyword extraction...")
+            return self._fallback_keyword_extraction(job_description)
+    
+    def _fallback_keyword_extraction(self, job_description: str) -> Dict[str, List[str]]:
+        """
+        Fallback method to extract skills using keyword matching
+        When AI fails, this ensures we still extract some skills
+        """
+        logger.info("🔍 Using fallback keyword extraction method...")
+        
+        # Common technical skills and patterns
+        skill_patterns = {
+            # Programming Languages
+            'python': 'Python', 'java': 'Java', 'javascript': 'JavaScript', 
+            'typescript': 'TypeScript', 'c++': 'C++', 'c#': 'C#', 'go': 'Go',
+            'rust': 'Rust', 'kotlin': 'Kotlin', 'swift': 'Swift', 'php': 'PHP',
+            'ruby': 'Ruby', 'scala': 'Scala', 'r': 'R',
+            
+            # Frontend
+            'react': 'React', 'react.js': 'React', 'reactjs': 'React',
+            'vue': 'Vue.js', 'vue.js': 'Vue.js', 'angular': 'Angular',
+            'html': 'HTML', 'css': 'CSS', 'sass': 'SASS', 'scss': 'SCSS',
+            'tailwind': 'Tailwind CSS', 'bootstrap': 'Bootstrap',
+            'next.js': 'Next.js', 'nextjs': 'Next.js',
+            
+            # Backend
+            'node.js': 'Node.js', 'nodejs': 'Node.js', 'node': 'Node.js',
+            'express': 'Express.js', 'express.js': 'Express.js',
+            'django': 'Django', 'flask': 'Flask', 'fastapi': 'FastAPI',
+            'spring': 'Spring Boot', 'spring boot': 'Spring Boot',
+            
+            # Databases
+            'mongodb': 'MongoDB', 'mysql': 'MySQL', 'postgresql': 'PostgreSQL',
+            'postgres': 'PostgreSQL', 'redis': 'Redis', 'cassandra': 'Cassandra',
+            'dynamodb': 'DynamoDB', 'sql': 'SQL', 'nosql': 'NoSQL',
+            
+            # Cloud & DevOps
+            'aws': 'AWS', 'azure': 'Azure', 'gcp': 'Google Cloud', 
+            'google cloud': 'Google Cloud', 'docker': 'Docker',
+            'kubernetes': 'Kubernetes', 'k8s': 'Kubernetes',
+            'jenkins': 'Jenkins', 'ci/cd': 'CI/CD', 'terraform': 'Terraform',
+            'ansible': 'Ansible', 'git': 'Git', 'github': 'GitHub',
+            'gitlab': 'GitLab', 'bitbucket': 'Bitbucket',
+            
+            # Testing
+            'jest': 'Jest', 'mocha': 'Mocha', 'junit': 'JUnit',
+            'pytest': 'PyTest', 'selenium': 'Selenium', 'cypress': 'Cypress',
+            
+            # Others
+            'graphql': 'GraphQL', 'rest': 'REST API', 'restful': 'RESTful API',
+            'api': 'API Development', 'microservices': 'Microservices',
+            'agile': 'Agile', 'scrum': 'Scrum', 'jira': 'Jira',
+            'kafka': 'Apache Kafka', 'rabbitmq': 'RabbitMQ',
+            'elasticsearch': 'Elasticsearch', 'redis': 'Redis',
+        }
+        
+        description_lower = job_description.lower()
+        found_skills = set()
+        
+        # Extract skills based on patterns
+        for pattern, skill_name in skill_patterns.items():
+            if pattern in description_lower:
+                found_skills.add(skill_name)
+        
+        # Convert to list and categorize
+        all_skills = list(found_skills)
+        
+        # Try to categorize based on context
+        required_skills = []
+        preferred_skills = []
+        
+        # Split description into sections
+        lines = job_description.split('\n')
+        current_section = 'required'  # Default to required
+        
+        for line in lines:
+            line_lower = line.lower()
+            
+            # Check if this line indicates a section change
+            if any(keyword in line_lower for keyword in ['required', 'must have', 'mandatory', 'essential', 'qualifications']):
+                current_section = 'required'
+            elif any(keyword in line_lower for keyword in ['preferred', 'nice to have', 'plus', 'bonus', 'desirable']):
+                current_section = 'preferred'
+            
+            # Extract skills from this line
+            for pattern, skill_name in skill_patterns.items():
+                if pattern in line_lower and skill_name in all_skills:
+                    if current_section == 'required':
+                        required_skills.append(skill_name)
+                    else:
+                        preferred_skills.append(skill_name)
+        
+        # Remove duplicates while preserving order
+        required_skills = list(dict.fromkeys(required_skills))
+        preferred_skills = list(dict.fromkeys(preferred_skills))
+        
+        # Remove preferred skills that are already in required
+        preferred_skills = [s for s in preferred_skills if s not in required_skills]
+        
+        # If we couldn't categorize, put all in required (as per user's request)
+        if not required_skills and not preferred_skills:
+            required_skills = all_skills
+        
+        result = {
+            'required_skills': required_skills,
+            'preferred_skills': preferred_skills
+        }
+        
+        logger.info(f"✅ Fallback extracted {len(required_skills)} required skills and {len(preferred_skills)} preferred skills")
+        return result
     
     def validate_and_enhance_skills(
         self, 

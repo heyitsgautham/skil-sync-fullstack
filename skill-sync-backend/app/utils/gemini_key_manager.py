@@ -231,7 +231,26 @@ class GeminiKeyManager:
                 config=config
             )
             
-            if not response or not response.text:
+            # Check if response exists
+            if not response:
+                logger.error("❌ No response object from Gemini API")
+                raise Exception("No response from Gemini API")
+            
+            # Check for blocked content or safety issues
+            if hasattr(response, 'candidates') and response.candidates:
+                candidate = response.candidates[0]
+                if hasattr(candidate, 'finish_reason'):
+                    logger.info(f"📊 Finish reason: {candidate.finish_reason}")
+                    if candidate.finish_reason == 'SAFETY':
+                        logger.error("❌ Response blocked by safety filters")
+                        raise Exception("Response blocked by Gemini safety filters")
+                if hasattr(candidate, 'safety_ratings'):
+                    logger.info(f"📊 Safety ratings: {candidate.safety_ratings}")
+            
+            # Get response text
+            if not response.text or response.text.strip() == "":
+                logger.error("❌ Empty response text from Gemini API")
+                logger.error(f"📊 Full response: {response}")
                 raise Exception("Empty response from Gemini API")
             
             logger.info(f"✅ Content generated successfully ({len(response.text)} chars)")
