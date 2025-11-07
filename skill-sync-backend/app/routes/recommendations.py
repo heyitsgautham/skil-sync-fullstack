@@ -290,14 +290,17 @@ def get_candidate_resume_url(
     current_user: User = Depends(get_current_user)
 ):
     """
-    Get presigned URL to view candidate's resume (Company only)
+    Get URL to view candidate's resume (Company only) - with anonymization support
     
     - **student_id**: ID of the student/candidate
     - **internship_id**: Optional internship ID to verify company owns the internship
-    - Returns presigned S3 URL (expires in 1 hour) or local file path
+    - Returns URL with temporary token to view resume (anonymized if company has anonymization enabled)
     - Tracks resume views for analytics
     """
     import logging
+    import jwt
+    from datetime import datetime, timedelta
+    
     logger = logging.getLogger(__name__)
     
     if current_user.role != UserRole.company:
@@ -331,35 +334,70 @@ def get_candidate_resume_url(
             detail="Resume not found"
         )
     
-    # Generate presigned URL if S3 is enabled and resume is stored in S3
-    if s3_service.is_enabled() and resume.s3_key:
-        logger.info(f"📄 Generating presigned URL for resume: {resume.s3_key}")
-        presigned_url = s3_service.generate_presigned_url(resume.s3_key, expiration=3600)
+    # Check if company has anonymization enabled
+    anonymization_enabled = getattr(current_user, 'anonymization_enabled', False)
+    
+    # If anonymization is DISABLED, return direct S3 presigned URL
+    if not anonymization_enabled:
+        if s3_service.is_enabled() and resume.s3_key:
+            logger.info(f"📄 Generating S3 presigned URL for resume: {resume.s3_key}")
+            presigned_url = s3_service.generate_presigned_url(resume.s3_key, expiration=3600)
+            
+            if presigned_url:
+                logger.info(f"📄 Company {current_user.id} viewing original resume {resume.id} from S3")
+                return {
+                    "resume_id": resume.id,
+                    "file_name": resume.file_name,
+                    "url": presigned_url,
+                    "storage_type": "s3",
+                    "anonymized": False,
+                    "expires_in": 3600,
+                    "message": "Direct S3 URL - expires in 1 hour"
+                }
+            else:
+                logger.warning(f"⚠️ Failed to generate presigned URL for {resume.s3_key}")
         
-        if presigned_url:
-            return {
-                "resume_id": resume.id,
-                "file_name": resume.file_name,
-                "url": presigned_url,
-                "storage_type": "s3",
-                "expires_in": 3600,
-                "message": "URL expires in 1 hour"
-            }
-        else:
-            logger.warning(f"⚠️ Failed to generate presigned URL, falling back to local path")
+        # Fallback to local file if S3 not available
+        if not os.path.exists(resume.file_path):
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Resume file not found"
+            )
+        
+        logger.info(f"📄 Company {current_user.id} viewing original resume {resume.id} (local file)")
+        return {
+            "resume_id": resume.id,
+            "file_name": resume.file_name,
+            "file_path": resume.file_path,
+            "storage_type": "local",
+            "anonymized": False,
+            "message": "Resume stored locally. Use appropriate endpoint to download."
+        }
     
-    # Fallback to local file path
-    if not os.path.exists(resume.file_path):
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Resume file not found"
-        )
+    # If anonymization is ENABLED, generate temporary token and use API endpoint
+    import os
+    TEMP_TOKEN_SECRET = os.getenv("TEMP_TOKEN_SECRET", "your-secret-key-change-in-production")
     
-    # For local storage, return file path (frontend will need to handle this differently)
+    token_payload = {
+        "resume_id": resume.id,
+        "anonymize": True,
+        "company_id": current_user.id,
+        "exp": datetime.utcnow() + timedelta(hours=1)
+    }
+    
+    temp_token = jwt.encode(token_payload, TEMP_TOKEN_SECRET, algorithm="HS256")
+    
+    # Return URL to our anonymization-aware endpoint with temporary token
+    base_url = os.getenv("BACKEND_URL", "http://localhost:8000")
+    resume_view_url = f"{base_url}/api/resumes/{resume.id}/view?token={temp_token}"
+    
+    logger.info(f"🔒 Company {current_user.id} viewing anonymized resume {resume.id}")
+    
     return {
         "resume_id": resume.id,
         "file_name": resume.file_name,
-        "file_path": resume.file_path,
-        "storage_type": "local",
-        "message": "Resume stored locally. Use appropriate endpoint to download."
+        "url": resume_view_url,
+        "storage_type": "api",
+        "anonymized": True,
+        "message": "Resume will be anonymized (names/emails/phone redacted)"
     }

@@ -37,6 +37,9 @@ class User(Base):
     hr_contact_name = Column(String(255), nullable=True)  # HR contact name (for companies)
     mailing_email = Column(String(255), nullable=True)  # Mailing email for notifications (companies)
     
+    # Resume Anonymization (Admin-controlled feature for companies)
+    anonymization_enabled = Column(Boolean, default=False)  # If True, company can only view anonymized resumes
+    
     is_active = Column(Integer, default=1)  # 1 = active, 0 = inactive
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())

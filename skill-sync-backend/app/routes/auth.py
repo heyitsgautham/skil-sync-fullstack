@@ -47,6 +47,7 @@ class UserResponse(BaseModel):
     full_name: str
     role: str
     created_at: str
+    anonymization_enabled: Optional[bool] = False  # Resume anonymization toggle (for companies)
     
     class Config:
         from_attributes = True
@@ -151,7 +152,8 @@ async def list_users(
                 email=user.email,
                 full_name=user.full_name,
                 role=user.role.value if hasattr(user.role, 'value') else user.role,
-                created_at=user.created_at.isoformat() if user.created_at else ""
+                created_at=user.created_at.isoformat() if user.created_at else "",
+                anonymization_enabled=user.anonymization_enabled if hasattr(user, 'anonymization_enabled') else False
             )
             for user in users
         ]
@@ -221,6 +223,7 @@ class UpdateUserRequest(BaseModel):
     github_url: Optional[str] = None
     hr_contact_name: Optional[str] = None
     mailing_email: Optional[EmailStr] = None
+    anonymization_enabled: Optional[bool] = None  # Admin can toggle resume anonymization for companies
     
     class Config:
         use_enum_values = True
@@ -296,6 +299,13 @@ async def update_user(
             user.hr_contact_name = request.hr_contact_name
         if request.mailing_email is not None:
             user.mailing_email = request.mailing_email
+        if request.anonymization_enabled is not None:
+            # Only allow setting anonymization for companies
+            if user.role == UserRole.company:
+                user.anonymization_enabled = request.anonymization_enabled
+                logger.info(f"Admin {current_user.email} {'enabled' if request.anonymization_enabled else 'disabled'} anonymization for company {user.email}")
+            else:
+                logger.warning(f"Admin {current_user.email} attempted to set anonymization for non-company user {user.email}")
         
         db.commit()
         db.refresh(user)
@@ -307,7 +317,8 @@ async def update_user(
             email=user.email,
             full_name=user.full_name,
             role=user.role.value if hasattr(user.role, 'value') else user.role,
-            created_at=user.created_at.isoformat() if user.created_at else ""
+            created_at=user.created_at.isoformat() if user.created_at else "",
+            anonymization_enabled=user.anonymization_enabled if hasattr(user, 'anonymization_enabled') else False
         )
     
     except HTTPException as e:

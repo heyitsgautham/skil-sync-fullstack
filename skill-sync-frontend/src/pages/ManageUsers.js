@@ -27,6 +27,8 @@ import {
     Select,
     MenuItem,
     Snackbar,
+    Switch,
+    FormControlLabel,
 } from '@mui/material';
 import {
     ManageAccounts as ManageAccountsIcon,
@@ -36,6 +38,8 @@ import {
     AdminPanelSettings as AdminIcon,
     Edit as EditIcon,
     Delete as DeleteIcon,
+    Visibility as VisibilityIcon,
+    VisibilityOff as VisibilityOffIcon,
 } from '@mui/icons-material';
 import Layout from '../components/Layout';
 import api from '../services/api';
@@ -51,7 +55,8 @@ const ManageUsers = () => {
     const [selectedUser, setSelectedUser] = useState(null);
     const [editFormData, setEditFormData] = useState({
         full_name: '',
-        is_active: 1
+        is_active: 1,
+        anonymization_enabled: false
     });
     const [snackbar, setSnackbar] = useState({
         open: false,
@@ -96,7 +101,8 @@ const ManageUsers = () => {
         setSelectedUser(user);
         setEditFormData({
             full_name: user.full_name,
-            is_active: user.is_active !== undefined ? user.is_active : 1
+            is_active: user.is_active !== undefined ? user.is_active : 1,
+            anonymization_enabled: user.anonymization_enabled || false
         });
         setEditDialogOpen(true);
     };
@@ -409,6 +415,24 @@ const ManageUsers = () => {
                                                     textTransform: 'capitalize',
                                                 }}
                                             />
+                                            {/* Anonymization indicator for companies */}
+                                            {user.role === 'company' && user.anonymization_enabled && (
+                                                <Tooltip title="Resume Anonymization Enabled">
+                                                    <Chip
+                                                        icon={<VisibilityOffIcon sx={{ fontSize: 16 }} />}
+                                                        label="Anonymous"
+                                                        size="small"
+                                                        sx={{
+                                                            ml: 1,
+                                                            background: 'linear-gradient(135deg, rgba(255, 152, 0, 0.15) 0%, rgba(255, 193, 7, 0.15) 100%)',
+                                                            border: '1px solid rgba(255, 152, 0, 0.3)',
+                                                            color: '#f57c00',
+                                                            fontWeight: 600,
+                                                            fontSize: '0.7rem',
+                                                        }}
+                                                    />
+                                                </Tooltip>
+                                            )}
                                         </TableCell>
                                         <TableCell>
                                             <Typography variant="body2" color="text.secondary">
@@ -521,6 +545,50 @@ const ManageUsers = () => {
                                 <MenuItem value={0}>Inactive</MenuItem>
                             </Select>
                         </FormControl>
+
+                        {/* Anonymization Toggle (Only for Companies) */}
+                        {selectedUser?.role === 'company' && (
+                            <Box sx={{ 
+                                p: 2, 
+                                mt: 2, 
+                                bgcolor: 'rgba(245, 166, 35, 0.1)', 
+                                borderRadius: 2,
+                                border: '1px solid rgba(245, 166, 35, 0.3)'
+                            }}>
+                                <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 600, color: '#f5a623' }}>
+                                    🔒 Resume Anonymization
+                                </Typography>
+                                <FormControlLabel
+                                    control={
+                                        <Switch
+                                            checked={editFormData.anonymization_enabled}
+                                            onChange={(e) => setEditFormData({ 
+                                                ...editFormData, 
+                                                anonymization_enabled: e.target.checked 
+                                            })}
+                                            sx={{
+                                                '& .MuiSwitch-switchBase.Mui-checked': {
+                                                    color: '#f5a623',
+                                                },
+                                                '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': {
+                                                    backgroundColor: '#f5a623',
+                                                },
+                                            }}
+                                        />
+                                    }
+                                    label={
+                                        <Typography variant="body2">
+                                            {editFormData.anonymization_enabled 
+                                                ? '✅ Enabled - Company can only view anonymized resumes' 
+                                                : '❌ Disabled - Company can view original resumes'}
+                                        </Typography>
+                                    }
+                                />
+                                <Typography variant="caption" display="block" sx={{ mt: 1, color: 'text.secondary' }}>
+                                    When enabled, this company will only see resumes with names, emails, phone numbers, and profile links removed.
+                                </Typography>
+                            </Box>
+                        )}
                     </DialogContent>
                     <DialogActions sx={{ p: 2 }}>
                         <Button 
