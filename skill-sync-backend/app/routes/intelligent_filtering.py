@@ -22,6 +22,7 @@ from app.services.parser_service import ResumeParser
 from app.services.resume_intelligence_service import ResumeIntelligenceService
 from app.services.rag_engine import RAGEngine
 from app.services.matching_engine import MatchingEngine
+from app.services.resume_service import ResumeService
 from app.utils.security import get_current_user, get_current_company
 
 router = APIRouter(prefix="/api/filter", tags=["intelligent-filtering"])
@@ -43,12 +44,13 @@ async def parse_and_extract_resume(
     """
     Parse resume and extract structured information using Gemini AI
     
-    This endpoint:
-    1. Extracts text from uploaded resume (PDF/DOCX)
-    2. Uses Gemini to extract structured data (skills, experience, education)
-    3. Calculates total experience (handling overlaps)
-    4. Generates embeddings using HuggingFace
-    5. Stores in database with vector embeddings
+    This endpoint (used by Resume Intelligence UI):
+    1. Uploads resume to S3 for cloud storage (HR can view it later)
+    2. Extracts text from uploaded resume (PDF/DOCX)
+    3. Uses Gemini to extract structured data (skills, experience, education)
+    4. Calculates total experience (handling overlaps)
+    5. Generates embeddings and stores in ChromaDB
+    6. Stores in database with vector embeddings and S3 key
     
     Returns structured candidate profile with parsed data
     """
@@ -58,84 +60,30 @@ async def parse_and_extract_resume(
     try:
         logger.info(f"[RESUME UPLOAD] User {current_user.id} uploading: {file.filename}")
         
-        # Validate file type
-        if not file.filename.endswith(('.pdf', '.docx', '.txt')):
-            raise HTTPException(status_code=400, detail="Only PDF, DOCX, and TXT files are supported")
-        
-        # Save file temporarily
-        upload_dir = "app/public/resumes"
-        os.makedirs(upload_dir, exist_ok=True)
-        
-        file_id = str(uuid.uuid4())
-        file_extension = os.path.splitext(file.filename)[1]
-        file_path = os.path.join(upload_dir, f"{file_id}{file_extension}")
-        
-        with open(file_path, "wb") as f:
-            content = await file.read()
-            f.write(content)
-        
-        # Extract text
-        if file_extension == '.pdf':
-            text = resume_parser.extract_text_from_pdf(file_path)
-        elif file_extension == '.docx':
-            text = resume_parser.extract_text_from_docx(file_path)
-        else:
-            text = content.decode('utf-8')
-        
-        # Extract structured data using Gemini
-        logger.info(f"[RESUME UPLOAD] Extracting structured data using Gemini...")
-        structured_data = intelligence_service.extract_structured_data(text)
-        logger.info(f"[RESUME UPLOAD] Extracted {len(structured_data.get('all_skills', []))} skills")
-        
-        # Deactivate all other resumes for this student
-        deactivated = db.query(Resume).filter(
-            Resume.student_id == current_user.id,
-            Resume.is_active == 1
-        ).update({"is_active": 0})
-        logger.info(f"[RESUME UPLOAD] Deactivated {deactivated} previous resumes")
-        
-        # Store in database with is_active = 1 (active)
-        resume = Resume(
-            student_id=current_user.id,  # Use integer id, not UUID user_id
-            file_name=file.filename,
-            file_path=file_path,
-            parsed_data=structured_data,
-            is_active=1
+        # Use ResumeService for consistent S3 upload + processing
+        # This ensures the resume is uploaded to S3 so HR can view it
+        resume = await ResumeService.upload_and_process_resume(
+            file=file,
+            student_id=current_user.id,
+            db=db,
+            is_tailored=False,
+            deactivate_others=True
         )
-        db.add(resume)
         
         # Update user profile with extracted data
+        structured_data = resume.parsed_data or {}
         current_user.skills = structured_data.get('all_skills', [])
         current_user.total_experience_years = structured_data.get('total_experience_years', 0)
-        
         db.commit()
-        db.refresh(resume)
-        
-        # Store in vector database using integer ID (not UUID resume_id)
-        logger.info(f"[RESUME UPLOAD] Storing embedding in ChromaDB with ID: resume_{resume.id}")
-        embedding_id = rag_engine.store_resume_embedding(
-            resume_id=str(resume.id),  # Use integer id for consistency
-            content=text,
-            skills=structured_data.get('all_skills', []),
-            metadata={
-                'student_id': current_user.id,  # Use integer id
-                'file_name': file.filename,
-                'total_experience': structured_data.get('total_experience_years', 0)
-            }
-        )
-        logger.info(f"[RESUME UPLOAD] Embedding stored successfully: {embedding_id}")
-        
-        # Update resume with embedding ID
-        resume.embedding_id = embedding_id
-        db.commit()
-        db.refresh(resume)
         
         logger.info(f"[RESUME UPLOAD] ✅ Resume {resume.id} uploaded and indexed successfully!")
+        logger.info(f"[RESUME UPLOAD] 📁 S3 Key: {resume.s3_key}")
         
         return {
             "success": True,
             "message": "Resume parsed and analyzed successfully",
             "resume_id": resume.resume_id,
+            "s3_key": resume.s3_key,  # Include S3 key in response
             "structured_data": structured_data,
             "processing_details": {
                 "skills_extracted": len(structured_data.get('all_skills', [])),
