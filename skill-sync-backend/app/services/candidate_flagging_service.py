@@ -1,5 +1,14 @@
 """
 Candidate Flagging Service - Detects duplicate candidates based on contact info
+
+This service identifies potential duplicate candidate profiles by comparing:
+- Mobile phone numbers (normalized to digits only)
+- LinkedIn URLs (normalized, case-insensitive)
+- GitHub URLs (normalized, case-insensitive)
+
+**Important:** Only candidates who have uploaded at least one active resume are flagged.
+This ensures we only flag active candidates who are actually participating in the platform,
+reducing false positives from incomplete or inactive profiles.
 """
 
 from sqlalchemy.orm import Session
@@ -14,7 +23,11 @@ logger = logging.getLogger(__name__)
 
 
 class CandidateFlaggingService:
-    """Service to detect and flag duplicate candidates"""
+    """
+    Service to detect and flag duplicate candidates
+    
+    Only flags candidates who have uploaded resumes to focus on active participants.
+    """
     
     @staticmethod
     def normalize_url(url: Optional[str]) -> Optional[str]:
@@ -30,28 +43,19 @@ class CandidateFlaggingService:
         if not url:
             return None
         
-        # Remove whitespace
-        url = url.strip()
+        # Remove whitespace and convert to lowercase for consistent processing
+        url = url.strip().lower()
         
-        # Parse URL
-        try:
-            parsed = urlparse(url)
-            
-            # Extract domain and path
-            domain = parsed.netloc or parsed.path.split('/')[0]
-            path = parsed.path if parsed.netloc else '/'.join(parsed.path.split('/')[1:])
-            
-            # Remove 'www.' prefix
-            domain = re.sub(r'^www\.', '', domain, flags=re.IGNORECASE)
-            
-            # Combine domain and path, remove trailing slash
-            normalized = f"{domain}{path}".rstrip('/')
-            
-            # Convert to lowercase for case-insensitive comparison
-            return normalized.lower()
-        except Exception as e:
-            logger.warning(f"Failed to normalize URL '{url}': {e}")
-            return url.lower().strip()
+        # Remove protocol if present
+        url = re.sub(r'^https?://', '', url)
+        
+        # Remove www. prefix
+        url = re.sub(r'^www\.', '', url)
+        
+        # Remove trailing slash
+        url = url.rstrip('/')
+        
+        return url
     
     @staticmethod
     def normalize_phone(phone: Optional[str]) -> Optional[str]:
@@ -77,6 +81,9 @@ class CandidateFlaggingService:
         """
         Detect all flagged candidates globally across the platform
         
+        Only flags candidates who have uploaded at least one resume.
+        This ensures we only flag active candidates who are actually participating.
+        
         Returns a dictionary mapping student_id to flag information:
         {
             student_id: {
@@ -89,10 +96,28 @@ class CandidateFlaggingService:
             }
         }
         """
+        from app.models.resume import Resume
+        
         logger.info("🔍 Starting candidate flagging detection...")
         
-        # Get all students with contact info
-        students = db.query(User).filter(User.role == UserRole.student).all()
+        # Get all students who have uploaded at least one resume
+        # Only flag active candidates with resumes
+        students_with_resumes = db.query(User.id).join(
+            Resume, Resume.student_id == User.id
+        ).filter(
+            User.role == UserRole.student,
+            Resume.is_active == 1
+        ).distinct().all()
+        
+        student_ids_with_resumes = {student.id for student in students_with_resumes}
+        
+        logger.info(f"📊 Total students with resumes: {len(student_ids_with_resumes)}")
+        
+        # Get all students with contact info who have uploaded resumes
+        students = db.query(User).filter(
+            User.role == UserRole.student,
+            User.id.in_(student_ids_with_resumes)
+        ).all()
         
         # Build normalized lookup maps
         phone_map = {}  # normalized_phone -> [student_ids]

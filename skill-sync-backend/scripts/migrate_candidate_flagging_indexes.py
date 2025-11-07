@@ -10,7 +10,7 @@ import os
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from sqlalchemy import create_index, Index, text
-from app.database.connection import engine, get_db_session
+from app.database.connection import engine, SessionLocal
 from app.models.user import User
 import logging
 
@@ -25,7 +25,7 @@ def add_indexes():
     logger.info("MIGRATION: Add indexes for candidate flagging")
     logger.info("=" * 80)
     
-    db = next(get_db_session())
+    db = SessionLocal()
     
     try:
         # Check if indexes already exist
@@ -91,7 +91,7 @@ def rollback_indexes():
     logger.info("ROLLBACK: Remove candidate flagging indexes")
     logger.info("=" * 80)
     
-    db = next(get_db_session())
+    db = SessionLocal()
     
     try:
         indexes_to_drop = ['idx_users_phone', 'idx_users_linkedin_url', 'idx_users_github_url']
