@@ -27,8 +27,6 @@ import {
     Select,
     MenuItem,
     Snackbar,
-    Switch,
-    FormControlLabel,
 } from '@mui/material';
 import {
     ManageAccounts as ManageAccountsIcon,
@@ -38,8 +36,6 @@ import {
     AdminPanelSettings as AdminIcon,
     Edit as EditIcon,
     Delete as DeleteIcon,
-    Visibility as VisibilityIcon,
-    VisibilityOff as VisibilityOffIcon,
 } from '@mui/icons-material';
 import Layout from '../components/Layout';
 import api from '../services/api';
@@ -55,8 +51,7 @@ const ManageUsers = () => {
     const [selectedUser, setSelectedUser] = useState(null);
     const [editFormData, setEditFormData] = useState({
         full_name: '',
-        is_active: 1,
-        anonymization_enabled: false
+        is_active: 1
     });
     const [snackbar, setSnackbar] = useState({
         open: false,
@@ -101,8 +96,7 @@ const ManageUsers = () => {
         setSelectedUser(user);
         setEditFormData({
             full_name: user.full_name,
-            is_active: user.is_active !== undefined ? user.is_active : 1,
-            anonymization_enabled: user.anonymization_enabled || false
+            is_active: user.is_active !== undefined ? user.is_active : 1
         });
         setEditDialogOpen(true);
     };
@@ -187,11 +181,11 @@ const ManageUsers = () => {
     const getRoleIcon = (role) => {
         switch (role.toLowerCase()) {
             case 'student':
-                return <PersonIcon sx={{ fontSize: 20, color: '#667eea' }} />;
+                return <PersonIcon sx={{ fontSize: 20, color: '#1976d2' }} />;
             case 'company':
-                return <BusinessIcon sx={{ fontSize: 20, color: '#11998e' }} />;
+                return <BusinessIcon sx={{ fontSize: 20, color: '#2e7d32' }} />;
             case 'admin':
-                return <AdminIcon sx={{ fontSize: 20, color: '#f5576c' }} />;
+                return <AdminIcon sx={{ fontSize: 20, color: '#d32f2f' }} />;
             default:
                 return <PersonIcon sx={{ fontSize: 20 }} />;
         }
@@ -201,9 +195,9 @@ const ManageUsers = () => {
         switch (role.toLowerCase()) {
             case 'student':
                 return {
-                    background: 'linear-gradient(135deg, rgba(102, 126, 234, 0.15) 0%, rgba(118, 75, 162, 0.15) 100%)',
-                    border: '1px solid rgba(102, 126, 234, 0.3)',
-                    color: '#667eea',
+                    background: 'linear-gradient(135deg, rgba(19, 39, 128, 0.15) 0%, rgba(19, 13, 95, 0.15) 100%)',
+                    border: '1px solid rgba(11, 25, 85, 0.3)',
+                    color: '#1976d2',
                 };
             case 'company':
                 return {
@@ -267,17 +261,17 @@ const ManageUsers = () => {
                                     width: 64,
                                     height: 64,
                                     borderRadius: 3,
-                                    background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                                    background: 'linear-gradient(135deg,#d32f2f 0%, #d32f2fdd 100%)',
                                     display: 'flex',
                                     alignItems: 'center',
                                     justifyContent: 'center',
                                     mr: 3,
-                                    boxShadow: '0 8px 24px rgba(102, 126, 234, 0.3)',
+                                    boxShadow: '0 8px 24px rgba(211, 47, 47         , 0.3)',
                                 }}
                             >
                                 <ManageAccountsIcon sx={{ fontSize: 36, color: 'white' }} />
                             </Box>
-                            <Box>
+                            <Box>   
                                 <Typography
                                     variant="h4"
                                     sx={{
@@ -383,16 +377,26 @@ const ManageUsers = () => {
                                                         width: 40,
                                                         height: 40,
                                                         borderRadius: 2,
-                                                        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                                                        background: user.role.toLowerCase() === 'student' 
+                                                            ? '#1976d2'
+                                                            : user.role.toLowerCase() === 'company'
+                                                            ? '#2e7d32'
+                                                            : '#d32f2f',
                                                         display: 'flex',
                                                         alignItems: 'center',
                                                         justifyContent: 'center',
                                                         mr: 2,
                                                     }}
                                                 >
-                                                    <Typography sx={{ color: 'white', fontWeight: 700 }}>
-                                                        {user.full_name.charAt(0).toUpperCase()}
-                                                    </Typography>
+                                                    {user.role.toLowerCase() === 'student' && (
+                                                        <PersonIcon sx={{ color: 'white', fontSize: 22 }} />
+                                                    )}
+                                                    {user.role.toLowerCase() === 'company' && (
+                                                        <BusinessIcon sx={{ color: 'white', fontSize: 22 }} />
+                                                    )}
+                                                    {user.role.toLowerCase() === 'admin' && (
+                                                        <AdminIcon sx={{ color: 'white', fontSize: 22 }} />
+                                                    )}
                                                 </Box>
                                                 <Typography sx={{ fontWeight: 600 }}>
                                                     {user.full_name}
@@ -415,24 +419,6 @@ const ManageUsers = () => {
                                                     textTransform: 'capitalize',
                                                 }}
                                             />
-                                            {/* Anonymization indicator for companies */}
-                                            {user.role === 'company' && user.anonymization_enabled && (
-                                                <Tooltip title="Resume Anonymization Enabled">
-                                                    <Chip
-                                                        icon={<VisibilityOffIcon sx={{ fontSize: 16 }} />}
-                                                        label="Anonymous"
-                                                        size="small"
-                                                        sx={{
-                                                            ml: 1,
-                                                            background: 'linear-gradient(135deg, rgba(255, 152, 0, 0.15) 0%, rgba(255, 193, 7, 0.15) 100%)',
-                                                            border: '1px solid rgba(255, 152, 0, 0.3)',
-                                                            color: '#f57c00',
-                                                            fontWeight: 600,
-                                                            fontSize: '0.7rem',
-                                                        }}
-                                                    />
-                                                </Tooltip>
-                                            )}
                                         </TableCell>
                                         <TableCell>
                                             <Typography variant="body2" color="text.secondary">
@@ -445,7 +431,7 @@ const ManageUsers = () => {
                                                     size="small"
                                                     onClick={() => handleEditClick(user)}
                                                     sx={{
-                                                        color: '#667eea',
+                                                        color: '#263991ff',
                                                         mr: 1,
                                                         '&:hover': {
                                                             backgroundColor: 'rgba(102, 126, 234, 0.1)',
@@ -545,50 +531,6 @@ const ManageUsers = () => {
                                 <MenuItem value={0}>Inactive</MenuItem>
                             </Select>
                         </FormControl>
-
-                        {/* Anonymization Toggle (Only for Companies) */}
-                        {selectedUser?.role === 'company' && (
-                            <Box sx={{ 
-                                p: 2, 
-                                mt: 2, 
-                                bgcolor: 'rgba(245, 166, 35, 0.1)', 
-                                borderRadius: 2,
-                                border: '1px solid rgba(245, 166, 35, 0.3)'
-                            }}>
-                                <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 600, color: '#f5a623' }}>
-                                    🔒 Resume Anonymization
-                                </Typography>
-                                <FormControlLabel
-                                    control={
-                                        <Switch
-                                            checked={editFormData.anonymization_enabled}
-                                            onChange={(e) => setEditFormData({ 
-                                                ...editFormData, 
-                                                anonymization_enabled: e.target.checked 
-                                            })}
-                                            sx={{
-                                                '& .MuiSwitch-switchBase.Mui-checked': {
-                                                    color: '#f5a623',
-                                                },
-                                                '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': {
-                                                    backgroundColor: '#f5a623',
-                                                },
-                                            }}
-                                        />
-                                    }
-                                    label={
-                                        <Typography variant="body2">
-                                            {editFormData.anonymization_enabled 
-                                                ? '✅ Enabled - Company can only view anonymized resumes' 
-                                                : '❌ Disabled - Company can view original resumes'}
-                                        </Typography>
-                                    }
-                                />
-                                <Typography variant="caption" display="block" sx={{ mt: 1, color: 'text.secondary' }}>
-                                    When enabled, this company will only see resumes with names, emails, phone numbers, and profile links removed.
-                                </Typography>
-                            </Box>
-                        )}
                     </DialogContent>
                     <DialogActions sx={{ p: 2 }}>
                         <Button 

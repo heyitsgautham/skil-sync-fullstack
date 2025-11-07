@@ -209,12 +209,12 @@ const InternshipList = () => {
                         sx={{
                             '& .MuiOutlinedInput-root': {
                                 borderRadius: 3,
-                                backgroundColor: 'rgba(102, 126, 234, 0.05)',
+                                backgroundColor: 'rgba(214, 38, 26, 0.05)',
                                 '&:hover fieldset': {
-                                    borderColor: '#667eea',
+                                    borderColor: '#d32f2f',
                                 },
                                 '&.Mui-focused fieldset': {
-                                    borderColor: '#667eea',
+                                    borderColor: '#d32f2f',
                                 },
                             },
                         }}
@@ -256,7 +256,7 @@ const InternshipList = () => {
                                             borderRadius: 4,
                                             background: 'rgba(255, 255, 255, 0.95)',
                                             backdropFilter: 'blur(20px)',
-                                            boxShadow: '0 8px 32px rgba(0,0,0,0.08)',
+                                            boxShadow: '0 8px 32px rgba(211, 10, 10, 0.08)',
                                             border: '1px solid rgba(255,255,255,0.3)',
                                             transition: 'all 0.3s ease',
                                             '&:hover': {
@@ -272,12 +272,12 @@ const InternshipList = () => {
                                                         width: 48,
                                                         height: 48,
                                                         borderRadius: 2,
-                                                        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                                                        background: 'linear-gradient(135deg, #d32f2f 0%, #d32f2fdd 100%)',
                                                         display: 'flex',
                                                         alignItems: 'center',
                                                         justifyContent: 'center',
                                                         mr: 2,
-                                                        boxShadow: '0 4px 12px rgba(102, 126, 234, 0.3)',
+                                                        boxShadow: '0 4px 12px rgba(211, 10, 10, 0.3)',
                                                     }}
                                                 >
                                                     <WorkIcon sx={{ color: 'white', fontSize: 28 }} />
