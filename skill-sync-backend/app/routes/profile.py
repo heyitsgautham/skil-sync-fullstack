@@ -276,6 +276,7 @@ def get_job_email_stats(
 @router.post("/send-job-email/{internship_id}")
 def send_job_email(
     internship_id: int,
+    filters: list[str] = Query(default=["great", "good", "other"], description="Match quality filters: great (≥80%), good (60-79%), other (<60%)"),
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
@@ -283,6 +284,7 @@ def send_job_email(
     Send email with CSV, Excel, and summary for a specific job
     
     - **internship_id**: ID of the internship (use 0 for all jobs)
+    - **filters**: List of match quality filters (great=≥80%, good=60-79%, other=<60%)
     
     Only accessible by companies for their own jobs
     """
@@ -290,6 +292,15 @@ def send_job_email(
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Only companies can send job emails"
+        )
+    
+    # Validate filters
+    valid_filters = {"great", "good", "other"}
+    filters = [f for f in filters if f in valid_filters]
+    if not filters:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="At least one valid filter must be provided (great, good, or other)"
         )
     
     # Get stats
@@ -337,37 +348,66 @@ def send_job_email(
             StudentInternshipMatch.internship_id == internship_id
         )
     
-    matches = matches_query.all()
+    all_matches = matches_query.all()
     
-    if not matches:
+    if not all_matches:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="No candidates found"
         )
     
-    # Generate CSV content from all matched candidates
-    csv_content = generate_csv_export_from_matches(matches, db, internship)
+    # Filter matches based on match quality filters
+    filtered_matches = []
+    for match in all_matches:
+        score = match.base_similarity_score or 0
+        
+        if "great" in filters and score >= 80:
+            filtered_matches.append(match)
+        elif "good" in filters and 60 <= score < 80:
+            filtered_matches.append(match)
+        elif "other" in filters and score < 60:
+            filtered_matches.append(match)
     
-    # Generate email HTML
+    if not filtered_matches:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"No candidates found matching the selected filters: {', '.join(filters)}"
+        )
+    
+    # Generate CSV content from filtered matched candidates
+    csv_content = generate_csv_export_from_matches(filtered_matches, db, internship)
+    
+    # Update job_stats to reflect filtered counts
+    filtered_stats = {
+        "total_applicants": len(filtered_matches),
+        "great_matches": sum(1 for m in filtered_matches if (m.base_similarity_score or 0) >= 80),
+        "good_matches": sum(1 for m in filtered_matches if 60 <= (m.base_similarity_score or 0) < 80),
+        "bad_matches": sum(1 for m in filtered_matches if (m.base_similarity_score or 0) < 60),
+        "tailored_resume_count": job_stats.get("tailored_resume_count", 0)
+    }
+    
+    # Generate email HTML with filtered data
     html_content = generate_job_email_html(
         company_name=current_user.full_name,
         internship_title=internship_title,
-        job_stats=job_stats,
-        matches=matches,
-        db=db
+        job_stats=filtered_stats,
+        matches=filtered_matches,
+        db=db,
+        applied_filters=filters
     )
     
     text_content = generate_job_email_text(
         company_name=current_user.full_name,
         internship_title=internship_title,
-        job_stats=job_stats
+        job_stats=filtered_stats
     )
     
-    # Generate Excel content
-    excel_content = generate_excel_export_from_matches(matches, db, internship)
+    # Generate Excel content from filtered matches
+    excel_content = generate_excel_export_from_matches(filtered_matches, db, internship)
     
     # Send email with CSV and Excel attachments
-    subject = f"SkillSync Job Report: {internship_title} - {job_stats['total_applicants']} Candidates"
+    filter_label = ", ".join([f.upper() for f in filters])
+    subject = f"SkillSync Job Report: {internship_title} - {len(filtered_matches)} Candidates ({filter_label})"
     
     # Use mailing_email if set, otherwise fallback to regular email
     recipient_email = current_user.mailing_email or current_user.email
@@ -405,7 +445,8 @@ def send_job_email(
         "success": True,
         "message": f"Email sent successfully to {recipient_email}",
         "internship_title": internship_title,
-        "total_applicants": job_stats["total_applicants"],
+        "total_applicants": len(filtered_matches),
+        "applied_filters": filters,
         "csv_preview": csv_content[:500] + "..." if len(csv_content) > 500 else csv_content
     }
 
@@ -723,8 +764,26 @@ def generate_excel_export_from_matches(matches, db, internship):
     return output.getvalue()
 
 
-def generate_job_email_html(company_name, internship_title, job_stats, matches, db):
+def generate_job_email_html(company_name, internship_title, job_stats, matches, db, applied_filters=None):
     """Generate HTML email content for job report"""
+    
+    # Generate filter info HTML if filters were applied
+    filter_info = ""
+    if applied_filters and len(applied_filters) < 3:  # If not all filters selected
+        filter_labels = {
+            "great": "Great Matches (≥80%)",
+            "good": "Good Matches (60-79%)",
+            "other": "Other Matches (<60%)"
+        }
+        selected_filters = [filter_labels.get(f, f.upper()) for f in applied_filters]
+        filter_info = f"""
+            <div style="background-color: #e3f2fd; padding: 15px; border-radius: 8px; margin: 20px 0;">
+                <strong>📋 Filtered Categories:</strong> {', '.join(selected_filters)}
+                <br/>
+                <em style="color: #666; font-size: 13px;">This report includes only candidates from the selected match quality categories.</em>
+            </div>
+        """
+    
     html = f"""
     <!DOCTYPE html>
     <html>
@@ -786,6 +845,8 @@ def generate_job_email_html(company_name, internship_title, job_stats, matches, 
             <h3>Hello, {company_name}!</h3>
             <p>Here's your comprehensive report for <strong>{internship_title}</strong>.</p>
             
+            {filter_info}
+            
             <div class="stats-grid">
                 <div class="stat-card">
                     <div class="stat-number">{job_stats['total_applicants']}</div>
@@ -793,7 +854,7 @@ def generate_job_email_html(company_name, internship_title, job_stats, matches, 
                 </div>
                 <div class="stat-card great">
                     <div class="stat-number">{job_stats['great_matches']}</div>
-                    <div class="stat-label">Great Matches (80%+)</div>
+                    <div class="stat-label">Great Matches (≥80%)</div>
                 </div>
                 <div class="stat-card good">
                     <div class="stat-number">{job_stats['good_matches']}</div>
@@ -801,7 +862,7 @@ def generate_job_email_html(company_name, internship_title, job_stats, matches, 
                 </div>
                 <div class="stat-card bad">
                     <div class="stat-number">{job_stats['bad_matches']}</div>
-                    <div class="stat-label">Low Matches (<60%)</div>
+                    <div class="stat-label">Other Matches (<60%)</div>
                 </div>
                 <div class="stat-card tailored">
                     <div class="stat-number">{job_stats['tailored_resume_count']}</div>
@@ -809,7 +870,7 @@ def generate_job_email_html(company_name, internship_title, job_stats, matches, 
                 </div>
             </div>
             
-            <p><strong>Note:</strong> CSV export with detailed candidate information is attached to this email.</p>
+            <p><strong>Note:</strong> CSV and Excel exports with detailed candidate information are attached to this email.</p>
             
             <hr style="margin: 30px 0; border: none; border-top: 1px solid #ddd;">
             

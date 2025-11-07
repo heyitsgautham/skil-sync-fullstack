@@ -29,7 +29,10 @@ import {
   DialogContent,
   DialogContentText,
   DialogActions,
-  Chip
+  Chip,
+  Checkbox,
+  FormGroup,
+  FormLabel
 } from '@mui/material';
 import {
   Save as SaveIcon,
@@ -56,6 +59,14 @@ const CompanyProfile = () => {
   const [selectedJob, setSelectedJob] = useState('');
   const [sendingEmail, setSendingEmail] = useState(false);
   const [confirmDialog, setConfirmDialog] = useState(false);
+  
+  // Match quality filter state
+  const [matchFilters, setMatchFilters] = useState({
+    all: true,
+    greatMatches: true,
+    goodMatches: true,
+    otherMatches: true
+  });
 
   const [formData, setFormData] = useState({
     company_name: '',
@@ -206,12 +217,25 @@ const CompanyProfile = () => {
     setConfirmDialog(false);
 
     try {
-      const response = await fetch(`${API_BASE_URL}/profile/send-job-email/${selectedJob}`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`
+      // Prepare filter parameters
+      const filters = [];
+      if (matchFilters.greatMatches) filters.push('great');
+      if (matchFilters.goodMatches) filters.push('good');
+      if (matchFilters.otherMatches) filters.push('other');
+      
+      // Build query params
+      const queryParams = new URLSearchParams();
+      filters.forEach(filter => queryParams.append('filters', filter));
+      
+      const response = await fetch(
+        `${API_BASE_URL}/profile/send-job-email/${selectedJob}?${queryParams.toString()}`,
+        {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
         }
-      });
+      );
 
       if (!response.ok) {
         throw new Error('Failed to send email');
@@ -224,6 +248,14 @@ const CompanyProfile = () => {
         severity: 'success'
       });
       setSelectedJob('');
+      
+      // Reset filters to default (all selected)
+      setMatchFilters({
+        all: true,
+        greatMatches: true,
+        goodMatches: true,
+        otherMatches: true
+      });
     } catch (error) {
       setSnackbar({
         open: true,
@@ -242,6 +274,46 @@ const CompanyProfile = () => {
 
   const getSelectedJobStats = () => {
     return jobStats.find(job => job.internship_id === parseInt(selectedJob));
+  };
+  
+  const handleFilterChange = (filterName) => {
+    if (filterName === 'all') {
+      // Toggle all filters
+      const newValue = !matchFilters.all;
+      setMatchFilters({
+        all: newValue,
+        greatMatches: newValue,
+        goodMatches: newValue,
+        otherMatches: newValue
+      });
+    } else {
+      // Update individual filter
+      const newFilters = {
+        ...matchFilters,
+        [filterName]: !matchFilters[filterName]
+      };
+      
+      // Check if all individual filters are selected
+      const allIndividualSelected = newFilters.greatMatches && 
+                                    newFilters.goodMatches && 
+                                    newFilters.otherMatches;
+      
+      newFilters.all = allIndividualSelected;
+      setMatchFilters(newFilters);
+    }
+  };
+  
+  const getFilteredCandidateCount = () => {
+    if (!selectedJob || !getSelectedJobStats()) return 0;
+    
+    const stats = getSelectedJobStats();
+    let count = 0;
+    
+    if (matchFilters.greatMatches) count += stats.great_matches;
+    if (matchFilters.goodMatches) count += stats.good_matches;
+    if (matchFilters.otherMatches) count += stats.bad_matches;
+    
+    return count;
   };
 
   if (loading) {
@@ -415,14 +487,14 @@ const CompanyProfile = () => {
             {/* Job Email Section */}
             <Box>
               <Typography variant="h6" gutterBottom>
-                Send Job Applicants Email
+                Send Customized Candidate Email
               </Typography>
               <Typography variant="body2" color="text.secondary" paragraph>
-                Select a job position to send a summary email with all applicant details, including CSV/Excel exports and match statistics.
+                Select a job position and filter candidates by match quality to send a customized email with CSV/Excel exports.
               </Typography>
 
               <Grid container spacing={2}>
-                <Grid size={{ xs: 12, md: 8 }}>
+                <Grid size={{ xs: 12 }}>
                   <FormControl fullWidth>
                     <InputLabel>Select Job Position</InputLabel>
                     <Select
@@ -440,48 +512,123 @@ const CompanyProfile = () => {
                   </FormControl>
                 </Grid>
 
-                <Grid size={{ xs: 12, md: 4 }}>
+                {/* Match Quality Filters */}
+                {selectedJob && (
+                  <Grid size={{ xs: 12 }}>
+                    <Card variant="outlined" sx={{ p: 2 }}>
+                      <FormLabel component="legend" sx={{ mb: 2, fontWeight: 600 }}>
+                        Select Candidate Categories to Include:
+                      </FormLabel>
+                      <FormGroup>
+                        <FormControlLabel
+                          control={
+                            <Checkbox
+                              checked={matchFilters.all}
+                              onChange={() => handleFilterChange('all')}
+                              color="primary"
+                            />
+                          }
+                          label={
+                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                              <Typography variant="body1" fontWeight={600}>ALL</Typography>
+                              <Typography variant="body2" color="text.secondary">
+                                (Select all categories)
+                              </Typography>
+                            </Box>
+                          }
+                        />
+                        <Box sx={{ ml: 3, mt: 1, display: 'flex', flexDirection: 'column', gap: 1 }}>
+                          <FormControlLabel
+                            control={
+                              <Checkbox
+                                checked={matchFilters.greatMatches}
+                                onChange={() => handleFilterChange('greatMatches')}
+                                disabled={matchFilters.all}
+                                color="success"
+                              />
+                            }
+                            label={
+                              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                <Chip
+                                  size="small"
+                                  label="GREAT MATCHES"
+                                  color="success"
+                                />
+                                <Typography variant="body2" color="text.secondary">
+                                  (≥80% match - {getSelectedJobStats()?.great_matches || 0} candidates)
+                                </Typography>
+                              </Box>
+                            }
+                          />
+                          <FormControlLabel
+                            control={
+                              <Checkbox
+                                checked={matchFilters.goodMatches}
+                                onChange={() => handleFilterChange('goodMatches')}
+                                disabled={matchFilters.all}
+                                color="info"
+                              />
+                            }
+                            label={
+                              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                <Chip
+                                  size="small"
+                                  label="GOOD MATCHES"
+                                  color="info"
+                                />
+                                <Typography variant="body2" color="text.secondary">
+                                  (60-79% match - {getSelectedJobStats()?.good_matches || 0} candidates)
+                                </Typography>
+                              </Box>
+                            }
+                          />
+                          <FormControlLabel
+                            control={
+                              <Checkbox
+                                checked={matchFilters.otherMatches}
+                                onChange={() => handleFilterChange('otherMatches')}
+                                disabled={matchFilters.all}
+                                color="default"
+                              />
+                            }
+                            label={
+                              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                <Chip
+                                  size="small"
+                                  label="OTHER MATCHES"
+                                  color="default"
+                                />
+                                <Typography variant="body2" color="text.secondary">
+                                  (&lt;60% match - {getSelectedJobStats()?.bad_matches || 0} candidates)
+                                </Typography>
+                              </Box>
+                            }
+                          />
+                        </Box>
+                      </FormGroup>
+                      
+                      {/* Filtered count display */}
+                      <Box sx={{ mt: 2, p: 1.5, bgcolor: 'primary.lighter', borderRadius: 1 }}>
+                        <Typography variant="body2" fontWeight={600}>
+                          Total candidates to include: {getFilteredCandidateCount()} / {getSelectedJobStats()?.total_applicants || 0}
+                        </Typography>
+                      </Box>
+                    </Card>
+                  </Grid>
+                )}
+
+                <Grid size={{ xs: 12 }}>
                   <Button
                     fullWidth
                     variant="contained"
                     color="primary"
                     startIcon={sendingEmail ? <CircularProgress size={20} /> : <SendIcon />}
                     onClick={() => setConfirmDialog(true)}
-                    disabled={!selectedJob || sendingEmail || jobStats.length === 0}
+                    disabled={!selectedJob || sendingEmail || jobStats.length === 0 || getFilteredCandidateCount() === 0}
                   >
                     {sendingEmail ? 'Sending...' : 'Send Email'}
                   </Button>
                 </Grid>
-
-                {/* Job Statistics */}
-                {selectedJob && getSelectedJobStats() && (
-                  <Grid size={{ xs: 12 }}>
-                    <Card variant="outlined" sx={{ bgcolor: 'grey.50', p: 2 }}>
-                      <Typography variant="subtitle2" gutterBottom>
-                        Applicant Statistics for {getSelectedJobStats().internship_title}:
-                      </Typography>
-                      <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap', mt: 1 }}>
-                        <Chip
-                          icon={<CheckCircleIcon />}
-                          label={`Great Matches (80%+): ${getSelectedJobStats().great_matches}`}
-                          color="success"
-                        />
-                        <Chip
-                          label={`Good Matches (60-79%): ${getSelectedJobStats().good_matches}`}
-                          color="info"
-                        />
-                        <Chip
-                          label={`Other Matches (<60%): ${getSelectedJobStats().bad_matches}`}
-                          color="default"
-                        />
-                        <Chip
-                          label={`Tailored Resumes: ${getSelectedJobStats().tailored_resume_count}`}
-                          color="secondary"
-                        />
-                      </Box>
-                    </Card>
-                  </Grid>
-                )}
               </Grid>
             </Box>
           </CardContent>
@@ -495,11 +642,24 @@ const CompanyProfile = () => {
               Are you sure you want to send the applicant summary email for{' '}
               <strong>{getSelectedJobStats()?.internship_title}</strong>?
               <br /><br />
+              <strong>Selected Categories:</strong>
+              <ul style={{ marginTop: '8px', marginBottom: '8px' }}>
+                {matchFilters.greatMatches && (
+                  <li>Great Matches (≥80%): {getSelectedJobStats()?.great_matches || 0} candidates</li>
+                )}
+                {matchFilters.goodMatches && (
+                  <li>Good Matches (60-79%): {getSelectedJobStats()?.good_matches || 0} candidates</li>
+                )}
+                {matchFilters.otherMatches && (
+                  <li>Other Matches (&lt;60%): {getSelectedJobStats()?.bad_matches || 0} candidates</li>
+                )}
+              </ul>
+              <br />
               The email will include:
               <ul>
-                <li>CSV export of all {getSelectedJobStats()?.total_applicants} candidates</li>
+                <li>CSV export of {getFilteredCandidateCount()} candidates</li>
+                <li>Excel export of {getFilteredCandidateCount()} candidates</li>
                 <li>Match statistics breakdown</li>
-                <li>Summary of tailored resumes</li>
               </ul>
             </DialogContentText>
           </DialogContent>
