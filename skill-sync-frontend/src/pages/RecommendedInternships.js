@@ -7,20 +7,16 @@ import {
     Paper,
     Card,
     CardContent,
-    CardActions,
     Button,
     Alert,
     Grid,
     Divider,
-    Snackbar,
 } from '@mui/material';
 import WorkIcon from '@mui/icons-material/Work';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
 import TrendingUpIcon from '@mui/icons-material/TrendingUp';
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import DescriptionIcon from '@mui/icons-material/Description';
 import { motion } from 'framer-motion';
 import toast from 'react-hot-toast';
 import apiClient from '../services/api';
@@ -31,7 +27,6 @@ import { InternshipListSkeleton } from '../components/SkeletonLoader';
 import FilterPanel from '../components/FilterPanel';
 import PaginationControls from '../components/PaginationControls';
 import SortControls from '../components/SortControls';
-import InternshipApplicationDialog from '../components/InternshipApplicationDialog';
 
 const RecommendedInternships = () => {
     const navigate = useNavigate();
@@ -62,12 +57,6 @@ const RecommendedInternships = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [availableSkills, setAvailableSkills] = useState([]);
-
-    // Application dialog state
-    const [selectedInternship, setSelectedInternship] = useState(null);
-    const [applicationDialogOpen, setApplicationDialogOpen] = useState(false);
-    const [successMessage, setSuccessMessage] = useState('');
-    const [showSuccess, setShowSuccess] = useState(false);
 
     // Fetch recommendations only once on mount
     useEffect(() => {
@@ -303,23 +292,6 @@ const RecommendedInternships = () => {
     const handlePageSizeChange = (newPageSize) => {
         setPageSize(newPageSize);
         setPage(1); // Reset to first page when page size changes
-    };
-
-    const handleApply = (internship) => {
-        setSelectedInternship(internship);
-        setApplicationDialogOpen(true);
-    };
-
-    const handleApplicationSuccess = (result) => {
-        setSuccessMessage(result.message);
-        setShowSuccess(true);
-
-        // Refresh recommendations to update "Applied" status
-        fetchRecommendations();
-    };
-
-    const handleCloseSuccess = () => {
-        setShowSuccess(false);
     };
 
     return (
@@ -660,112 +632,7 @@ const RecommendedInternships = () => {
                                                         </Grid>
                                                     )}
                                                 </Grid>
-
-                                                {internship.required_skills && internship.required_skills.length > 0 && (
-                                                    <Box sx={{ mt: 3 }}>
-                                                        <Typography
-                                                            variant="subtitle2"
-                                                            gutterBottom
-                                                            sx={{
-                                                                fontWeight: 700,
-                                                                color: '#1a1a1a',
-                                                                mb: 1.5,
-                                                                textTransform: 'uppercase',
-                                                                letterSpacing: '0.5px',
-                                                                fontSize: '0.75rem',
-                                                            }}
-                                                        >
-                                                            Required Skills
-                                                        </Typography>
-                                                        <SkillsCloud
-                                                            skills={internship.required_skills}
-                                                            matchedSkills={[]}
-                                                        />
-                                                    </Box>
-                                                )}
                                             </CardContent>
-
-                                            <CardActions sx={{ p: 4, pt: 0, flexDirection: 'column', gap: 2 }}>
-                                                {internship.has_applied ? (
-                                                    <>
-                                                        <Button
-                                                            variant="contained"
-                                                            fullWidth
-                                                            disabled
-                                                            startIcon={<CheckCircleIcon />}
-                                                            sx={{
-                                                                py: 1.5,
-                                                                borderRadius: 2,
-                                                                background: 'linear-gradient(135deg, #4caf50 0%, #66bb6a 100%)',
-                                                                fontWeight: 700,
-                                                                textTransform: 'none',
-                                                                fontSize: '1rem',
-                                                                color: 'white',
-                                                                '&.Mui-disabled': {
-                                                                    background: 'linear-gradient(135deg, #4caf50 0%, #66bb6a 100%)',
-                                                                    color: 'white',
-                                                                    opacity: 1,
-                                                                }
-                                                            }}
-                                                        >
-                                                            Applied
-                                                        </Button>
-                                                        {internship.application_resume_name && (
-                                                            <Box
-                                                                sx={{
-                                                                    width: '100%',
-                                                                    display: 'flex',
-                                                                    alignItems: 'center',
-                                                                    justifyContent: 'center',
-                                                                    gap: 1,
-                                                                    p: 1.5,
-                                                                    borderRadius: 2,
-                                                                    background: 'rgba(76, 175, 80, 0.08)',
-                                                                    border: '1px solid rgba(76, 175, 80, 0.2)',
-                                                                }}
-                                                            >
-                                                                <DescriptionIcon sx={{ fontSize: 18, color: '#4caf50' }} />
-                                                                <Typography
-                                                                    variant="body2"
-                                                                    sx={{
-                                                                        color: '#4caf50',
-                                                                        fontWeight: 600,
-                                                                        fontSize: '0.875rem',
-                                                                        overflow: 'hidden',
-                                                                        textOverflow: 'ellipsis',
-                                                                        whiteSpace: 'nowrap',
-                                                                    }}
-                                                                >
-                                                                    {internship.application_resume_name}
-                                                                </Typography>
-                                                            </Box>
-                                                        )}
-                                                    </>
-                                                ) : (
-                                                    <Button
-                                                        variant="contained"
-                                                        fullWidth
-                                                        onClick={() => handleApply(internship)}
-                                                        sx={{
-                                                            py: 1.5,
-                                                            borderRadius: 2,
-                                                            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                                                            fontWeight: 700,
-                                                            textTransform: 'none',
-                                                            fontSize: '1rem',
-                                                            boxShadow: '0 4px 16px rgba(102, 126, 234, 0.3)',
-                                                            transition: 'all 0.3s ease',
-                                                            '&:hover': {
-                                                                transform: 'translateY(-2px)',
-                                                                boxShadow: '0 8px 24px rgba(102, 126, 234, 0.4)',
-                                                                background: 'linear-gradient(135deg, #764ba2 0%, #667eea 100%)',
-                                                            },
-                                                        }}
-                                                    >
-                                                        Apply Now
-                                                    </Button>
-                                                )}
-                                            </CardActions>
                                         </Card>
                                     </motion.div>
                                 </Grid>
@@ -818,26 +685,6 @@ const RecommendedInternships = () => {
                         </Box>
                     </Paper>
                 )}
-
-                {/* Application Dialog */}
-                <InternshipApplicationDialog
-                    open={applicationDialogOpen}
-                    onClose={() => setApplicationDialogOpen(false)}
-                    internship={selectedInternship}
-                    onSuccess={handleApplicationSuccess}
-                />
-
-                {/* Success Snackbar */}
-                <Snackbar
-                    open={showSuccess}
-                    autoHideDuration={6000}
-                    onClose={handleCloseSuccess}
-                    anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
-                >
-                    <Alert onClose={handleCloseSuccess} severity="success" sx={{ width: '100%', borderRadius: 2 }}>
-                        {successMessage}
-                    </Alert>
-                </Snackbar>
             </Container>
         </Layout>
     );
