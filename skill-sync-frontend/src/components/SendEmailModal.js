@@ -102,7 +102,7 @@ const SendEmailModal = ({ open, onClose, selectedCandidates, internshipTitle, in
             }}
         >
             <DialogTitle sx={{ 
-                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                background: 'linear-gradient(135deg, #4caf50 0%, #45a049 100%)',
                 color: 'white',
                 display: 'flex',
                 alignItems: 'center',
@@ -118,7 +118,7 @@ const SendEmailModal = ({ open, onClose, selectedCandidates, internshipTitle, in
                     label={`${selectedCandidates.length} Selected`}
                     sx={{ 
                         backgroundColor: 'white',
-                        color: '#667eea',
+                        color: '#4caf50',
                         fontWeight: 'bold'
                     }}
                 />
@@ -141,7 +141,7 @@ const SendEmailModal = ({ open, onClose, selectedCandidates, internshipTitle, in
                             <ListItem key={candidate.candidate_id}>
                                 <ListItemText
                                     primary={candidate.candidate_name}
-                                    secondary={`ID: ${candidate.candidate_id} • Score: ${candidate.match_score.toFixed(1)}%`}
+                                    secondary={`ID: ${candidate.candidate_id}${candidate.match_score ? ` • Score: ${candidate.match_score.toFixed(1)}%` : ''}`}
                                     primaryTypographyProps={{ fontWeight: 500 }}
                                 />
                             </ListItem>
@@ -215,9 +215,9 @@ const SendEmailModal = ({ open, onClose, selectedCandidates, internshipTitle, in
                         disabled={sending || !subject.trim() || !message.trim()}
                         startIcon={sending ? <CircularProgress size={20} color="inherit" /> : <SendIcon />}
                         sx={{
-                            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                            background: 'linear-gradient(135deg, #4caf50 0%, #45a049 100%)',
                             '&:hover': {
-                                background: 'linear-gradient(135deg, #5568d3 0%, #6a3f8f 100%)',
+                                background: 'linear-gradient(135deg, #45a049 0%, #388e3c 100%)',
                             }
                         }}
                     >
