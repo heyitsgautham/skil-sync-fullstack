@@ -59,33 +59,33 @@ SkillSync analyzes **hundreds of resumes** against job requirements to deliver u
 
 # AI extracts requirements and matches against candidate pool
 ┌─────────────────────────────────────────────────────────┐
-│ 🎯 AI-Powered Candidate Ranking (87 candidates)        │
+│  AI-Powered Candidate Ranking (87 candidates)           │
 ├─────────────────────────────────────────────────────────┤
 │                                                         │
-│ 🥇 Candidate #1 - Match Score: 94.2%                   │
-│    ├─ Skills Match: 96% (11/12 required skills)        │
-│    ├─ Experience Match: 95% (2.5 years Python)         │
-│    └─ Education Match: 92% (B.S. Computer Science)     │
+│  Candidate #1 - Match Score: 94.2%                      │
+│    ├─ Skills Match: 96% (11/12 required skills)         │
+│    ├─ Experience Match: 95% (2.5 years Python)          │
+│    └─ Education Match: 92% (B.S. Computer Science)      │
 │                                                         │
 │    Top Matching Skills:                                 │
-│    ✓ Python (Evidence: "3 years Django/Flask")         │
-│    ✓ FastAPI (Evidence: "Built REST APIs with FastAPI")│
-│    ✓ PostgreSQL (Evidence: "Database optimization")    │
-│    ✓ Docker (Evidence: "Containerized microservices") │
+│    ✓ Python (Evidence: "3 years Django/Flask")          │
+│    ✓ FastAPI (Evidence: "Built REST APIs with FastAPI") │
+│    ✓ PostgreSQL (Evidence: "Database optimization")     │
+│    ✓ Docker (Evidence: "Containerized microservices")   │
 │                                                         │
 │    Key Strengths:                                       │
 │    • Strong backend development portfolio               │
 │    • Direct experience with required tech stack         │
 │    • Demonstrated leadership in 2 projects              │
 │                                                         │
-│    📄 [View Resume] [📧 Send Email] [⭐ Shortlist]      │
+│    📄 [View Resume] [📧 Send Email] [⭐ Shortlist]       │
 │                                                         │
 ├─────────────────────────────────────────────────────────┤
 │                                                         │
-│ 🥈 Candidate #2 - Match Score: 91.8%                   │
-│    ├─ Skills Match: 92% (10/12 required skills)        │
-│    ├─ Experience Match: 90% (1.8 years Python)         │
-│    └─ Education Match: 94% (B.S. Software Eng.)        │
+│  Candidate #2 - Match Score: 91.8%                      │
+│    ├─ Skills Match: 92% (10/12 required skills)         │
+│    ├─ Experience Match: 90% (1.8 years Python)          │
+│    └─ Education Match: 94% (B.S. Software Eng.)         │
 │    ...                                                  │
 │                                                         │
 └─────────────────────────────────────────────────────────┘
@@ -557,17 +557,17 @@ Spreadsheet Columns:
 ```
 After Export:
 ┌─────────────────────────────────────────────────┐
-│ ✅ Exported: Backend_Dev_Top_Candidates.xlsx   │
+│  Exported: Backend_Dev_Top_Candidates.xlsx      │
 │                                                 │
-│ [📧 Email to Hiring Manager]                   │
+│ [Email to Hiring Manager]                       │
 │                                                 │
-│ To: hiring-manager@company.com                 │
-│ Subject: Top 23 Backend Developer Candidates   │
-│ Body: See attached ranked candidates with AI   │
-│       analysis. All scored 85%+ on requirements│
-│ Attachment: Backend_Dev_Top_Candidates.xlsx   │
+│ To: hiring-manager@company.com                  │
+│ Subject: Top 23 Backend Developer Candidates    │
+│ Body: See attached ranked candidates with AI    │
+│       analysis. All scored 85%+ on requirements │
+│ Attachment: Backend_Dev_Top_Candidates.xlsx     │
 │                                                 │
-│ [Send] [Save Draft] [Schedule]                 │
+│ [Send] [Save Draft] [Schedule]                  │
 └─────────────────────────────────────────────────┘
 ```
 
@@ -601,27 +601,27 @@ Annual Savings: $10,000 per recruiter
 │ CRON JOB SCHEDULER                                      │
 ├─────────────────────────────────────────────────────────┤
 │                                                         │
-│ 🕐 02:00 AM - Batch Resume Processing                  │
-│    ├─ Process all pending resume uploads               │
-│    ├─ Generate embeddings for new resumes              │
-│    ├─ Update candidate match scores                    │
-│    └─ Status: 47 resumes processed in 8 minutes        │
+│ 02:00 AM - Batch Resume Processing                      │
+│    ├─ Process all pending resume uploads                │
+│    ├─ Generate embeddings for new resumes               │
+│    ├─ Update candidate match scores                     │
+│    └─ Status: 47 resumes processed in 8 minutes         │
 │                                                         │
-│ 🕑 02:30 AM - Database Optimization                    │
-│    ├─ Vacuum and analyze PostgreSQL                    │
-│    ├─ Reindex ChromaDB vectors                         │
-│    └─ Status: Database optimized                       │
+│ 02:30 AM - Database Optimization                        │
+│    ├─ Vacuum and analyze PostgreSQL                     │
+│    ├─ Reindex ChromaDB vectors                          │
+│    └─ Status: Database optimized                        │
 │                                                         │
-│ 🕒 03:00 AM - Email Digest Generation                  │
-│    ├─ Compile new applications per job posting         │
-│    ├─ Generate personalized digests for recruiters     │
-│    ├─ Queue emails for 8:00 AM delivery                │
-│    └─ Status: 23 digests queued                        │
+│  03:00 AM - Email Digest Generation                     │
+│    ├─ Compile new applications per job posting          │
+│    ├─ Generate personalized digests for recruiters      │
+│    ├─ Queue emails for 8:00 AM delivery                 │
+│    └─ Status: 23 digests queued                         │
 │                                                         │
-│ 🕓 04:00 AM - Analytics & Reporting                    │
-│    ├─ Generate daily analytics snapshots               │
-│    ├─ Calculate system performance metrics             │
-│    └─ Status: Reports ready for dashboard              │
+│  04:00 AM - Analytics & Reporting                       │
+│    ├─ Generate daily analytics snapshots                │
+│    ├─ Calculate system performance metrics              │
+│    └─ Status: Reports ready for dashboard               │
 │                                                         │
 └─────────────────────────────────────────────────────────┘
 ```
@@ -1293,27 +1293,6 @@ Response:
 - [x] Email notifications
 - [x] Daily digest emails
 
-### 🚧 Phase 5: Enterprise Features (IN PROGRESS)
-
-- [ ] ATS integrations (Greenhouse, Lever, Workday)
-- [ ] Video interview scheduling
-- [ ] Candidate communication hub
-- [ ] Interview feedback collection
-- [ ] Offer letter generation
-- [ ] Analytics dashboard
-- [ ] Custom scoring models
-- [ ] Multi-language support
-
-### 🔮 Phase 6: Advanced AI (PLANNED)
-
-- [ ] Interview question generation
-- [ ] Candidate persona analysis
-- [ ] Team fit prediction
-- [ ] Salary recommendation
-- [ ] Retention risk scoring
-- [ ] Skill gap analysis
-- [ ] Learning path suggestions
-
 ---
 
 ## 🎥 Demo
@@ -1459,29 +1438,6 @@ Preserved Fields:
 - ✅ **CCPA Compliant** - California privacy rights
 - ✅ **ISO 27001 Ready** - Information security management
 
----
-
-## 🤝 Contributing
-
-We welcome contributions! See [CONTRIBUTING.md](./CONTRIBUTING.md)
-
-```bash
-# Fork the repository
-git clone https://github.com/yourusername/skillsync.git
-
-# Create feature branch
-git checkout -b feature/amazing-feature
-
-# Make changes and test
-pytest tests/
-npm test
-
-# Commit with conventional commits
-git commit -m "feat: add amazing feature"
-
-# Push and create PR
-git push origin feature/amazing-feature
-```
 
 ---
 
@@ -1511,9 +1467,9 @@ MIT License - see [LICENSE](./LICENSE) for details
 
 ---
 
-**Team:** [Your Team Name]  
-**Contact:** [your-email@example.com]  
-**Repository:** [github.com/yourusername/skillsync](https://github.com/yourusername/skillsync)
+**Team:** Zero Vector  
+**Contact:** heyitsgautham@gmail.com
+**Repository:** [github.com/heyitsgautham/skillsync](https://github.com/yourusername/skillsync)
 
 ---
 
