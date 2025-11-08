@@ -14,7 +14,11 @@
 
 ---
 
-**Built for**: 24-Hour GenAI Hackathon 2025  
+<img src="./assets/Thumbnail1.png" alt="SkillSync Platform Preview" width="100%"/>
+
+---
+
+**Built for**: 24-Hour HACK.IO National Level Hackathon 2025  
 **Domain**: HR Tech | Intelligent Resume Filtering  
 **Tech Stack**: FastAPI • Google Gemini 2.5 • ChromaDB • React • Material-UI • PostgreSQL
 
@@ -125,149 +129,6 @@ HR teams face overwhelming challenges in modern hiring:
 - Quality: Finds 42% more qualified candidates using AI embeddings
 
 > **Full problem statement**: *Build an intelligent resume filtering system that helps recruiters prioritize applicants by extracting structured information (skills, experience, education), matching profiles to job requirements, and surfacing the best-fit candidates with interpretable reasons.*
-
----
-
-## 🏗️ Solution Architecture
-
-### Agentic RAG System Design
-
-```
-┌──────────────────────────────────────────────────────────────────┐
-│                    RECRUITER DASHBOARD (React)                   │
-│  (Material-UI • Advanced Filtering • Export • Anonymization)     │
-└────────────────────────────┬─────────────────────────────────────┘
-                             │
-                    ┌────────▼────────┐
-                    │ FASTAPI BACKEND │
-                    │ (Python 3.11+)  │
-                    └────────┬────────┘
-                             │
-         ┌───────────────────┼───────────────────┐
-         │                   │                   │
-    ┌────▼─────┐      ┌──────▼─────┐     ┌───────▼────┐
-    │ Resume   │      │ Matching   │     │ Anonymize  │
-    │ Parser   │      │  Engine    │     │  Service   │
-    └────┬─────┘      └─────┬──────┘     └───────┬────┘
-         │                   │                   │
-         └───────────────────┼───────────────────┘
-                             │
-                 ┌───────────▼──────────┐
-                 │   HYBRID RAG LAYER   │
-                 ├──────────────────────┤
-                 │ • ChromaDB (Vectors) │
-                 │ • Semantic Search    │
-                 │ • Reranking          │
-                 └───────────┬──────────┘
-                             │
-                 ┌───────────▼──────────┐
-                 │   AI ENGINE LAYER    │
-                 ├──────────────────────┤
-                 │ • Gemini 2.5 Flash   │
-                 │ • Provenance Extract │
-                 │ • Evidence Citation  │
-                 └───────────┬──────────┘
-                             │
-                 ┌───────────▼──────────┐
-                 │    DATA LAYER        │
-                 ├──────────────────────┤
-                 │ • PostgreSQL         │
-                 │ • AWS S3 (Resumes)   │
-                 │ • ChromaDB (Vectors) │
-                 └──────────────────────┘
-```
-
-### Component Breakdown
-
-#### 1️⃣ **Resume Processing Pipeline**
-
-```python
-Resume Upload → Parse (PDF/DOCX) → Extract Skills → Generate Embeddings → Store in Vector DB
-
-Supported Formats:
-• PDF (recommended)
-• DOCX (Microsoft Word)
-• Auto-extraction: Skills, Experience, Education, Projects
-
-Intelligence Features:
-• Semantic understanding (not just keyword matching)
-• Context-aware skill extraction
-• Experience level inference
-• Education validation
-```
-
-#### 2️⃣ **Anonymization Engine** 🎭
-
-```python
-Original Resume → Identity Detection → PII Redaction → Anonymized View
-
-Redacted Information:
-• Full name (replaced with candidate ID)
-• Email addresses (all formats)
-• Phone numbers (all formats)
-• LinkedIn URLs
-• GitHub URLs
-• Personal websites
-• Location details (optional)
-• Profile pictures
-
-Preserved Information:
-✓ Skills and competencies
-✓ Work experience (dates + descriptions)
-✓ Education details
-✓ Project descriptions
-✓ Certifications
-✓ Technical achievements
-
-Toggle: Recruiters can disable anonymization if needed
-```
-
-#### 3️⃣ **Hybrid Matching Engine**
-
-```python
-# Multi-Component Scoring
-1. Skills Match (40% weight)
-   - Semantic similarity using Gemini embeddings
-   - Required vs. nice-to-have skills
-   - Skill proficiency levels
-   
-2. Experience Match (30% weight)
-   - Years of relevant experience
-   - Industry alignment
-   - Role progression
-   
-3. Education Match (20% weight)
-   - Degree level alignment
-   - Field of study relevance
-   - Institution quality (optional)
-   
-4. Cultural Fit (10% weight)
-   - Project types
-   - Work style indicators
-   - Team size experience
-
-Final Score = Weighted Average (0-100%)
-```
-
-#### 4️⃣ **Provenance & Evidence System**
-
-```python
-# Every claim is backed by evidence
-Claim: "Candidate has Python experience"
-
-Evidence:
-├─ Location: Page 2, Work Experience section
-├─ Context: "Built microservices with Python/FastAPI"
-├─ Confidence: 98%
-├─ Quote: "Developed RESTful APIs using Python 3.9+..."
-└─ Verification: Direct text match confirmed
-
-This enables:
-• Explainable AI decisions
-• Audit trails for compliance
-• Dispute resolution
-• Continuous improvement
-```
 
 ---
 
@@ -885,6 +746,149 @@ Share insights with hiring managers, integrate with ATS systems, maintain audit 
 - ✅ **EEOC** - Bias-free screening practices
 - ✅ **SOC 2** - Security controls framework
 - ✅ **CCPA** - California privacy rights
+
+---
+
+## 🏗️ Solution Architecture
+
+### Agentic RAG System Design
+
+```
+┌──────────────────────────────────────────────────────────────────┐
+│                    RECRUITER DASHBOARD (React)                   │
+│  (Material-UI • Advanced Filtering • Export • Anonymization)     │
+└────────────────────────────┬─────────────────────────────────────┘
+                             │
+                    ┌────────▼────────┐
+                    │ FASTAPI BACKEND │
+                    │ (Python 3.11+)  │
+                    └────────┬────────┘
+                             │
+         ┌───────────────────┼───────────────────┐
+         │                   │                   │
+    ┌────▼─────┐      ┌──────▼─────┐     ┌───────▼────┐
+    │ Resume   │      │ Matching   │     │ Anonymize  │
+    │ Parser   │      │  Engine    │     │  Service   │
+    └────┬─────┘      └─────┬──────┘     └───────┬────┘
+         │                   │                   │
+         └───────────────────┼───────────────────┘
+                             │
+                 ┌───────────▼──────────┐
+                 │   HYBRID RAG LAYER   │
+                 ├──────────────────────┤
+                 │ • ChromaDB (Vectors) │
+                 │ • Semantic Search    │
+                 │ • Reranking          │
+                 └───────────┬──────────┘
+                             │
+                 ┌───────────▼──────────┐
+                 │   AI ENGINE LAYER    │
+                 ├──────────────────────┤
+                 │ • Gemini 2.5 Flash   │
+                 │ • Provenance Extract │
+                 │ • Evidence Citation  │
+                 └───────────┬──────────┘
+                             │
+                 ┌───────────▼──────────┐
+                 │    DATA LAYER        │
+                 ├──────────────────────┤
+                 │ • PostgreSQL         │
+                 │ • AWS S3 (Resumes)   │
+                 │ • ChromaDB (Vectors) │
+                 └──────────────────────┘
+```
+
+### Component Breakdown
+
+#### 1️⃣ **Resume Processing Pipeline**
+
+```python
+Resume Upload → Parse (PDF/DOCX) → Extract Skills → Generate Embeddings → Store in Vector DB
+
+Supported Formats:
+• PDF (recommended)
+• DOCX (Microsoft Word)
+• Auto-extraction: Skills, Experience, Education, Projects
+
+Intelligence Features:
+• Semantic understanding (not just keyword matching)
+• Context-aware skill extraction
+• Experience level inference
+• Education validation
+```
+
+#### 2️⃣ **Anonymization Engine** 🎭
+
+```python
+Original Resume → Identity Detection → PII Redaction → Anonymized View
+
+Redacted Information:
+• Full name (replaced with candidate ID)
+• Email addresses (all formats)
+• Phone numbers (all formats)
+• LinkedIn URLs
+• GitHub URLs
+• Personal websites
+• Location details (optional)
+• Profile pictures
+
+Preserved Information:
+✓ Skills and competencies
+✓ Work experience (dates + descriptions)
+✓ Education details
+✓ Project descriptions
+✓ Certifications
+✓ Technical achievements
+
+Toggle: Recruiters can disable anonymization if needed
+```
+
+#### 3️⃣ **Hybrid Matching Engine**
+
+```python
+# Multi-Component Scoring
+1. Skills Match (40% weight)
+   - Semantic similarity using Gemini embeddings
+   - Required vs. nice-to-have skills
+   - Skill proficiency levels
+   
+2. Experience Match (30% weight)
+   - Years of relevant experience
+   - Industry alignment
+   - Role progression
+   
+3. Education Match (20% weight)
+   - Degree level alignment
+   - Field of study relevance
+   - Institution quality (optional)
+   
+4. Cultural Fit (10% weight)
+   - Project types
+   - Work style indicators
+   - Team size experience
+
+Final Score = Weighted Average (0-100%)
+```
+
+#### 4️⃣ **Provenance & Evidence System**
+
+```python
+# Every claim is backed by evidence
+Claim: "Candidate has Python experience"
+
+Evidence:
+├─ Location: Page 2, Work Experience section
+├─ Context: "Built microservices with Python/FastAPI"
+├─ Confidence: 98%
+├─ Quote: "Developed RESTful APIs using Python 3.9+..."
+└─ Verification: Direct text match confirmed
+
+This enables:
+• Explainable AI decisions
+• Audit trails for compliance
+• Dispute resolution
+• Continuous improvement
+```
 
 ---
 
