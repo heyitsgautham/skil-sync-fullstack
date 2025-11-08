@@ -14,7 +14,7 @@
 
 ---
 
-<img src="./assets/Thumbnail1.png" alt="SkillSync Platform Preview" width="100%"/>
+<img src="./skill-sync-frontend/public/assets/Thumbnail1.png" alt="SkillSync Platform Preview" width="100%"/>
 
 ---
 
@@ -122,10 +122,10 @@ HR teams face overwhelming challenges in modern hiring:
 </tr>
 <tr>
 <td>
-<img src="./assets/Gautham_Krishna_Resume_HackerRank.jpg" alt="Original Resume" width="400"/>
+<img src="./skill-sync-frontend/public/assets/Gautham_Krishna_Resume_HackerRank.jpg" alt="Original Resume" width="400"/>
 </td>
 <td>
-<img src="./assets/Masked Resume.jpg" alt="Anonymized Resume" width="400"/>
+<img src="./skill-sync-frontend/public/assets/Masked Resume.jpg" alt="Anonymized Resume" width="400"/>
 </td>
 </tr>
 <tr>
