@@ -182,7 +182,8 @@ async def rank_candidates_for_internship(
             ).join(
                 Resume, Application.resume_id == Resume.id
             ).filter(
-                Application.internship_id == internship.id
+                Application.internship_id == internship.id,
+                User.is_active == 1  # Only show active students in rankings
             ).all()
             
             if not applications:
@@ -561,7 +562,8 @@ async def rank_candidates_for_internship(
             ).join(
                 Resume, StudentInternshipMatch.resume_id == Resume.id
             ).filter(
-                StudentInternshipMatch.internship_id == internship.id
+                StudentInternshipMatch.internship_id == internship.id,
+                User.is_active == 1  # Only show active students in rankings
             ).order_by(
                 StudentInternshipMatch.base_similarity_score.desc()
             ).limit(limit).all()
@@ -1234,7 +1236,8 @@ async def get_filtered_ranked_candidates(
                     Application.internship_id == internship.id
                 )
             ).filter(
-                StudentInternshipMatch.internship_id == internship.id
+                StudentInternshipMatch.internship_id == internship.id,
+                User.is_active == 1  # Only show active students in rankings
             )
         else:
             # All candidates with pre-computed matches
@@ -1248,7 +1251,8 @@ async def get_filtered_ranked_candidates(
                     Resume.is_active == 1
                 )
             ).filter(
-                StudentInternshipMatch.internship_id == internship.id
+                StudentInternshipMatch.internship_id == internship.id,
+                User.is_active == 1  # Only show active students in rankings
             )
         
         # Apply filters
@@ -1500,7 +1504,8 @@ async def export_candidate_rankings(
                     Application.internship_id == internship.id
                 )
             ).filter(
-                StudentInternshipMatch.internship_id == internship.id
+                StudentInternshipMatch.internship_id == internship.id,
+                User.is_active == 1  # Only show active students in rankings
             )
         else:
             query = db.query(
@@ -1513,7 +1518,8 @@ async def export_candidate_rankings(
                     Resume.is_active == 1
                 )
             ).filter(
-                StudentInternshipMatch.internship_id == internship.id
+                StudentInternshipMatch.internship_id == internship.id,
+                User.is_active == 1  # Only show active students in rankings
             )
         
         # Apply filters only if not exporting all

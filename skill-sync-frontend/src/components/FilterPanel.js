@@ -15,6 +15,7 @@ import {
     IconButton,
     Collapse,
     Divider,
+    Autocomplete,
 } from '@mui/material';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import ClearIcon from '@mui/icons-material/Clear';
@@ -92,11 +93,10 @@ const FilterPanel = ({
         });
     };
 
-    const handleSkillsChange = (event) => {
-        const value = event.target.value;
+    const handleSkillsChange = (event, newValue) => {
         setTempFilters({
             ...tempFilters,
-            skills: typeof value === 'string' ? value.split(',') : value,
+            skills: newValue,
         });
     };
 
@@ -225,28 +225,38 @@ const FilterPanel = ({
                     {/* Skills Filter */}
                     {availableSkills.length > 0 && (
                         <Grid size={{ xs: 12, md: 6 }}>
-                            <FormControl fullWidth>
-                                <InputLabel>Filter by Skills</InputLabel>
-                                <Select
-                                    multiple
-                                    value={tempFilters.skills || []}
-                                    onChange={handleSkillsChange}
-                                    label="Filter by Skills"
-                                    renderValue={(selected) => (
-                                        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                                            {selected.map((value) => (
-                                                <Chip key={value} label={value} size="small" />
-                                            ))}
-                                        </Box>
-                                    )}
-                                >
-                                    {availableSkills.map((skill) => (
-                                        <MenuItem key={skill} value={skill}>
-                                            {skill}
-                                        </MenuItem>
-                                    ))}
-                                </Select>
-                            </FormControl>
+                            <Autocomplete
+                                multiple
+                                options={availableSkills}
+                                value={tempFilters.skills || []}
+                                onChange={handleSkillsChange}
+                                freeSolo
+                                renderTags={(value, getTagProps) =>
+                                    value.map((option, index) => (
+                                        <Chip
+                                            variant="outlined"
+                                            label={option}
+                                            size="small"
+                                            {...getTagProps({ index })}
+                                            key={option}
+                                        />
+                                    ))
+                                }
+                                renderInput={(params) => (
+                                    <TextField
+                                        {...params}
+                                        label="Filter by Skills"
+                                        placeholder="Type or select skills"
+                                        variant="outlined"
+                                    />
+                                )}
+                                sx={{
+                                    '& .MuiOutlinedInput-root': {
+                                        paddingTop: '8px',
+                                        paddingBottom: '8px',
+                                    },
+                                }}
+                            />
                         </Grid>
                     )}
 

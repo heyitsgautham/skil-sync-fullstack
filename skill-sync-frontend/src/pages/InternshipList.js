@@ -272,12 +272,16 @@ const InternshipList = () => {
                                                         width: 48,
                                                         height: 48,
                                                         borderRadius: 2,
-                                                        background: 'linear-gradient(135deg, #4caf50 0%, #45a049 100%)',
+                                                        background: userRole === 'admin' 
+                                                            ? 'linear-gradient(135deg, #f44336 0%, #d32f2f 100%)'
+                                                            : 'linear-gradient(135deg, #4caf50 0%, #45a049 100%)',
                                                         display: 'flex',
                                                         alignItems: 'center',
                                                         justifyContent: 'center',
                                                         mr: 2,
-                                                        boxShadow: '0 4px 12px rgba(76, 175, 80, 0.3)',
+                                                        boxShadow: userRole === 'admin'
+                                                            ? '0 4px 12px rgba(244, 67, 54, 0.3)'
+                                                            : '0 4px 12px rgba(76, 175, 80, 0.3)',
                                                     }}
                                                 >
                                                     <WorkIcon sx={{ color: 'white', fontSize: 28 }} />
@@ -490,7 +494,9 @@ const InternshipList = () => {
                     fullWidth
                 >
                     <DialogTitle sx={{
-                        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                        background: userRole === 'admin' 
+                            ? 'linear-gradient(135deg, #f44336 0%, #d32f2f 100%)'
+                            : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
                         color: 'white',
                         fontWeight: 700
                     }}>
@@ -560,9 +566,13 @@ const InternshipList = () => {
                             onClick={handleEditSubmit}
                             variant="contained"
                             sx={{
-                                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                                background: userRole === 'admin'
+                                    ? 'linear-gradient(135deg, #f44336 0%, #d32f2f 100%)'
+                                    : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
                                 '&:hover': {
-                                    background: 'linear-gradient(135deg, #5568d3 0%, #6a3f8e 100%)',
+                                    background: userRole === 'admin'
+                                        ? 'linear-gradient(135deg, #d32f2f 0%, #c62828 100%)'
+                                        : 'linear-gradient(135deg, #5568d3 0%, #6a3f8e 100%)',
                                 }
                             }}
                         >
@@ -644,7 +654,9 @@ const InternshipList = () => {
                     fullWidth
                 >
                     <DialogTitle sx={{
-                        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                        background: userRole === 'company'
+                            ? 'linear-gradient(135deg, #4caf50 0%, #45a049 100%)'
+                            : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
                         color: 'white',
                         fontWeight: 700
                     }}>
@@ -768,11 +780,13 @@ const InternshipList = () => {
                             onClick={() => setDetailsDialogOpen(false)}
                             variant="outlined"
                             sx={{
-                                color: '#667eea',
-                                borderColor: '#667eea',
+                                color: userRole === 'company' ? '#4caf50' : '#667eea',
+                                borderColor: userRole === 'company' ? '#4caf50' : '#667eea',
                                 '&:hover': {
-                                    borderColor: '#667eea',
-                                    backgroundColor: 'rgba(102, 126, 234, 0.1)'
+                                    borderColor: userRole === 'company' ? '#4caf50' : '#667eea',
+                                    backgroundColor: userRole === 'company' 
+                                        ? 'rgba(76, 175, 80, 0.1)' 
+                                        : 'rgba(102, 126, 234, 0.1)'
                                 }
                             }}
                         >
@@ -786,9 +800,13 @@ const InternshipList = () => {
                             variant="contained"
                             startIcon={<EditIcon />}
                             sx={{
-                                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                                background: userRole === 'company'
+                                    ? 'linear-gradient(135deg, #4caf50 0%, #45a049 100%)'
+                                    : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
                                 '&:hover': {
-                                    background: 'linear-gradient(135deg, #764ba2 0%, #667eea 100%)',
+                                    background: userRole === 'company'
+                                        ? 'linear-gradient(135deg, #45a049 0%, #388e3c 100%)'
+                                        : 'linear-gradient(135deg, #764ba2 0%, #667eea 100%)',
                                 }
                             }}
                         >

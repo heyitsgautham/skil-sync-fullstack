@@ -46,6 +46,7 @@ class UserResponse(BaseModel):
     email: str
     full_name: str
     role: str
+    is_active: int  # 1 = active, 0 = inactive
     created_at: str
     anonymization_enabled: Optional[bool] = False  # Resume anonymization toggle (for companies)
     
@@ -152,6 +153,7 @@ async def list_users(
                 email=user.email,
                 full_name=user.full_name,
                 role=user.role.value if hasattr(user.role, 'value') else user.role,
+                is_active=user.is_active if user.is_active is not None else 1,
                 created_at=user.created_at.isoformat() if user.created_at else "",
                 anonymization_enabled=user.anonymization_enabled if hasattr(user, 'anonymization_enabled') else False
             )
@@ -317,6 +319,7 @@ async def update_user(
             email=user.email,
             full_name=user.full_name,
             role=user.role.value if hasattr(user.role, 'value') else user.role,
+            is_active=user.is_active if user.is_active is not None else 1,
             created_at=user.created_at.isoformat() if user.created_at else "",
             anonymization_enabled=user.anonymization_enabled if hasattr(user, 'anonymization_enabled') else False
         )

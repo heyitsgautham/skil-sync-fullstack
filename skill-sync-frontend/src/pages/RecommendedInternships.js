@@ -406,14 +406,14 @@ const RecommendedInternships = () => {
                                 width: 120,
                                 height: 120,
                                 borderRadius: '50%',
-                                background: 'linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%)',
+                                background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(29, 78, 216, 0.1) 100%)',
                                 display: 'flex',
                                 alignItems: 'center',
                                 justifyContent: 'center',
                                 margin: '0 auto 24px',
                             }}
                         >
-                            <WorkIcon sx={{ fontSize: 60, color: '#667eea' }} />
+                            <WorkIcon sx={{ fontSize: 60, color: '#3b82f6' }} />
                         </Box>
                         <Typography variant="h5" gutterBottom sx={{ fontWeight: 700, mb: 2 }}>
                             {allRecommendations.length === 0 ? 'No Recommendations Yet' : 'No Matching Jobs Found'}
@@ -441,14 +441,14 @@ const RecommendedInternships = () => {
                                             py: 1.5,
                                             px: 4,
                                             borderRadius: 2,
-                                            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                                            background: 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)',
                                             fontWeight: 700,
                                             textTransform: 'none',
                                             fontSize: '1rem',
-                                            boxShadow: '0 4px 16px rgba(102, 126, 234, 0.3)',
+                                            boxShadow: '0 4px 16px rgba(59, 130, 246, 0.3)',
                                             '&:hover': {
                                                 transform: 'translateY(-2px)',
-                                                boxShadow: '0 8px 24px rgba(102, 126, 234, 0.4)',
+                                                boxShadow: '0 8px 24px rgba(59, 130, 246, 0.4)',
                                             },
                                         }}
                                     >
@@ -462,14 +462,14 @@ const RecommendedInternships = () => {
                                             py: 1.5,
                                             px: 4,
                                             borderRadius: 2,
-                                            borderColor: '#667eea',
-                                            color: '#667eea',
+                                            borderColor: '#3b82f6',
+                                            color: '#3b82f6',
                                             fontWeight: 700,
                                             textTransform: 'none',
                                             fontSize: '1rem',
                                             '&:hover': {
-                                                borderColor: '#764ba2',
-                                                backgroundColor: 'rgba(102, 126, 234, 0.05)',
+                                                borderColor: '#1d4ed8',
+                                                backgroundColor: 'rgba(59, 130, 246, 0.05)',
                                             },
                                         }}
                                     >
@@ -485,14 +485,14 @@ const RecommendedInternships = () => {
                                         py: 1.5,
                                         px: 4,
                                         borderRadius: 2,
-                                        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                                        background: 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)',
                                         fontWeight: 700,
                                         textTransform: 'none',
                                         fontSize: '1rem',
-                                        boxShadow: '0 4px 16px rgba(102, 126, 234, 0.3)',
+                                        boxShadow: '0 4px 16px rgba(59, 130, 246, 0.3)',
                                         '&:hover': {
                                             transform: 'translateY(-2px)',
-                                            boxShadow: '0 8px 24px rgba(102, 126, 234, 0.4)',
+                                            boxShadow: '0 8px 24px rgba(59, 130, 246, 0.4)',
                                         },
                                     }}
                                 >
@@ -543,12 +543,12 @@ const RecommendedInternships = () => {
                                                                 width: 56,
                                                                 height: 56,
                                                                 borderRadius: 2,
-                                                                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                                                                background: 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)',
                                                                 display: 'flex',
                                                                 alignItems: 'center',
                                                                 justifyContent: 'center',
                                                                 mr: 2,
-                                                                boxShadow: '0 4px 12px rgba(102, 126, 234, 0.3)',
+                                                                boxShadow: '0 4px 12px rgba(59, 130, 246, 0.3)',
                                                             }}
                                                         >
                                                             <WorkIcon sx={{ color: 'white', fontSize: 32 }} />
@@ -570,7 +570,7 @@ const RecommendedInternships = () => {
                                                                     variant="subtitle1"
                                                                     sx={{
                                                                         fontWeight: 600,
-                                                                        color: '#667eea',
+                                                                        color: '#3b82f6',
                                                                     }}
                                                                 >
                                                                     {internship.company_name}
@@ -658,8 +658,8 @@ const RecommendedInternships = () => {
                             p: 3,
                             mt: 4,
                             borderRadius: 4,
-                            background: 'linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%)',
-                            border: '1px solid rgba(102, 126, 234, 0.2)',
+                            background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(29, 78, 216, 0.1) 100%)',
+                            border: '1px solid rgba(59, 130, 246, 0.2)',
                         }}
                     >
                         <Box sx={{ display: 'flex', alignItems: 'center' }}>
@@ -668,7 +668,7 @@ const RecommendedInternships = () => {
                                     width: 48,
                                     height: 48,
                                     borderRadius: 2,
-                                    background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                                    background: 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)',
                                     display: 'flex',
                                     alignItems: 'center',
                                     justifyContent: 'center',
