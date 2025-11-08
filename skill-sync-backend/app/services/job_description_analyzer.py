@@ -36,6 +36,12 @@ class JobDescriptionAnalyzer:
         """
         prompt = f"""Extract technical skills from this job description.
 
+IMPORTANT LIMITS:
+- Extract MAX 7 required skills
+- Extract MAX 7 preferred skills  
+- Total skills (required + preferred) must NOT exceed 15
+- Prioritize the MOST IMPORTANT and SPECIFIC skills
+
 REQUIRED SKILLS = Explicitly required/mandatory/must-have
 PREFERRED SKILLS = Nice-to-have/preferred/bonus/plus
 
@@ -99,12 +105,40 @@ Return JSON only (no markdown, no explanation):
                 if s.lower() not in required_skills_lower
             ]
             
+            # Apply skill limits: max 7 required, max 7 preferred, max 15 total
+            required_skills_list = list(required_skills_lower.values())
+            original_required = len(required_skills_list)
+            original_preferred = len(preferred_skills_cleaned)
+            
+            # Limit required to 7
+            if len(required_skills_list) > 7:
+                logger.warning(f"⚠️ Required skills ({len(required_skills_list)}) exceeds limit. Trimming to 7.")
+                required_skills_list = required_skills_list[:7]
+            
+            # Limit preferred to 7
+            if len(preferred_skills_cleaned) > 7:
+                logger.warning(f"⚠️ Preferred skills ({len(preferred_skills_cleaned)}) exceeds limit. Trimming to 7.")
+                preferred_skills_cleaned = preferred_skills_cleaned[:7]
+            
+            # Ensure total doesn't exceed 15
+            total = len(required_skills_list) + len(preferred_skills_cleaned)
+            if total > 15:
+                available_for_preferred = 15 - len(required_skills_list)
+                logger.warning(f"⚠️ Total skills ({total}) exceeds 15. Trimming preferred to {available_for_preferred}.")
+                preferred_skills_cleaned = preferred_skills_cleaned[:available_for_preferred]
+            
             result = {
-                'required_skills': list(required_skills_lower.values()),
+                'required_skills': required_skills_list,
                 'preferred_skills': preferred_skills_cleaned
             }
             
-            logger.info(f"✅ Extracted {len(result['required_skills'])} required skills and {len(result['preferred_skills'])} preferred skills")
+            # Log if trimming occurred
+            final_required = len(result['required_skills'])
+            final_preferred = len(result['preferred_skills'])
+            if original_required != final_required or original_preferred != final_preferred:
+                logger.info(f"📊 Skills adjusted: Required {original_required}→{final_required}, Preferred {original_preferred}→{final_preferred}, Total: {final_required + final_preferred}/15")
+            
+            logger.info(f"✅ Extracted {final_required} required skills and {final_preferred} preferred skills")
             return result
             
         except json.JSONDecodeError as e:
@@ -220,12 +254,35 @@ Return JSON only (no markdown, no explanation):
         if not required_skills and not preferred_skills:
             required_skills = all_skills
         
+        # Apply skill limits: max 7 required, max 7 preferred, max 15 total
+        original_required = len(required_skills)
+        original_preferred = len(preferred_skills)
+        
+        if len(required_skills) > 7:
+            logger.warning(f"⚠️ Fallback: Required skills ({len(required_skills)}) exceeds limit. Trimming to 7.")
+            required_skills = required_skills[:7]
+        
+        if len(preferred_skills) > 7:
+            logger.warning(f"⚠️ Fallback: Preferred skills ({len(preferred_skills)}) exceeds limit. Trimming to 7.")
+            preferred_skills = preferred_skills[:7]
+        
+        total = len(required_skills) + len(preferred_skills)
+        if total > 15:
+            available = 15 - len(required_skills)
+            logger.warning(f"⚠️ Fallback: Total skills ({total}) exceeds 15. Trimming preferred to {available}.")
+            preferred_skills = preferred_skills[:available]
+        
         result = {
             'required_skills': required_skills,
             'preferred_skills': preferred_skills
         }
         
-        logger.info(f"✅ Fallback extracted {len(required_skills)} required skills and {len(preferred_skills)} preferred skills")
+        final_required = len(required_skills)
+        final_preferred = len(preferred_skills)
+        if original_required != final_required or original_preferred != final_preferred:
+            logger.info(f"📊 Fallback skills adjusted: Required {original_required}→{final_required}, Preferred {original_preferred}→{final_preferred}")
+        
+        logger.info(f"✅ Fallback extracted {final_required} required skills and {final_preferred} preferred skills")
         return result
     
     def validate_and_enhance_skills(

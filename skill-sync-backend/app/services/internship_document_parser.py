@@ -96,9 +96,9 @@ class InternshipDocumentParser:
         Returns:
             Dictionary with internship details:
             - title: Job title/position
-            - description: Full job description
-            - required_skills: Empty array (skills should be manually added)
-            - preferred_skills: Empty array (skills should be manually added)
+            - description: Full job description (complete text from document)
+            - required_skills: Array of must-have skills extracted from document
+            - preferred_skills: Array of nice-to-have skills extracted from document
             - location: Work location (city/remote/hybrid)
             - duration: Internship duration (e.g., "3 months", "Summer 2025")
             - stipend: Stipend/compensation information
@@ -108,17 +108,26 @@ class InternshipDocumentParser:
             - start_date: Expected start date
             - application_deadline: Application deadline
             - company_info: Brief company description if mentioned
-            
-        Note: Skills are NOT automatically extracted to ensure accuracy.
-              Companies should manually input required and preferred skills.
         """
         prompt = f"""
 You are an expert job description analyzer. Extract structured internship information from this document.
 
 IMPORTANT RULES:
 1. Extract the job TITLE/POSITION (e.g., "Software Engineering Intern", "Data Science Intern")
-2. Extract FULL job DESCRIPTION (include responsibilities, qualifications, benefits)
-3. DO NOT extract or categorize skills - leave required_skills and preferred_skills as empty arrays
+2. Extract FULL job DESCRIPTION - This is CRITICAL! Include ALL text from the document:
+   - Job responsibilities and duties
+   - Required qualifications and skills
+   - Preferred/nice-to-have qualifications
+   - Company description and benefits
+   - Application instructions
+   - ANY other information in the document
+   DO NOT summarize or truncate - include the COMPLETE text!
+3. Extract SKILLS and categorize them:
+   - required_skills: Skills marked as "required", "must-have", "mandatory", or emphasized (MAX 7 skills)
+   - preferred_skills: Skills marked as "preferred", "nice-to-have", "plus", or mentioned casually (MAX 7 skills)
+   - Total skills (required + preferred) should NOT exceed 15
+   - Prioritize the MOST IMPORTANT and SPECIFIC skills
+   - Include technical skills (languages, frameworks, tools) AND soft skills
 4. Extract LOCATION (city, remote, hybrid, on-site)
 5. Extract DURATION (e.g., "3 months", "6 months", "Summer 2025", "Jan-May 2025")
 6. Extract STIPEND/COMPENSATION (monthly amount, total amount, or "Unpaid" if not mentioned)
@@ -130,9 +139,9 @@ IMPORTANT RULES:
 Return ONLY valid JSON in this exact format:
 {{
   "title": "Job Title",
-  "description": "Full job description with responsibilities and qualifications",
-  "required_skills": [],
-  "preferred_skills": [],
+  "description": "COMPLETE FULL job description with ALL details from the document - do NOT truncate or summarize",
+  "required_skills": ["skill1", "skill2", "skill3"],
+  "preferred_skills": ["skill4", "skill5"],
   "location": "City, State or Remote or Hybrid",
   "duration": "Duration string (e.g., '3 months', 'Summer 2025')",
   "stipend": "Compensation details or 'Unpaid' or null",
@@ -154,12 +163,13 @@ Return ONLY the JSON object, no markdown, no explanation.
             logger.info("📤 Extracting internship details using Gemini AI...")
             
             # Use key manager with retry logic
+            # Increased token limit to handle longer descriptions
             result_text = self.key_manager.generate_content(
                 prompt=prompt,
                 model="gemini-2.5-flash",
                 purpose="internship_parsing",
                 temperature=0.1,
-                max_output_tokens=8000,
+                max_output_tokens=12000,  # Increased from 8000 to allow fuller descriptions
                 max_retries=3
             )
             
@@ -176,11 +186,7 @@ Return ONLY the JSON object, no markdown, no explanation.
             # Validate and set defaults
             structured_data = self._validate_and_normalize(structured_data, document_text)
             
-            # Force empty skills arrays (skills should be manually added by user)
-            structured_data['required_skills'] = []
-            structured_data['preferred_skills'] = []
-            
-            logger.info(f"✅ Extracted internship: '{structured_data.get('title')}' (skills extraction skipped - will be manually added)")
+            logger.info(f"✅ Extracted internship: '{structured_data.get('title')}' with {len(structured_data.get('required_skills', []))} required and {len(structured_data.get('preferred_skills', []))} preferred skills")
             return structured_data
             
         except json.JSONDecodeError as e:
@@ -219,9 +225,11 @@ Return ONLY the JSON object, no markdown, no explanation.
                         break
             data['title'] = title
         
-        # Ensure description is present (use original text if not extracted)
-        if not data.get('description') or len(str(data.get('description', '')).strip()) < 50:
-            data['description'] = original_text[:2000]  # Use first 2000 chars as description
+        # Ensure description is present and substantial (use original text if not extracted properly)
+        if not data.get('description') or len(str(data.get('description', '')).strip()) < 100:
+            # Use more of the original text if description is too short
+            data['description'] = original_text[:5000]  # Increased from 2000 to 5000 chars
+            logger.warning(f"⚠️ Description was too short or missing, using first 5000 chars from document")
         
         # Ensure skills are lists
         if not isinstance(data.get('required_skills'), list):
@@ -238,6 +246,35 @@ Return ONLY the JSON object, no markdown, no explanation.
             s for s in data['preferred_skills'] 
             if s.lower() not in required_lower
         ]
+        
+        # Limit skills: max 7 required, max 7 preferred, max 15 total
+        original_required_count = len(data['required_skills'])
+        original_preferred_count = len(data['preferred_skills'])
+        
+        # Limit required skills to 7
+        if len(data['required_skills']) > 7:
+            logger.warning(f"⚠️ Required skills ({len(data['required_skills'])}) exceeds limit of 7. Trimming to top 7.")
+            data['required_skills'] = data['required_skills'][:7]
+        
+        # Limit preferred skills to 7
+        if len(data['preferred_skills']) > 7:
+            logger.warning(f"⚠️ Preferred skills ({len(data['preferred_skills'])}) exceeds limit of 7. Trimming to top 7.")
+            data['preferred_skills'] = data['preferred_skills'][:7]
+        
+        # Ensure total skills don't exceed 15
+        total_skills = len(data['required_skills']) + len(data['preferred_skills'])
+        if total_skills > 15:
+            # Prioritize required skills, trim preferred if needed
+            available_for_preferred = 15 - len(data['required_skills'])
+            if available_for_preferred < len(data['preferred_skills']):
+                logger.warning(f"⚠️ Total skills ({total_skills}) exceeds limit of 15. Trimming preferred skills to {available_for_preferred}.")
+                data['preferred_skills'] = data['preferred_skills'][:available_for_preferred]
+        
+        # Log if we had to trim
+        final_required_count = len(data['required_skills'])
+        final_preferred_count = len(data['preferred_skills'])
+        if original_required_count != final_required_count or original_preferred_count != final_preferred_count:
+            logger.info(f"📊 Skills adjusted: Required {original_required_count}→{final_required_count}, Preferred {original_preferred_count}→{final_preferred_count}, Total: {final_required_count + final_preferred_count}/15")
         
         # Normalize experience values
         data['min_experience'] = float(data.get('min_experience', 0) or 0)
@@ -258,7 +295,7 @@ Return ONLY the JSON object, no markdown, no explanation.
     def _create_fallback_structure(self, document_text: str) -> Dict:
         """
         Create a fallback structure when AI parsing fails
-        Uses basic text extraction
+        Uses basic text extraction and keyword matching
         """
         # Try to extract title from first meaningful line
         lines = document_text.split('\n')
@@ -270,13 +307,20 @@ Return ONLY the JSON object, no markdown, no explanation.
                     title = line
                     break
         
-        logger.warning("⚠️ Using fallback structure - AI parsing failed (skills will be manually added)")
+        # Try basic skill extraction
+        basic_skills = self._extract_skills_basic(document_text)
+        
+        # Respect skill limits: max 7 required, max 7 preferred, max 15 total
+        required_skills = basic_skills[:7]  # Max 7 required
+        preferred_skills = basic_skills[7:15]  # Max 7 preferred (total won't exceed 15)
+        
+        logger.warning(f"⚠️ Using fallback structure - AI parsing failed. Extracted {len(required_skills)} required and {len(preferred_skills)} preferred skills using basic method")
         
         return {
             "title": title,
             "description": document_text[:2000],  # Use first 2000 chars
-            "required_skills": [],  # No auto-extraction, manual input required
-            "preferred_skills": [],
+            "required_skills": required_skills,
+            "preferred_skills": preferred_skills,
             "location": None,
             "duration": None,
             "stipend": None,

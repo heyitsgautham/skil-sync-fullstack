@@ -94,23 +94,32 @@ const CreateInternship = () => {
             });
 
             const extractedData = response.data;
+            
+            // Log extracted data for debugging
+            console.log('📄 Extracted data from document:', {
+                title: extractedData.title,
+                descriptionLength: extractedData.description?.length || 0,
+                requiredSkillsCount: extractedData.required_skills?.length || 0,
+                preferredSkillsCount: extractedData.preferred_skills?.length || 0,
+            });
 
-            // Pre-fill form with extracted data
+            // Pre-fill form with extracted data (but NOT skills - user must click Extract button)
             setFormData({
                 title: extractedData.title || '',
                 description: extractedData.description || '',
-                required_skills: extractedData.required_skills || [],
-                preferred_skills: extractedData.preferred_skills || [],
+                required_skills: [],  // Don't populate yet - wait for Extract button
+                preferred_skills: [],  // Don't populate yet - wait for Extract button
                 location: extractedData.location || '',
                 duration: extractedData.duration || '',
                 stipend: extractedData.stipend || '',
             });
 
             const totalSkills = (extractedData.required_skills?.length || 0) + (extractedData.preferred_skills?.length || 0);
+            
             setExtractionSuccess(
-                `✨ Successfully extracted internship details from "${file.name}"! Found ${totalSkills} skills. Please review and edit as needed.`
+                `✨ Successfully extracted internship details from "${file.name}"! Found ${totalSkills} skills in the document. Click "Extract Skills from Description" button below to populate skill fields (max 7 required + 7 preferred).`
             );
-            toast.success('Document parsed successfully! Review the extracted details.');
+            toast.success('Document parsed successfully! Click "Extract Skills from Description" to add skills.');
         } catch (err) {
             const errorMessage = err.response?.data?.detail || 'Failed to parse document';
             setError(errorMessage);
@@ -131,6 +140,8 @@ const CreateInternship = () => {
             return;
         }
 
+        console.log('🔍 Extracting skills from description. Description length:', formData.description.length);
+
         setExtracting(true);
         setError('');
         setExtractionSuccess('');
@@ -141,6 +152,11 @@ const CreateInternship = () => {
             });
 
             const { required_skills, preferred_skills } = response.data;
+            
+            console.log('✅ Skills extracted successfully:', {
+                required: required_skills.length,
+                preferred: preferred_skills.length,
+            });
 
             // Merge with existing skills (avoiding duplicates)
             const newRequiredSkills = [...new Set([...formData.required_skills, ...required_skills])];
@@ -154,10 +170,11 @@ const CreateInternship = () => {
 
             const totalExtracted = required_skills.length + preferred_skills.length;
             setExtractionSuccess(
-                `✨ Extracted ${totalExtracted} skills! (${required_skills.length} required, ${preferred_skills.length} preferred)`
+                `✨ Extracted ${totalExtracted} skills! (${required_skills.length} required, ${preferred_skills.length} preferred). Limit: max 7+7, total max 15.`
             );
-            toast.success('Skills extracted successfully!');
+            toast.success(`Skills extracted successfully! Total: ${totalExtracted}/15`);
         } catch (err) {
+            console.error('❌ Error extracting skills:', err);
             const errorMessage = err.response?.data?.detail || 'Failed to extract skills';
             setError(errorMessage);
             toast.error(errorMessage);
