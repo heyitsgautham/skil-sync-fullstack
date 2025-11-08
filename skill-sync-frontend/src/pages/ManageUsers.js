@@ -27,6 +27,8 @@ import {
     Select,
     MenuItem,
     Snackbar,
+    Switch,
+    FormControlLabel,
 } from '@mui/material';
 import {
     ManageAccounts as ManageAccountsIcon,
@@ -36,6 +38,8 @@ import {
     AdminPanelSettings as AdminIcon,
     Edit as EditIcon,
     Delete as DeleteIcon,
+    VisibilityOff as VisibilityOffIcon,
+    Visibility as VisibilityIcon,
 } from '@mui/icons-material';
 import Layout from '../components/Layout';
 import api from '../services/api';
@@ -51,7 +55,8 @@ const ManageUsers = () => {
     const [selectedUser, setSelectedUser] = useState(null);
     const [editFormData, setEditFormData] = useState({
         full_name: '',
-        is_active: 1
+        is_active: 1,
+        anonymization_enabled: false
     });
     const [snackbar, setSnackbar] = useState({
         open: false,
@@ -96,7 +101,8 @@ const ManageUsers = () => {
         setSelectedUser(user);
         setEditFormData({
             full_name: user.full_name,
-            is_active: user.is_active !== undefined ? user.is_active : 1
+            is_active: user.is_active !== undefined ? user.is_active : 1,
+            anonymization_enabled: user.anonymization_enabled || false
         });
         setEditDialogOpen(true);
     };
@@ -164,17 +170,17 @@ const ManageUsers = () => {
 
     const canDeleteUser = (user) => {
         const currentUserId = getCurrentUserId();
-        
+
         // Cannot delete yourself
         if (user.id === currentUserId) {
             return { allowed: false, reason: 'Cannot delete your own account' };
         }
-        
+
         // Cannot delete last admin
         if (user.role === 'admin' && getAdminCount() <= 1) {
             return { allowed: false, reason: 'Cannot delete the last administrator' };
         }
-        
+
         return { allowed: true, reason: '' };
     };
 
@@ -271,7 +277,7 @@ const ManageUsers = () => {
                             >
                                 <ManageAccountsIcon sx={{ fontSize: 36, color: 'white' }} />
                             </Box>
-                            <Box>   
+                            <Box>
                                 <Typography
                                     variant="h4"
                                     sx={{
@@ -344,6 +350,7 @@ const ManageUsers = () => {
                                 <TableCell sx={{ fontWeight: 700, fontSize: '0.95rem' }}>User</TableCell>
                                 <TableCell sx={{ fontWeight: 700, fontSize: '0.95rem' }}>Email</TableCell>
                                 <TableCell sx={{ fontWeight: 700, fontSize: '0.95rem' }}>Role</TableCell>
+                                <TableCell sx={{ fontWeight: 700, fontSize: '0.95rem' }}>Status</TableCell>
                                 <TableCell sx={{ fontWeight: 700, fontSize: '0.95rem' }}>Joined</TableCell>
                                 <TableCell align="right" sx={{ fontWeight: 700, fontSize: '0.95rem' }}>
                                     Actions
@@ -353,7 +360,7 @@ const ManageUsers = () => {
                         <TableBody>
                             {filteredUsers.length === 0 ? (
                                 <TableRow>
-                                    <TableCell colSpan={5} align="center" sx={{ py: 8 }}>
+                                    <TableCell colSpan={6} align="center" sx={{ py: 8 }}>
                                         <PersonIcon sx={{ fontSize: 60, color: '#ccc', mb: 2 }} />
                                         <Typography variant="h6" color="text.secondary">
                                             No users found
@@ -377,11 +384,11 @@ const ManageUsers = () => {
                                                         width: 40,
                                                         height: 40,
                                                         borderRadius: 2,
-                                                        background: user.role.toLowerCase() === 'student' 
+                                                        background: user.role.toLowerCase() === 'student'
                                                             ? '#1976d2'
                                                             : user.role.toLowerCase() === 'company'
-                                                            ? '#2e7d32'
-                                                            : '#d32f2f',
+                                                                ? '#2e7d32'
+                                                                : '#d32f2f',
                                                         display: 'flex',
                                                         alignItems: 'center',
                                                         justifyContent: 'center',
@@ -421,6 +428,61 @@ const ManageUsers = () => {
                                             />
                                         </TableCell>
                                         <TableCell>
+                                            {user.role.toLowerCase() === 'company' ? (
+                                                <Tooltip title={user.anonymization_enabled ? "Anonymization Enabled - Company views anonymized resumes" : "Anonymization Disabled - Company views original resumes"}>
+                                                    <Chip
+                                                        icon={user.anonymization_enabled ? <VisibilityOffIcon /> : <VisibilityIcon />}
+                                                        label={user.anonymization_enabled ? "Anonymized" : "Original"}
+                                                        size="small"
+                                                        sx={{
+                                                            background: user.anonymization_enabled
+                                                                ? 'linear-gradient(135deg, rgba(46, 125, 50, 0.15) 0%, rgba(56, 142, 60, 0.15) 100%)'
+                                                                : 'linear-gradient(135deg, rgba(25, 118, 210, 0.15) 0%, rgba(21, 101, 192, 0.15) 100%)',
+                                                            border: user.anonymization_enabled
+                                                                ? '1px solid rgba(46, 125, 50, 0.3)'
+                                                                : '1px solid rgba(25, 118, 210, 0.3)',
+                                                            color: user.anonymization_enabled ? '#2e7d32' : '#1976d2',
+                                                            fontWeight: 600,
+                                                        }}
+                                                    />
+                                                </Tooltip>
+                                            ) : user.role.toLowerCase() === 'student' ? (
+                                                <Tooltip title={user.is_active === 1 ? "Active - Visible in candidate rankings" : "Inactive - Hidden from candidate rankings"}>
+                                                    <Chip
+                                                        label={user.is_active === 1 ? "Active" : "Inactive"}
+                                                        size="small"
+                                                        sx={{
+                                                            background: user.is_active === 1
+                                                                ? 'linear-gradient(135deg, rgba(46, 125, 50, 0.15) 0%, rgba(56, 142, 60, 0.15) 100%)'
+                                                                : 'linear-gradient(135deg, rgba(211, 47, 47, 0.15) 0%, rgba(198, 40, 40, 0.15) 100%)',
+                                                            border: user.is_active === 1
+                                                                ? '1px solid rgba(46, 125, 50, 0.3)'
+                                                                : '1px solid rgba(211, 47, 47, 0.3)',
+                                                            color: user.is_active === 1 ? '#2e7d32' : '#d32f2f',
+                                                            fontWeight: 600,
+                                                        }}
+                                                    />
+                                                </Tooltip>
+                                            ) : (
+                                                <Tooltip title={user.is_active === 1 ? "Active" : "Inactive"}>
+                                                    <Chip
+                                                        label={user.is_active === 1 ? "Active" : "Inactive"}
+                                                        size="small"
+                                                        sx={{
+                                                            background: user.is_active === 1
+                                                                ? 'linear-gradient(135deg, rgba(46, 125, 50, 0.15) 0%, rgba(56, 142, 60, 0.15) 100%)'
+                                                                : 'linear-gradient(135deg, rgba(211, 47, 47, 0.15) 0%, rgba(198, 40, 40, 0.15) 100%)',
+                                                            border: user.is_active === 1
+                                                                ? '1px solid rgba(46, 125, 50, 0.3)'
+                                                                : '1px solid rgba(211, 47, 47, 0.3)',
+                                                            color: user.is_active === 1 ? '#2e7d32' : '#d32f2f',
+                                                            fontWeight: 600,
+                                                        }}
+                                                    />
+                                                </Tooltip>
+                                            )}
+                                        </TableCell>
+                                        <TableCell>
                                             <Typography variant="body2" color="text.secondary">
                                                 {formatDate(user.created_at)}
                                             </Typography>
@@ -442,8 +504,8 @@ const ManageUsers = () => {
                                                 </IconButton>
                                             </Tooltip>
                                             <Tooltip title={
-                                                !canDeleteUser(user).allowed 
-                                                    ? canDeleteUser(user).reason 
+                                                !canDeleteUser(user).allowed
+                                                    ? canDeleteUser(user).reason
                                                     : "Delete User"
                                             }>
                                                 <span>
@@ -454,8 +516,8 @@ const ManageUsers = () => {
                                                         sx={{
                                                             color: canDeleteUser(user).allowed ? '#f5576c' : '#ccc',
                                                             '&:hover': {
-                                                                backgroundColor: canDeleteUser(user).allowed 
-                                                                    ? 'rgba(245, 87, 108, 0.1)' 
+                                                                backgroundColor: canDeleteUser(user).allowed
+                                                                    ? 'rgba(245, 87, 108, 0.1)'
                                                                     : 'transparent',
                                                             },
                                                             '&.Mui-disabled': {
@@ -476,14 +538,14 @@ const ManageUsers = () => {
                 </TableContainer>
 
                 {/* Edit User Dialog */}
-                <Dialog 
-                    open={editDialogOpen} 
+                <Dialog
+                    open={editDialogOpen}
                     onClose={() => setEditDialogOpen(false)}
                     maxWidth="sm"
                     fullWidth
                 >
-                    <DialogTitle sx={{ 
-                        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                    <DialogTitle sx={{
+                        background: 'linear-gradient(135deg, #d32f2f 0%, #c62828 100%)',
                         color: 'white',
                         fontWeight: 700
                     }}>
@@ -498,10 +560,10 @@ const ManageUsers = () => {
                             margin="normal"
                             sx={{ mb: 2 }}
                         />
-                        <Box sx={{ 
-                            p: 2, 
-                            mb: 2, 
-                            bgcolor: 'rgba(102, 126, 234, 0.1)', 
+                        <Box sx={{
+                            p: 2,
+                            mb: 2,
+                            bgcolor: 'rgba(102, 126, 234, 0.1)',
                             borderRadius: 2,
                             border: '1px solid rgba(102, 126, 234, 0.3)'
                         }}>
@@ -520,32 +582,148 @@ const ManageUsers = () => {
                                 ℹ️ Role cannot be changed for security reasons
                             </Typography>
                         </Box>
-                        <FormControl fullWidth margin="normal">
-                            <InputLabel>Status</InputLabel>
-                            <Select
-                                value={editFormData.is_active}
-                                label="Status"
-                                onChange={(e) => setEditFormData({ ...editFormData, is_active: e.target.value })}
-                            >
-                                <MenuItem value={1}>Active</MenuItem>
-                                <MenuItem value={0}>Inactive</MenuItem>
-                            </Select>
-                        </FormControl>
+
+                        {/* Student Status - Active/Inactive */}
+                        {selectedUser?.role.toLowerCase() === 'student' && (
+                            <Box sx={{
+                                p: 2,
+                                mt: 2,
+                                bgcolor: 'rgba(25, 118, 210, 0.05)',
+                                borderRadius: 2,
+                                border: '1px solid rgba(25, 118, 210, 0.2)'
+                            }}>
+                                <FormControlLabel
+                                    control={
+                                        <Switch
+                                            checked={editFormData.is_active === 1}
+                                            onChange={(e) => setEditFormData({
+                                                ...editFormData,
+                                                is_active: e.target.checked ? 1 : 0
+                                            })}
+                                            sx={{
+                                                '& .MuiSwitch-switchBase.Mui-checked': {
+                                                    color: '#2e7d32',
+                                                },
+                                                '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': {
+                                                    backgroundColor: '#2e7d32',
+                                                },
+                                            }}
+                                        />
+                                    }
+                                    label={
+                                        <Box>
+                                            <Typography variant="body1" sx={{ fontWeight: 600 }}>
+                                                Candidate Status
+                                            </Typography>
+                                            <Typography variant="caption" color="text.secondary" display="block">
+                                                {editFormData.is_active === 1
+                                                    ? '✅ Active - Candidate appears in all internship rankings'
+                                                    : '🚫 Inactive - Candidate hidden from all internship rankings'
+                                                }
+                                            </Typography>
+                                        </Box>
+                                    }
+                                    sx={{ m: 0, width: '100%', alignItems: 'flex-start' }}
+                                />
+                                <Box sx={{
+                                    mt: 2,
+                                    p: 1.5,
+                                    bgcolor: 'rgba(211, 47, 47, 0.05)',
+                                    borderRadius: 1,
+                                    border: '1px solid rgba(211, 47, 47, 0.2)'
+                                }}>
+                                    <Typography variant="caption" sx={{ display: 'flex', alignItems: 'flex-start', color: '#d32f2f' }}>
+                                        <strong>⚠️ Note:</strong>&nbsp;When inactive, this candidate will NOT appear in the Candidate Ranking page for any internship. Use this to temporarily hide candidates from company views.
+                                    </Typography>
+                                </Box>
+                            </Box>
+                        )}
+
+                        {/* Company Anonymization Toggle */}
+                        {selectedUser?.role.toLowerCase() === 'company' && (
+                            <Box sx={{
+                                p: 2,
+                                mt: 2,
+                                bgcolor: 'rgba(46, 125, 50, 0.05)',
+                                borderRadius: 2,
+                                border: '1px solid rgba(46, 125, 50, 0.2)'
+                            }}>
+                                <FormControlLabel
+                                    control={
+                                        <Switch
+                                            checked={editFormData.anonymization_enabled}
+                                            onChange={(e) => setEditFormData({
+                                                ...editFormData,
+                                                anonymization_enabled: e.target.checked
+                                            })}
+                                            sx={{
+                                                '& .MuiSwitch-switchBase.Mui-checked': {
+                                                    color: '#2e7d32',
+                                                },
+                                                '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': {
+                                                    backgroundColor: '#2e7d32',
+                                                },
+                                            }}
+                                        />
+                                    }
+                                    label={
+                                        <Box>
+                                            <Typography variant="body1" sx={{ fontWeight: 600 }}>
+                                                Resume Anonymization
+                                            </Typography>
+                                            <Typography variant="caption" color="text.secondary" display="block">
+                                                {editFormData.anonymization_enabled
+                                                    ? '🔒 Company views anonymized resumes (PII removed)'
+                                                    : '👁️ Company views original resumes with full information'
+                                                }
+                                            </Typography>
+                                        </Box>
+                                    }
+                                    sx={{ m: 0, width: '100%', alignItems: 'flex-start' }}
+                                />
+                                <Box sx={{
+                                    mt: 2,
+                                    p: 1.5,
+                                    bgcolor: 'rgba(25, 118, 210, 0.05)',
+                                    borderRadius: 1,
+                                    border: '1px solid rgba(25, 118, 210, 0.2)'
+                                }}>
+                                    <Typography variant="caption" color="primary" sx={{ display: 'flex', alignItems: 'flex-start' }}>
+                                        <strong>ℹ️ Info:</strong>&nbsp;When enabled, the company will see anonymized versions of student resumes with personal information (name, email, phone, address) automatically redacted to prevent bias in the screening process.
+                                    </Typography>
+                                </Box>
+                            </Box>
+                        )}
+
+                        {/* Admin Status */}
+                        {selectedUser?.role.toLowerCase() === 'admin' && (
+                            <FormControl fullWidth margin="normal" sx={{ mt: 2 }}>
+                                <InputLabel>Account Status</InputLabel>
+                                <Select
+                                    value={editFormData.is_active}
+                                    label="Account Status"
+                                    onChange={(e) => setEditFormData({ ...editFormData, is_active: e.target.value })}
+                                >
+                                    <MenuItem value={1}>Active</MenuItem>
+                                    <MenuItem value={0}>Inactive</MenuItem>
+                                </Select>
+                            </FormControl>
+                        )}
                     </DialogContent>
                     <DialogActions sx={{ p: 2 }}>
-                        <Button 
+                        <Button
                             onClick={() => setEditDialogOpen(false)}
                             sx={{ color: '#666' }}
                         >
                             Cancel
                         </Button>
-                        <Button 
+                        <Button
                             onClick={handleEditSubmit}
                             variant="contained"
                             sx={{
-                                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                                background: 'linear-gradient(135deg, #d32f2f 0%, #c62828 100%)',
                                 '&:hover': {
-                                    background: 'linear-gradient(135deg, #5568d3 0%, #6a3f8e 100%)',
+                                    background: 'linear-gradient(135deg, #c62828 0%, #b71c1c 100%)',
                                 }
                             }}
                         >
@@ -555,13 +733,13 @@ const ManageUsers = () => {
                 </Dialog>
 
                 {/* Delete Confirmation Dialog */}
-                <Dialog 
-                    open={deleteDialogOpen} 
+                <Dialog
+                    open={deleteDialogOpen}
                     onClose={() => setDeleteDialogOpen(false)}
                     maxWidth="sm"
                     fullWidth
                 >
-                    <DialogTitle sx={{ 
+                    <DialogTitle sx={{
                         background: 'linear-gradient(135deg, #f5576c 0%, #f093fb 100%)',
                         color: 'white',
                         fontWeight: 700
@@ -572,7 +750,7 @@ const ManageUsers = () => {
                         <Typography variant="h6" sx={{ mb: 2 }}>
                             Are you sure you want to delete this user?
                         </Typography>
-                        
+
                         <Paper sx={{ p: 2, mb: 2, bgcolor: 'rgba(245, 87, 108, 0.1)' }}>
                             <Typography variant="body1" sx={{ fontWeight: 600 }}>
                                 {selectedUser?.full_name}
@@ -594,11 +772,11 @@ const ManageUsers = () => {
                         <Typography color="error" sx={{ mb: 1, fontWeight: 600 }}>
                             ⚠️ This action cannot be undone!
                         </Typography>
-                        
+
                         <Typography variant="body2" sx={{ mb: 1 }}>
                             The following data will be permanently deleted:
                         </Typography>
-                        
+
                         <Box component="ul" sx={{ pl: 2, mt: 1 }}>
                             {selectedUser?.role === 'student' && (
                                 <>
@@ -626,13 +804,13 @@ const ManageUsers = () => {
                         </Box>
                     </DialogContent>
                     <DialogActions sx={{ p: 2 }}>
-                        <Button 
+                        <Button
                             onClick={() => setDeleteDialogOpen(false)}
                             sx={{ color: '#666' }}
                         >
                             Cancel
                         </Button>
-                        <Button 
+                        <Button
                             onClick={handleDeleteConfirm}
                             variant="contained"
                             color="error"
@@ -655,8 +833,8 @@ const ManageUsers = () => {
                     onClose={handleCloseSnackbar}
                     anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
                 >
-                    <Alert 
-                        onClose={handleCloseSnackbar} 
+                    <Alert
+                        onClose={handleCloseSnackbar}
                         severity={snackbar.severity}
                         sx={{ width: '100%' }}
                     >
