@@ -57,45 +57,13 @@ SkillSync analyzes **hundreds of resumes** against job requirements to deliver u
 
 ### Live Demo
 
-```bash
-# Company uploads internship posting
-"Backend Developer Intern - Python, FastAPI, PostgreSQL, Docker"
+<div align="center">
 
-# AI extracts requirements and matches against candidate pool
-┌─────────────────────────────────────────────────────────┐
-│  AI-Powered Candidate Ranking (87 candidates)           │
-├─────────────────────────────────────────────────────────┤
-│                                                         │
-│  Candidate #1 - Match Score: 94.2%                      │
-│    ├─ Skills Match: 96% (11/12 required skills)         │
-│    ├─ Experience Match: 95% (2.5 years Python)          │
-│    └─ Education Match: 92% (B.S. Computer Science)      │
-│                                                         │
-│    Top Matching Skills:                                 │
-│    ✓ Python (Evidence: "3 years Django/Flask")          │
-│    ✓ FastAPI (Evidence: "Built REST APIs with FastAPI") │
-│    ✓ PostgreSQL (Evidence: "Database optimization")     │
-│    ✓ Docker (Evidence: "Containerized microservices")   │
-│                                                         │
-│    Key Strengths:                                       │
-│    • Strong backend development portfolio               │
-│    • Direct experience with required tech stack         │
-│    • Demonstrated leadership in 2 projects              │
-│                                                         │
-│    📄 [View Resume] [📧 Send Email] [⭐ Shortlist]       │
-│                                                         │
-├─────────────────────────────────────────────────────────┤
-│                                                         │
-│  Candidate #2 - Match Score: 91.8%                      │
-│    ├─ Skills Match: 92% (10/12 required skills)         │
-│    ├─ Experience Match: 90% (1.8 years Python)          │
-│    └─ Education Match: 94% (B.S. Software Eng.)         │
-│    ...                                                  │
-│                                                         │
-└─────────────────────────────────────────────────────────┘
+[![SkillSync Demo Video](https://img.youtube.com/vi/K7wjLY_iihg/maxresdefault.jpg)](https://youtu.be/K7wjLY_iihg)
 
-[Export CSV] [Export XLSX] [Expand All] [Collapse All]
-```
+**🎬 [Watch Full Demo Video](https://youtu.be/K7wjLY_iihg)** - See SkillSync in action!
+
+</div>
 
 ---
 
