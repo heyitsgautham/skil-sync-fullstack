@@ -14,7 +14,7 @@
 
 ---
 
-<img src="./assets/Thumbnail.png" alt="SkillSync Platform Preview" width="100%"/>
+<img src="./assets/Thumbnail1.png" alt="SkillSync Platform Preview" width="100%"/>
 
 ---
 
