@@ -285,9 +285,9 @@ const Register = () => {
                                     },
                                 }}
                             />
-                            <FormControl 
-                                fullWidth 
-                                margin="normal" 
+                            <FormControl
+                                fullWidth
+                                margin="normal"
                                 required
                                 sx={{
                                     '& .MuiOutlinedInput-root': {
@@ -354,10 +354,10 @@ const Register = () => {
                                 </Link>
                             </Box>
                         </Box>
-                </Paper>
-            </motion.div>
-        </Container>
-    </Box>
+                    </Paper>
+                </motion.div>
+            </Container>
+        </Box>
     );
 };
 
