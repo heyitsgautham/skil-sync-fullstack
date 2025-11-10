@@ -1089,12 +1089,16 @@ const Dashboard = () => {
                                 width: 80,
                                 height: 80,
                                 borderRadius: 3,
-                                background: 'linear-gradient(135deg, #1976d2 0%, #1976d2dd 100%)',
+                                background: role === 'admin'
+                                    ? 'linear-gradient(135deg, #d32f2f 0%, #c62828 100%)'
+                                    : 'linear-gradient(135deg, #1976d2 0%, #1976d2dd 100%)',
                                 display: 'flex',
                                 alignItems: 'center',
                                 justifyContent: 'center',
                                 mr: 3,
-                                boxShadow: '0 8px 24px rgba(25, 118, 210, 0.3)',
+                                boxShadow: role === 'admin'
+                                    ? '0 8px 24px rgba(211, 47, 47, 0.3)'
+                                    : '0 8px 24px rgba(25, 118, 210, 0.3)',
                             }}
                         >
                             {React.cloneElement(getRoleIcon(), {
@@ -1111,7 +1115,7 @@ const Dashboard = () => {
                                     letterSpacing: '-0.5px',
                                 }}
                             >
-                                Welcome back, {user?.full_name || 'User'}!
+                                {role === 'admin' ? 'Welcome back, Admin!' : `Welcome back, ${user?.full_name || 'User'}!`}
                             </Typography>
                             <Typography
                                 variant="body1"

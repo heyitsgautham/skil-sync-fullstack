@@ -32,6 +32,22 @@ const FlaggedCandidatesModal = ({ open, onClose, candidateId, flaggedWith, flagR
     const [loading, setLoading] = useState(false);
     const [candidatesData, setcandidatesData] = useState([]);
 
+    // Helper function to normalize URLs
+    const normalizeUrl = (url) => {
+        if (!url) return null;
+
+        // Trim whitespace
+        url = url.trim();
+
+        // If URL already has protocol, return as-is
+        if (url.startsWith('http://') || url.startsWith('https://')) {
+            return url;
+        }
+
+        // Add https:// protocol
+        return `https://${url}`;
+    };
+
     useEffect(() => {
         if (open && candidateId && flaggedWith) {
             fetchFlaggedCandidatesDetails();
@@ -44,7 +60,7 @@ const FlaggedCandidatesModal = ({ open, onClose, candidateId, flaggedWith, flagR
             // Collect all unique candidate IDs (current + all flagged with)
             const allCandidateIds = new Set();
             allCandidateIds.add(candidateId);
-            
+
             // Add all candidates flagged with this one
             Object.values(flaggedWith).forEach(candidatesList => {
                 candidatesList.forEach(id => allCandidateIds.add(id));
@@ -110,17 +126,17 @@ const FlaggedCandidatesModal = ({ open, onClose, candidateId, flaggedWith, flagR
     // Group candidates by flag reasons
     const groupCandidatesByReason = () => {
         const groups = {};
-        
+
         flagReasons.forEach(reason => {
             if (!groups[reason]) {
                 groups[reason] = [];
             }
-            
+
             // Find the current candidate data
             const currentCandidate = candidatesData.find(c => c.candidate_id === candidateId);
             if (currentCandidate) {
                 groups[reason].push(currentCandidate);
-                
+
                 // Add candidates flagged with this one for this reason
                 const flaggedWithIds = flaggedWith[reason] || [];
                 flaggedWithIds.forEach(flaggedId => {
@@ -131,7 +147,7 @@ const FlaggedCandidatesModal = ({ open, onClose, candidateId, flaggedWith, flagR
                 });
             }
         });
-        
+
         return groups;
     };
 
@@ -249,7 +265,7 @@ const FlaggedCandidatesModal = ({ open, onClose, candidateId, flaggedWith, flagR
                                                     <TableCell>
                                                         {candidate.linkedin_url ? (
                                                             <Link
-                                                                href={candidate.linkedin_url}
+                                                                href={normalizeUrl(candidate.linkedin_url)}
                                                                 target="_blank"
                                                                 rel="noopener noreferrer"
                                                                 sx={{
@@ -272,7 +288,7 @@ const FlaggedCandidatesModal = ({ open, onClose, candidateId, flaggedWith, flagR
                                                     <TableCell>
                                                         {candidate.github_url ? (
                                                             <Link
-                                                                href={candidate.github_url}
+                                                                href={normalizeUrl(candidate.github_url)}
                                                                 target="_blank"
                                                                 rel="noopener noreferrer"
                                                                 sx={{
