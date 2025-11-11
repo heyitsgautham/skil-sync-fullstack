@@ -18,10 +18,6 @@
 
 ---
 
-**Built for**: 24-Hour HACK.IO National Level Hackathon 2025  
-**Domain**: HR Tech | Intelligent Resume Filtering  
-**Tech Stack**: FastAPI • Google Gemini 2.5 • ChromaDB • React • Material-UI • PostgreSQL
-
 </div>
 
 ---
