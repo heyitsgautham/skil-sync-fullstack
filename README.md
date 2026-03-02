@@ -1419,25 +1419,11 @@ MIT License - see [LICENSE](./LICENSE) for details
 
 ## ⭐ If This Project Helped You, Give It a Star!
 
-[![Stars](https://img.shields.io/github/stars/yourusername/skillsync?style=social)](https://github.com/yourusername/skillsync/stargazers)
-[![Forks](https://img.shields.io/github/forks/yourusername/skillsync?style=social)](https://github.com/yourusername/skillsync/network/members)
-[![Issues](https://img.shields.io/github/issues/yourusername/skillsync)](https://github.com/yourusername/skillsync/issues)
-
----
-
-### 🎯 Built with ❤️ for the GenAI Hackathon 2025
-
-**Domain:** HR Tech | **Category:** Intelligent Resume Filtering | **Innovation:** AI-Powered Bias-Free Hiring
-
-![Demo](https://img.shields.io/badge/Demo-Live-brightgreen?style=for-the-badge)
-![Documentation](https://img.shields.io/badge/Docs-Complete-blue?style=for-the-badge)
-![Tests](https://img.shields.io/badge/Tests-Passing-success?style=for-the-badge)
 
 ---
 
 **Team:** Zero Vector  
 **Contact:** heyitsgautham@gmail.com
-**Repository:** [github.com/heyitsgautham/skillsync](https://github.com/yourusername/skillsync)
 
 ---
 
