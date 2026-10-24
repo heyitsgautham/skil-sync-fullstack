@@ -2,6 +2,7 @@
 Populate SkillSync Database
 Creates admin, 50 students with resumes, and 3 companies with internships
 """
+
 import sys
 import os
 from pathlib import Path
@@ -19,46 +20,49 @@ import shutil
 # Password hashing
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
+
 def hash_password(password: str) -> str:
     """Hash a password"""
     return pwd_context.hash(password)
 
+
 def create_admin_user(db: Session):
     """Create admin user"""
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print("CREATING ADMIN USER")
-    print("="*60)
-    
+    print("=" * 60)
+
     # Check if admin exists
     existing_admin = db.query(User).filter(User.email == "admin@skillsync.com").first()
     if existing_admin:
         print("⚠ Admin user already exists. Skipping...")
         return existing_admin
-    
+
     admin = User(
         email="admin@skillsync.com",
         hashed_password=hash_password("Admin@123"),
         full_name="System Administrator",
         role=UserRole.admin,
-        is_active=1
+        is_active=1,
     )
-    
+
     db.add(admin)
     db.commit()
     db.refresh(admin)
-    
+
     print(f"✓ Admin user created")
     print(f"  Email: admin@skillsync.com")
     print(f"  Password: Admin@123")
-    
+
     return admin
+
 
 def create_50_students(db: Session):
     """Create all 50 students with their resumes"""
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print("CREATING 50 STUDENTS")
-    print("="*60)
-    
+    print("=" * 60)
+
     students_data = [
         ("Aarav Sharma", "aarav.sharma@student.com", "aarav_sharma_resume.txt"),
         ("Diya Patel", "diya.patel@student.com", "diya_patel_resume.txt"),
@@ -111,72 +115,65 @@ def create_50_students(db: Session):
         ("Mihir Bhattacharya", "mihir.bhattacharya@student.com", "mihir_bhattacharya_resume.txt"),
         ("Keya Dubey", "keya.dubey@student.com", "keya_dubey_resume.txt"),
     ]
-    
+
     # Also add the 3 special students from DATABASE_CREDENTIALS
     special_students = [
         ("Alex Kumar", "alex.kumar@email.com", "software_engineer_resume.txt"),
         ("Priya Sharma", "priya.sharma@email.com", "game_developer_resume.txt"),
         ("Rahul Verma", "rahul.verma@email.com", "blockchain_developer_resume.txt"),
     ]
-    
+
     all_students = students_data + special_students
     created_count = 0
     resume_path = Path(__file__).parent.parent / "app" / "public" / "resumes"
-    
+
     for name, email, resume_file in all_students:
         # Check if student already exists
         existing_student = db.query(User).filter(User.email == email).first()
         if existing_student:
             print(f"⚠ {name} already exists. Skipping...")
             continue
-        
+
         # Determine password based on which list
         if email in [s[1] for s in special_students]:
             password = name.split()[0] + "2024"  # Alex2024, Priya2024, Rahul2024
         else:
             password = "Student@123"
-        
+
         # Create student user
         student = User(
-            email=email,
-            hashed_password=hash_password(password),
-            full_name=name,
-            role=UserRole.student,
-            is_active=1
+            email=email, hashed_password=hash_password(password), full_name=name, role=UserRole.student, is_active=1
         )
-        
+
         db.add(student)
         db.flush()  # Get the student ID
-        
+
         # Create resume entry if file exists
         resume_file_path = resume_path / resume_file
         if resume_file_path.exists():
-            resume = Resume(
-                student_id=student.id,
-                file_path=f"resumes/{resume_file}",
-                file_name=resume_file
-            )
+            resume = Resume(student_id=student.id, file_path=f"resumes/{resume_file}", file_name=resume_file)
             db.add(resume)
-        
+
         created_count += 1
         print(f"✓ Created: {name} ({email})")
-    
+
     db.commit()
-    
+
     print(f"\n✓ Successfully created {created_count} students")
     print(f"  Password for students 1-50: Student@123")
     print(f"  Password for Alex Kumar: Alex2024")
     print(f"  Password for Priya Sharma: Priya2024")
     print(f"  Password for Rahul Verma: Rahul2024")
-    
+
     return created_count
+
 
 def create_companies_and_internships(db: Session):
     """Create 3 companies with their internships"""
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print("CREATING COMPANIES AND INTERNSHIPS")
-    print("="*60)
-    
+    print("=" * 60)
+
     companies_data = [
         {
             "name": "TechCorp Solutions",
@@ -186,10 +183,18 @@ def create_companies_and_internships(db: Session):
                 {
                     "title": "Full Stack Software Engineer Intern",
                     "description": "Join our team to build scalable web applications using React, Node.js, and PostgreSQL. Work on real-world projects and learn from experienced engineers.",
-                    "required_skills": ["React", "Node.js", "PostgreSQL", "JavaScript", "TypeScript", "REST API", "Git"],
+                    "required_skills": [
+                        "React",
+                        "Node.js",
+                        "PostgreSQL",
+                        "JavaScript",
+                        "TypeScript",
+                        "REST API",
+                        "Git",
+                    ],
                     "location": "Bangalore, India",
                     "duration": "6 months",
-                    "stipend": 30000
+                    "stipend": 30000,
                 },
                 {
                     "title": "Backend Developer Intern",
@@ -197,17 +202,24 @@ def create_companies_and_internships(db: Session):
                     "required_skills": ["Python", "FastAPI", "Docker", "AWS", "PostgreSQL", "REST API", "CI/CD"],
                     "location": "Mumbai, India",
                     "duration": "6 months",
-                    "stipend": 28000
+                    "stipend": 28000,
                 },
                 {
                     "title": "Mobile App Developer Intern",
                     "description": "Build cross-platform mobile applications using React Native. Work on iOS and Android apps with modern UI/UX.",
-                    "required_skills": ["React Native", "JavaScript", "TypeScript", "Mobile Development", "Redux", "Firebase"],
+                    "required_skills": [
+                        "React Native",
+                        "JavaScript",
+                        "TypeScript",
+                        "Mobile Development",
+                        "Redux",
+                        "Firebase",
+                    ],
                     "location": "Hyderabad, India",
                     "duration": "4 months",
-                    "stipend": 25000
-                }
-            ]
+                    "stipend": 25000,
+                },
+            ],
         },
         {
             "name": "Epic Game Studios",
@@ -220,7 +232,7 @@ def create_companies_and_internships(db: Session):
                     "required_skills": ["Unity", "C#", "Game Development", "3D Modeling", "Physics", "AI"],
                     "location": "Pune, India",
                     "duration": "6 months",
-                    "stipend": 32000
+                    "stipend": 32000,
                 },
                 {
                     "title": "Graphics Programming Intern",
@@ -228,7 +240,7 @@ def create_companies_and_internships(db: Session):
                     "required_skills": ["Unreal Engine", "C++", "Shaders", "Graphics Programming", "OpenGL", "DirectX"],
                     "location": "Bangalore, India",
                     "duration": "6 months",
-                    "stipend": 35000
+                    "stipend": 35000,
                 },
                 {
                     "title": "Game Design Intern",
@@ -236,9 +248,9 @@ def create_companies_and_internships(db: Session):
                     "required_skills": ["Game Design", "Level Design", "UX", "Unity", "Game Mechanics", "Balancing"],
                     "location": "Remote",
                     "duration": "4 months",
-                    "stipend": 20000
-                }
-            ]
+                    "stipend": 20000,
+                },
+            ],
         },
         {
             "name": "Blockchain Labs Inc",
@@ -251,56 +263,70 @@ def create_companies_and_internships(db: Session):
                     "required_skills": ["Solidity", "Ethereum", "Smart Contracts", "Web3.js", "Blockchain", "DeFi"],
                     "location": "Delhi, India",
                     "duration": "6 months",
-                    "stipend": 40000
+                    "stipend": 40000,
                 },
                 {
                     "title": "DeFi Protocol Engineer Intern",
                     "description": "Develop DeFi protocols and ensure smart contract security. Work on lending, staking, and DEX platforms.",
-                    "required_skills": ["DeFi", "Solidity", "Smart Contract Security", "Ethereum", "Hardhat", "Testing"],
+                    "required_skills": [
+                        "DeFi",
+                        "Solidity",
+                        "Smart Contract Security",
+                        "Ethereum",
+                        "Hardhat",
+                        "Testing",
+                    ],
                     "location": "Bangalore, India",
                     "duration": "6 months",
-                    "stipend": 45000
+                    "stipend": 45000,
                 },
                 {
                     "title": "Crypto Backend Developer Intern",
                     "description": "Build backend services for blockchain applications using Node.js and blockchain APIs.",
-                    "required_skills": ["Node.js", "Blockchain APIs", "Web3.js", "MongoDB", "REST API", "Microservices"],
+                    "required_skills": [
+                        "Node.js",
+                        "Blockchain APIs",
+                        "Web3.js",
+                        "MongoDB",
+                        "REST API",
+                        "Microservices",
+                    ],
                     "location": "Mumbai, India",
                     "duration": "5 months",
-                    "stipend": 35000
-                }
-            ]
-        }
+                    "stipend": 35000,
+                },
+            ],
+        },
     ]
-    
+
     company_count = 0
     internship_count = 0
-    
+
     for company_data in companies_data:
         # Check if company exists
         existing_company = db.query(User).filter(User.email == company_data["email"]).first()
         if existing_company:
             print(f"\n⚠ {company_data['name']} already exists. Skipping...")
             continue
-        
+
         # Create company user
         company = User(
             email=company_data["email"],
             hashed_password=hash_password(company_data["password"]),
             full_name=company_data["name"],
             role=UserRole.company,
-            is_active=1
+            is_active=1,
         )
-        
+
         db.add(company)
         db.flush()  # Get company ID
-        
+
         print(f"\n✓ Created company: {company_data['name']}")
         print(f"  Email: {company_data['email']}")
         print(f"  Password: {company_data['password']}")
-        
+
         company_count += 1
-        
+
         # Create internships for this company
         for internship_data in company_data["internships"]:
             internship = Internship(
@@ -311,93 +337,96 @@ def create_companies_and_internships(db: Session):
                 location=internship_data["location"],
                 duration=internship_data["duration"],
                 stipend=str(internship_data["stipend"]),
-                is_active=1
+                is_active=1,
             )
-            
+
             db.add(internship)
             internship_count += 1
             print(f"  ✓ Posted: {internship_data['title']}")
-        
+
         db.commit()
-    
+
     print(f"\n✓ Successfully created {company_count} companies")
     print(f"✓ Successfully posted {internship_count} internships")
-    
+
     return company_count, internship_count
+
 
 def main():
     """Main execution function"""
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print("SKILLSYNC DATABASE POPULATION SCRIPT")
-    print("="*60)
-    
+    print("=" * 60)
+
     # Create tables
     print("\nCreating database tables...")
     Base.metadata.create_all(bind=engine)
     print("✓ Tables created/verified")
-    
+
     # Create database session
     db = SessionLocal()
-    
+
     try:
         # 1. Create admin user
         admin = create_admin_user(db)
-        
+
         # 2. Create 50 students with resumes
         student_count = create_50_students(db)
-        
+
         # 3. Create companies and internships
         company_count, internship_count = create_companies_and_internships(db)
-        
+
         # Summary
-        print("\n" + "="*60)
+        print("\n" + "=" * 60)
         print("DATABASE POPULATION COMPLETE!")
-        print("="*60)
+        print("=" * 60)
         print(f"\n✓ Admin user: 1")
         print(f"✓ Students: {student_count}")
         print(f"✓ Companies: {company_count}")
         print(f"✓ Internships: {internship_count}")
-        
-        print("\n" + "="*60)
+
+        print("\n" + "=" * 60)
         print("LOGIN CREDENTIALS SUMMARY")
-        print("="*60)
-        
+        print("=" * 60)
+
         print("\n🔐 ADMIN:")
         print("  Email: admin@skillsync.com")
         print("  Password: Admin@123")
-        
+
         print("\n👥 STUDENTS (50):")
         print("  Email: [name]@student.com (e.g., aarav.sharma@student.com)")
         print("  Password: Student@123")
-        
+
         print("\n👥 SPECIAL STUDENTS (3):")
         print("  alex.kumar@email.com / Alex2024")
         print("  priya.sharma@email.com / Priya2024")
         print("  rahul.verma@email.com / Rahul2024")
-        
+
         print("\n🏢 COMPANIES:")
         print("  hr@techcorp.com / TechCorp2024")
         print("  careers@gamestudio.com / GameStudio2024")
         print("  hiring@blockchainlabs.com / BlockLabs2024")
-        
-        print("\n" + "="*60)
+
+        print("\n" + "=" * 60)
         print("Next Steps:")
         print("1. Start backend: uvicorn app.main:app --reload")
         print("2. Start frontend: npm run dev")
         print("3. Login and test the platform!")
-        print("="*60 + "\n")
-        
+        print("=" * 60 + "\n")
+
     except Exception as e:
         print(f"\n✗ Error occurred: {e}")
         import traceback
+
         traceback.print_exc()
         db.rollback()
         return 1
-    
+
     finally:
         db.close()
-    
+
     return 0
+
 
 if __name__ == "__main__":
     sys.exit(main())

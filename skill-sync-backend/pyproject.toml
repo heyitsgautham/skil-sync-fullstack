@@ -44,6 +44,7 @@ dev = [
     "pytest-cov>=5.0",
     "httpx>=0.27",
     "pip-audit>=2.7",
+    "ruff>=0.6",
 ]
 
 [tool.uv]
@@ -71,3 +72,25 @@ branch = true
 [tool.coverage.report]
 show_missing = true
 skip_covered = true
+
+[tool.ruff]
+line-length = 120
+target-version = "py311"
+extend-exclude = ["frontend-integration", "data"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP"]
+ignore = [
+    "E501",  # long lines are left to the formatter
+    "B008",  # FastAPI uses Depends() in argument defaults by design
+    "B904",  # existing handlers re-raise HTTPException without chaining
+    "E711",  # SQLAlchemy filters need `== None`
+    "E712",  # SQLAlchemy filters need `== True`
+]
+
+[tool.ruff.lint.per-file-ignores]
+"scripts/*" = ["E402"]  # scripts add the backend root to sys.path before importing app
+"tests/*" = ["B011"]
+
+[tool.ruff.format]
+quote-style = "preserve"

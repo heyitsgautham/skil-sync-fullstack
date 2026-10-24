@@ -16,26 +16,26 @@ from app.services.rag_engine import rag_engine
 def create_sample_internships():
     """Create sample internship postings"""
     db = SessionLocal()
-    
+
     try:
         # First, check if we have a company user, if not create one
         company_user = db.query(User).filter(User.role == UserRole.company).first()
-        
+
         if not company_user:
             print("No company user found. Creating a sample company user...")
             from app.utils.security import hash_password
-            
+
             company_user = User(
                 email="techcorp@example.com",
                 password_hash=hash_password("password123"),
                 full_name="TechCorp Inc.",
-                role=UserRole.company
+                role=UserRole.company,
             )
             db.add(company_user)
             db.commit()
             db.refresh(company_user)
             print(f"✅ Created company user: {company_user.full_name}")
-        
+
         # Sample internships data
         sample_internships = [
             {
@@ -44,7 +44,7 @@ def create_sample_internships():
                 "required_skills": ["React", "Node.js", "JavaScript", "PostgreSQL", "Git"],
                 "location": "Bangalore, India",
                 "duration": "6 months",
-                "stipend": "₹25,000/month"
+                "stipend": "₹25,000/month",
             },
             {
                 "title": "Data Science Intern",
@@ -52,7 +52,7 @@ def create_sample_internships():
                 "required_skills": ["Python", "Machine Learning", "Pandas", "NumPy", "SQL"],
                 "location": "Mumbai, India",
                 "duration": "4 months",
-                "stipend": "₹30,000/month"
+                "stipend": "₹30,000/month",
             },
             {
                 "title": "Mobile App Development Intern",
@@ -60,7 +60,7 @@ def create_sample_internships():
                 "required_skills": ["Flutter", "Dart", "React Native", "JavaScript", "Mobile UI/UX"],
                 "location": "Hyderabad, India",
                 "duration": "5 months",
-                "stipend": "₹22,000/month"
+                "stipend": "₹22,000/month",
             },
             {
                 "title": "DevOps Engineer Intern",
@@ -68,7 +68,7 @@ def create_sample_internships():
                 "required_skills": ["Docker", "Kubernetes", "AWS", "Linux", "CI/CD"],
                 "location": "Pune, India",
                 "duration": "6 months",
-                "stipend": "₹28,000/month"
+                "stipend": "₹28,000/month",
             },
             {
                 "title": "UI/UX Design Intern",
@@ -76,7 +76,7 @@ def create_sample_internships():
                 "required_skills": ["Figma", "Adobe XD", "UI Design", "UX Research", "Prototyping"],
                 "location": "Delhi, India",
                 "duration": "3 months",
-                "stipend": "₹20,000/month"
+                "stipend": "₹20,000/month",
             },
             {
                 "title": "Backend Developer Intern",
@@ -84,7 +84,7 @@ def create_sample_internships():
                 "required_skills": ["Python", "Django", "REST API", "PostgreSQL", "Redis"],
                 "location": "Bangalore, India",
                 "duration": "6 months",
-                "stipend": "₹26,000/month"
+                "stipend": "₹26,000/month",
             },
             {
                 "title": "Machine Learning Engineer Intern",
@@ -92,7 +92,7 @@ def create_sample_internships():
                 "required_skills": ["TensorFlow", "PyTorch", "Python", "Deep Learning", "NLP"],
                 "location": "Bangalore, India",
                 "duration": "6 months",
-                "stipend": "₹35,000/month"
+                "stipend": "₹35,000/month",
             },
             {
                 "title": "Frontend Developer Intern",
@@ -100,7 +100,7 @@ def create_sample_internships():
                 "required_skills": ["React", "JavaScript", "HTML", "CSS", "TypeScript"],
                 "location": "Chennai, India",
                 "duration": "4 months",
-                "stipend": "₹24,000/month"
+                "stipend": "₹24,000/month",
             },
             {
                 "title": "Cybersecurity Intern",
@@ -108,7 +108,7 @@ def create_sample_internships():
                 "required_skills": ["Network Security", "Python", "Linux", "Penetration Testing", "Security Tools"],
                 "location": "Mumbai, India",
                 "duration": "5 months",
-                "stipend": "₹27,000/month"
+                "stipend": "₹27,000/month",
             },
             {
                 "title": "Business Analyst Intern",
@@ -116,10 +116,10 @@ def create_sample_internships():
                 "required_skills": ["Business Analysis", "SQL", "Excel", "Documentation", "Agile"],
                 "location": "Gurgaon, India",
                 "duration": "4 months",
-                "stipend": "₹21,000/month"
-            }
+                "stipend": "₹21,000/month",
+            },
         ]
-        
+
         # Check if internships already exist
         existing_count = db.query(Internship).count()
         if existing_count > 0:
@@ -128,7 +128,7 @@ def create_sample_internships():
             if response.lower() != 'y':
                 print("Cancelled.")
                 return
-        
+
         # Create internships
         created_count = 0
         for internship_data in sample_internships:
@@ -140,13 +140,13 @@ def create_sample_internships():
                 location=internship_data["location"],
                 duration=internship_data["duration"],
                 stipend=internship_data["stipend"],
-                is_active=1
+                is_active=1,
             )
-            
+
             db.add(internship)
             db.commit()
             db.refresh(internship)
-            
+
             # Store in vector DB
             try:
                 rag_engine.store_internship_embedding(
@@ -157,18 +157,18 @@ def create_sample_internships():
                     metadata={
                         "company_id": company_user.id,
                         "location": internship.location,
-                        "duration": internship.duration
-                    }
+                        "duration": internship.duration,
+                    },
                 )
             except Exception as e:
                 print(f"⚠️  Warning: Could not create embedding for {internship.title}: {e}")
-            
+
             created_count += 1
             print(f"✅ Created: {internship.title}")
-        
+
         print(f"\n🎉 Successfully created {created_count} sample internships!")
         print(f"📊 Total internships in database: {db.query(Internship).count()}")
-        
+
     except Exception as e:
         print(f"  Error creating sample internships: {e}")
         db.rollback()

@@ -20,20 +20,22 @@ from app.models.application import Application
 from app.utils.security import get_password_hash
 import shutil
 
+
 def reset_database():
     """Drop all tables and recreate them"""
     print("🗑️  Dropping all tables...")
     Base.metadata.drop_all(bind=engine)
-    
+
     print("✅ Creating fresh tables...")
     Base.metadata.create_all(bind=engine)
-    
+
     # Clear resume files
     resume_dir = Path(__file__).parent.parent / "app" / "public" / "resumes"
     if resume_dir.exists():
         shutil.rmtree(resume_dir)
     resume_dir.mkdir(parents=True, exist_ok=True)
     print("✅ Cleared resume directory")
+
 
 def create_companies(db: Session):
     """Create 3 companies with different profiles"""
@@ -46,10 +48,18 @@ def create_companies(db: Session):
                 {
                     "title": "Full Stack Software Engineer Intern",
                     "description": "Join our engineering team to build scalable web applications using React, Node.js, and PostgreSQL. Work on real-world projects that impact millions of users.",
-                    "required_skills": ["React", "Node.js", "JavaScript", "TypeScript", "PostgreSQL", "REST API", "Git"],
+                    "required_skills": [
+                        "React",
+                        "Node.js",
+                        "JavaScript",
+                        "TypeScript",
+                        "PostgreSQL",
+                        "REST API",
+                        "Git",
+                    ],
                     "location": "Bangalore, India",
                     "duration": "6 months",
-                    "stipend": "₹40,000/month"
+                    "stipend": "₹40,000/month",
                 },
                 {
                     "title": "Backend Developer Intern",
@@ -57,7 +67,7 @@ def create_companies(db: Session):
                     "required_skills": ["Python", "FastAPI", "Django", "PostgreSQL", "Docker", "AWS", "Redis"],
                     "location": "Bangalore, India",
                     "duration": "6 months",
-                    "stipend": "₹35,000/month"
+                    "stipend": "₹35,000/month",
                 },
                 {
                     "title": "Mobile App Developer Intern",
@@ -65,9 +75,9 @@ def create_companies(db: Session):
                     "required_skills": ["React Native", "JavaScript", "Mobile Development", "Redux", "REST API"],
                     "location": "Remote",
                     "duration": "4 months",
-                    "stipend": "₹30,000/month"
-                }
-            ]
+                    "stipend": "₹30,000/month",
+                },
+            ],
         },
         {
             "email": "careers@gamestudio.com",
@@ -77,28 +87,50 @@ def create_companies(db: Session):
                 {
                     "title": "Game Developer Intern",
                     "description": "Create immersive gaming experiences using Unity and C#. Work on gameplay mechanics, physics, and AI for our upcoming RPG title.",
-                    "required_skills": ["Unity", "C#", "Game Development", "3D Modeling", "Physics Engine", "AI Programming"],
+                    "required_skills": [
+                        "Unity",
+                        "C#",
+                        "Game Development",
+                        "3D Modeling",
+                        "Physics Engine",
+                        "AI Programming",
+                    ],
                     "location": "Hyderabad, India",
                     "duration": "6 months",
-                    "stipend": "₹45,000/month"
+                    "stipend": "₹45,000/month",
                 },
                 {
                     "title": "Graphics Programming Intern",
                     "description": "Optimize rendering pipelines and develop shader programs. Experience with Unreal Engine and graphics programming required.",
-                    "required_skills": ["Unreal Engine", "C++", "HLSL", "OpenGL", "DirectX", "Graphics Programming", "Shaders"],
+                    "required_skills": [
+                        "Unreal Engine",
+                        "C++",
+                        "HLSL",
+                        "OpenGL",
+                        "DirectX",
+                        "Graphics Programming",
+                        "Shaders",
+                    ],
                     "location": "Hyderabad, India",
                     "duration": "6 months",
-                    "stipend": "₹50,000/month"
+                    "stipend": "₹50,000/month",
                 },
                 {
                     "title": "Game Design Intern",
                     "description": "Design game levels, mechanics, and user experiences. Work with artists and programmers to bring creative visions to life.",
-                    "required_skills": ["Game Design", "Unity", "Level Design", "UX Design", "Prototyping", "Playtesting"],
+                    "required_skills": [
+                        "Game Design",
+                        "Unity",
+                        "Level Design",
+                        "UX Design",
+                        "Prototyping",
+                        "Playtesting",
+                    ],
                     "location": "Hyderabad, India",
                     "duration": "4 months",
-                    "stipend": "₹30,000/month"
-                }
-            ]
+                    "stipend": "₹30,000/month",
+                },
+            ],
         },
         {
             "email": "hiring@blockchainlabs.com",
@@ -108,34 +140,58 @@ def create_companies(db: Session):
                 {
                     "title": "Blockchain Developer Intern",
                     "description": "Develop smart contracts and decentralized applications (DApps) using Solidity and Web3.js. Work on cutting-edge blockchain solutions.",
-                    "required_skills": ["Solidity", "Ethereum", "Web3.js", "Smart Contracts", "Blockchain", "JavaScript", "Truffle"],
+                    "required_skills": [
+                        "Solidity",
+                        "Ethereum",
+                        "Web3.js",
+                        "Smart Contracts",
+                        "Blockchain",
+                        "JavaScript",
+                        "Truffle",
+                    ],
                     "location": "Mumbai, India",
                     "duration": "6 months",
-                    "stipend": "₹50,000/month"
+                    "stipend": "₹50,000/month",
                 },
                 {
                     "title": "DeFi Protocol Engineer Intern",
                     "description": "Build decentralized finance protocols and integrate with various blockchain networks. Experience with DeFi ecosystems preferred.",
-                    "required_skills": ["Solidity", "DeFi", "Smart Contracts", "Hardhat", "Ethers.js", "Security Auditing", "Blockchain"],
+                    "required_skills": [
+                        "Solidity",
+                        "DeFi",
+                        "Smart Contracts",
+                        "Hardhat",
+                        "Ethers.js",
+                        "Security Auditing",
+                        "Blockchain",
+                    ],
                     "location": "Mumbai, India",
                     "duration": "6 months",
-                    "stipend": "₹55,000/month"
+                    "stipend": "₹55,000/month",
                 },
                 {
                     "title": "Crypto Backend Developer Intern",
                     "description": "Develop backend services for cryptocurrency exchanges and wallets. Build APIs for blockchain integration and transaction processing.",
-                    "required_skills": ["Python", "Node.js", "Blockchain", "Cryptocurrency", "REST API", "MongoDB", "Redis"],
+                    "required_skills": [
+                        "Python",
+                        "Node.js",
+                        "Blockchain",
+                        "Cryptocurrency",
+                        "REST API",
+                        "MongoDB",
+                        "Redis",
+                    ],
                     "location": "Remote",
                     "duration": "5 months",
-                    "stipend": "₹40,000/month"
-                }
-            ]
-        }
+                    "stipend": "₹40,000/month",
+                },
+            ],
+        },
     ]
-    
+
     companies = []
     print("\n📦 Creating Companies and Internships...")
-    
+
     for company_data in companies_data:
         # Create company user
         company = User(
@@ -143,35 +199,32 @@ def create_companies(db: Session):
             hashed_password=get_password_hash(company_data["password"]),
             full_name=company_data["full_name"],
             role=UserRole.company,
-            is_active=1
+            is_active=1,
         )
         db.add(company)
         db.flush()  # Get the company ID
-        
+
         print(f"\n✅ Created Company: {company.full_name}")
         print(f"   📧 Email: {company.email}")
         print(f"   🔑 Password: {company_data['password']}")
-        
+
         # Create internships for this company
         for internship_data in company_data["internships"]:
-            internship = Internship(
-                company_id=company.id,
-                **internship_data,
-                is_active=1
-            )
+            internship = Internship(company_id=company.id, **internship_data, is_active=1)
             db.add(internship)
             print(f"   📝 Added Role: {internship_data['title']}")
-        
+
         companies.append(company)
-    
+
     db.commit()
     return companies
+
 
 def create_sample_resumes():
     """Create sample resume files for testing"""
     resume_dir = Path(__file__).parent.parent / "app" / "public" / "resumes"
     resume_dir.mkdir(parents=True, exist_ok=True)
-    
+
     resumes = {
         "software_engineer": """
 ALEX KUMAR
@@ -358,22 +411,23 @@ CERTIFICATIONS
 • Certified Solidity Developer
 """,
     }
-    
+
     resume_paths = {}
     for profile, content in resumes.items():
         file_path = resume_dir / f"{profile}_resume.txt"
         with open(file_path, 'w') as f:
             f.write(content)
         resume_paths[profile] = file_path
-    
+
     return resume_paths
+
 
 def create_students(db: Session):
     """Create 3 students with different profiles"""
-    
+
     # First create the resume files
     resume_paths = create_sample_resumes()
-    
+
     students_data = [
         {
             "email": "alex.kumar@email.com",
@@ -381,8 +435,20 @@ def create_students(db: Session):
             "full_name": "Alex Kumar",
             "profile": "Software Engineer",
             "resume_key": "software_engineer",
-            "skills": ["React", "Node.js", "Python", "JavaScript", "TypeScript", "PostgreSQL", 
-                      "MongoDB", "FastAPI", "Docker", "AWS", "REST API", "Git"]
+            "skills": [
+                "React",
+                "Node.js",
+                "Python",
+                "JavaScript",
+                "TypeScript",
+                "PostgreSQL",
+                "MongoDB",
+                "FastAPI",
+                "Docker",
+                "AWS",
+                "REST API",
+                "Git",
+            ],
         },
         {
             "email": "priya.sharma@email.com",
@@ -390,8 +456,18 @@ def create_students(db: Session):
             "full_name": "Priya Sharma",
             "profile": "Game Developer",
             "resume_key": "game_developer",
-            "skills": ["Unity", "C#", "Unreal Engine", "C++", "Game Development", "3D Modeling",
-                      "Blender", "Shader Programming", "AI Programming", "Level Design"]
+            "skills": [
+                "Unity",
+                "C#",
+                "Unreal Engine",
+                "C++",
+                "Game Development",
+                "3D Modeling",
+                "Blender",
+                "Shader Programming",
+                "AI Programming",
+                "Level Design",
+            ],
         },
         {
             "email": "rahul.verma@email.com",
@@ -399,14 +475,25 @@ def create_students(db: Session):
             "full_name": "Rahul Verma",
             "profile": "Blockchain Developer",
             "resume_key": "blockchain_developer",
-            "skills": ["Solidity", "Ethereum", "Web3.js", "Smart Contracts", "Blockchain",
-                      "DeFi", "Hardhat", "Node.js", "Python", "Cryptocurrency", "IPFS"]
-        }
+            "skills": [
+                "Solidity",
+                "Ethereum",
+                "Web3.js",
+                "Smart Contracts",
+                "Blockchain",
+                "DeFi",
+                "Hardhat",
+                "Node.js",
+                "Python",
+                "Cryptocurrency",
+                "IPFS",
+            ],
+        },
     ]
-    
+
     students = []
     print("\n👥 Creating Students and Resumes...")
-    
+
     for student_data in students_data:
         # Create student user
         student = User(
@@ -414,70 +501,71 @@ def create_students(db: Session):
             hashed_password=get_password_hash(student_data["password"]),
             full_name=student_data["full_name"],
             role=UserRole.student,
-            is_active=1
+            is_active=1,
         )
         db.add(student)
         db.flush()  # Get the student ID
-        
+
         print(f"\n✅ Created Student: {student.full_name} ({student_data['profile']})")
         print(f"   📧 Email: {student.email}")
         print(f"   🔑 Password: {student_data['password']}")
-        
+
         # Create resume record
         resume_path = resume_paths[student_data["resume_key"]]
         with open(resume_path, 'r') as f:
             resume_content = f.read()
-        
+
         resume = Resume(
             student_id=student.id,
             file_path=f"resumes/{resume_path.name}",
             file_name=resume_path.name,
             parsed_content=resume_content,
             extracted_skills=student_data["skills"],
-            is_active=1
+            is_active=1,
         )
         db.add(resume)
         print(f"   📄 Added Resume: {resume_path.name}")
         print(f"   🔧 Skills: {', '.join(student_data['skills'][:5])}...")
-        
+
         students.append(student)
-    
+
     db.commit()
     return students
 
+
 def main():
     """Main function to reset and populate database"""
-    print("="*70)
+    print("=" * 70)
     print("🚀 DATABASE RESET AND POPULATION SCRIPT")
-    print("="*70)
-    
+    print("=" * 70)
+
     # Reset database
     reset_database()
-    
+
     # Create database session
     db = SessionLocal()
-    
+
     try:
         # Create companies and internships
         companies = create_companies(db)
-        
+
         # Create students and resumes
         students = create_students(db)
-        
-        print("\n" + "="*70)
+
+        print("\n" + "=" * 70)
         print("✅ DATABASE POPULATED SUCCESSFULLY!")
-        print("="*70)
-        
+        print("=" * 70)
+
         print("\n📊 SUMMARY:")
         print(f"   • Companies: {len(companies)}")
         print(f"   • Internship Roles: {len(companies) * 3}")
         print(f"   • Students: {len(students)}")
         print(f"   • Resumes: {len(students)}")
-        
-        print("\n" + "="*70)
+
+        print("\n" + "=" * 70)
         print("🔑 LOGIN CREDENTIALS")
-        print("="*70)
-        
+        print("=" * 70)
+
         print("\n🏢 COMPANIES:")
         print("-" * 70)
         print("1. TechCorp Solutions")
@@ -491,7 +579,7 @@ def main():
         print("3. Blockchain Labs Inc")
         print("   📧 Email: hiring@blockchainlabs.com")
         print("   🔑 Password: BlockLabs2024")
-        
+
         print("\n👥 STUDENTS:")
         print("-" * 70)
         print("1. Alex Kumar (Software Engineer)")
@@ -505,17 +593,18 @@ def main():
         print("3. Rahul Verma (Blockchain Developer)")
         print("   📧 Email: rahul.verma@email.com")
         print("   🔑 Password: Rahul2024")
-        
-        print("\n" + "="*70)
+
+        print("\n" + "=" * 70)
         print("🎉 You can now login with these credentials!")
-        print("="*70)
-        
+        print("=" * 70)
+
     except Exception as e:
         print(f"\n  Error: {str(e)}")
         db.rollback()
         raise
     finally:
         db.close()
+
 
 if __name__ == "__main__":
     main()

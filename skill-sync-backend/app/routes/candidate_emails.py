@@ -18,6 +18,7 @@ router = APIRouter(prefix="/candidate-emails", tags=["Candidate Emails"])
 
 class CandidateEmailRequest(BaseModel):
     """Request model for sending emails to candidates"""
+
     internship_id: int
     candidate_ids: List[int]
     subject: str
@@ -26,6 +27,7 @@ class CandidateEmailRequest(BaseModel):
 
 class CandidateEmailResponse(BaseModel):
     """Response model for candidate email sending"""
+
     success: bool
     message: str
     emails_sent: int
@@ -35,56 +37,47 @@ class CandidateEmailResponse(BaseModel):
 
 @router.post("/send-to-candidates", response_model=CandidateEmailResponse)
 def send_email_to_candidates(
-    request: CandidateEmailRequest,
-    db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user)
+    request: CandidateEmailRequest, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)
 ):
     """
     Send personalized emails to selected candidates
-    
+
     - **internship_id**: ID of the internship the candidates are for
     - **candidate_ids**: List of student IDs to send emails to
     - **subject**: Email subject line
     - **message**: Email body message
-    
+
     Only companies can use this endpoint.
     """
     # Verify user is a company
     if current_user.role != UserRole.company:
         raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Only companies can send emails to candidates"
+            status_code=status.HTTP_403_FORBIDDEN, detail="Only companies can send emails to candidates"
         )
-    
+
     # Verify internship belongs to this company
-    internship = db.query(Internship).filter(
-        Internship.id == request.internship_id,
-        Internship.company_id == current_user.id
-    ).first()
-    
+    internship = (
+        db.query(Internship)
+        .filter(Internship.id == request.internship_id, Internship.company_id == current_user.id)
+        .first()
+    )
+
     if not internship:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Internship not found or doesn't belong to your company"
+            status_code=status.HTTP_404_NOT_FOUND, detail="Internship not found or doesn't belong to your company"
         )
-    
+
     # Get all candidate details
-    candidates = db.query(User).filter(
-        User.id.in_(request.candidate_ids),
-        User.role == UserRole.student
-    ).all()
-    
+    candidates = db.query(User).filter(User.id.in_(request.candidate_ids), User.role == UserRole.student).all()
+
     if not candidates:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="No valid candidates found"
-        )
-    
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="No valid candidates found")
+
     # Track email sending results
     emails_sent = 0
     failed_emails = 0
     details = []
-    
+
     # Send email to each candidate
     for candidate in candidates:
         try:
@@ -93,70 +86,70 @@ def send_email_to_candidates(
                 candidate_name=candidate.full_name,
                 company_name=current_user.full_name,
                 internship_title=internship.title,
-                message=request.message
+                message=request.message,
             )
-            
+
             # Generate plain text version
             text_content = generate_candidate_selection_email_text(
                 candidate_name=candidate.full_name,
                 company_name=current_user.full_name,
                 internship_title=internship.title,
-                message=request.message
+                message=request.message,
             )
-            
+
             # Send email
             email_sent = email_service.send_email(
-                to_email=candidate.email,
-                subject=request.subject,
-                html_content=html_content,
-                text_content=text_content
+                to_email=candidate.email, subject=request.subject, html_content=html_content, text_content=text_content
             )
-            
+
             if email_sent:
                 emails_sent += 1
-                details.append({
-                    "candidate_id": candidate.id,
-                    "candidate_name": candidate.full_name,
-                    "email": candidate.email,
-                    "status": "sent",
-                    "error": None
-                })
+                details.append(
+                    {
+                        "candidate_id": candidate.id,
+                        "candidate_name": candidate.full_name,
+                        "email": candidate.email,
+                        "status": "sent",
+                        "error": None,
+                    }
+                )
             else:
                 failed_emails += 1
-                details.append({
+                details.append(
+                    {
+                        "candidate_id": candidate.id,
+                        "candidate_name": candidate.full_name,
+                        "email": candidate.email,
+                        "status": "failed",
+                        "error": "Email delivery failed",
+                    }
+                )
+        except Exception as e:
+            failed_emails += 1
+            details.append(
+                {
                     "candidate_id": candidate.id,
                     "candidate_name": candidate.full_name,
                     "email": candidate.email,
-                    "status": "failed",
-                    "error": "Email delivery failed"
-                })
-        except Exception as e:
-            failed_emails += 1
-            details.append({
-                "candidate_id": candidate.id,
-                "candidate_name": candidate.full_name,
-                "email": candidate.email,
-                "status": "error",
-                "error": str(e)
-            })
-    
+                    "status": "error",
+                    "error": str(e),
+                }
+            )
+
     return CandidateEmailResponse(
         success=emails_sent > 0,
         message=f"Successfully sent {emails_sent} email(s) to candidates. {failed_emails} failed.",
         emails_sent=emails_sent,
         failed_emails=failed_emails,
-        details=details
+        details=details,
     )
 
 
 def generate_candidate_selection_email_html(
-    candidate_name: str,
-    company_name: str,
-    internship_title: str,
-    message: str
+    candidate_name: str, company_name: str, internship_title: str, message: str
 ) -> str:
     """Generate HTML email for candidate selection notification"""
-    
+
     html = f"""
     <!DOCTYPE html>
     <html>
@@ -326,18 +319,15 @@ def generate_candidate_selection_email_html(
     </body>
     </html>
     """
-    
+
     return html
 
 
 def generate_candidate_selection_email_text(
-    candidate_name: str,
-    company_name: str,
-    internship_title: str,
-    message: str
+    candidate_name: str, company_name: str, internship_title: str, message: str
 ) -> str:
     """Generate plain text email for candidate selection notification"""
-    
+
     text = f"""
 CONGRATULATIONS - SELECTED FOR NEXT ROUND
 {'=' * 60}
@@ -365,5 +355,5 @@ Best regards,
 {'=' * 60}
 This email was sent via SkillSync. Please do not reply to this email.
 """
-    
+
     return text

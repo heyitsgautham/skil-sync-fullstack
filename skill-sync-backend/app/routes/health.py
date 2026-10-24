@@ -11,11 +11,12 @@ from datetime import datetime
 
 router = APIRouter()
 
+
 @router.get("/healthcheck")
 async def healthcheck(db: Session = Depends(get_db)):
     """
     Health check endpoint to verify API and database connectivity
-    
+
     Returns system status, timestamp, and database connectivity
     """
     try:
@@ -24,11 +25,11 @@ async def healthcheck(db: Session = Depends(get_db)):
         db_status = "connected"
     except Exception as e:
         db_status = f"error: {str(e)}"
-    
+
     return {
         "status": "healthy" if db_status == "connected" else "unhealthy",
         "timestamp": datetime.utcnow().isoformat(),
         "service": "SkillSync API",
         "version": "1.0.0",
-        "database": db_status
+        "database": db_status,
     }

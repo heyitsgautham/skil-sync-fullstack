@@ -17,7 +17,7 @@ from app.models.user import User, UserRole
 def name_to_url_slug(name: str) -> str:
     """
     Convert a student name to a URL-friendly slug.
-    
+
     Examples:
     - "Durga" -> "durga"
     - "Durga Devi" -> "durga-devi"
@@ -39,45 +39,45 @@ def name_to_url_slug(name: str) -> str:
 def populate_social_urls():
     """Populate LinkedIn and GitHub URLs for all students."""
     db: Session = SessionLocal()
-    
+
     try:
         # Get all students (users with role 'student')
         students = db.query(User).filter(User.role == UserRole.student).all()
-        
+
         if not students:
             print("No students found in the database.")
             return
-        
+
         print(f"Found {len(students)} students. Updating social URLs...")
         print("-" * 80)
-        
+
         updated_count = 0
-        
+
         for student in students:
             # Generate URL slug from student name
             url_slug = name_to_url_slug(student.full_name)
-            
+
             # Create LinkedIn and GitHub URLs
             linkedin_url = f"linkedin.com/in/{url_slug}"
             github_url = f"github.com/{url_slug}"
-            
+
             # Update student record
             student.linkedin_url = linkedin_url
             student.github_url = github_url
-            
+
             print(f"Student: {student.full_name}")
             print(f"  LinkedIn: {linkedin_url}")
             print(f"  GitHub: {github_url}")
             print()
-            
+
             updated_count += 1
-        
+
         # Commit all changes
         db.commit()
-        
+
         print("-" * 80)
         print(f"✓ Successfully updated social URLs for {updated_count} students!")
-        
+
     except Exception as e:
         print(f"✗ Error updating social URLs: {e}")
         db.rollback()
@@ -91,9 +91,9 @@ if __name__ == "__main__":
     print("POPULATE SOCIAL URLS FOR STUDENTS")
     print("=" * 80)
     print()
-    
+
     populate_social_urls()
-    
+
     print()
     print("=" * 80)
     print("SCRIPT COMPLETED")

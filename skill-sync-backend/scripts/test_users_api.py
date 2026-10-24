@@ -1,6 +1,7 @@
 """
 Test if the /api/auth/users endpoint returns is_active field
 """
+
 import requests
 import json
 
@@ -12,10 +13,7 @@ print("=" * 80)
 
 # Login as admin
 print("\n1️⃣ Logging in as admin...")
-login_data = {
-    "email": "admin@gmail.com",
-    "password": "Admin2024"
-}
+login_data = {"email": "admin@gmail.com", "password": "Admin2024"}
 
 response = requests.post(f"{BASE_URL}/api/auth/login", json=login_data)
 if response.status_code != 200:
@@ -25,9 +23,7 @@ if response.status_code != 200:
 token = response.json()["access_token"]
 print(f"✅ Logged in successfully")
 
-headers = {
-    "Authorization": f"Bearer {token}"
-}
+headers = {"Authorization": f"Bearer {token}"}
 
 # Get users list
 print("\n2️⃣ Fetching users list...")
@@ -51,7 +47,7 @@ has_is_active_field = False
 for student in students:
     is_active = student.get('is_active')
     status = "✅ ACTIVE" if is_active == 1 else "🚫 INACTIVE"
-    
+
     if is_active is not None:
         has_is_active_field = True
         print(f"  - {student['full_name']}: is_active = {is_active} {status}")

@@ -20,7 +20,7 @@ class EmailService:
     Email service for sending notifications using SMTP
     Supports both Gmail SMTP and other SMTP providers
     """
-    
+
     def __init__(self):
         self.smtp_host = os.getenv("SMTP_HOST", "smtp.gmail.com")
         self.smtp_port = int(os.getenv("SMTP_PORT", "587"))
@@ -28,18 +28,18 @@ class EmailService:
         self.smtp_password = os.getenv("SMTP_PASSWORD", "")
         self.sender_email = os.getenv("SENDER_EMAIL", self.smtp_username)
         self.sender_name = os.getenv("SENDER_NAME", "SkillSync")
-        
+
     def send_email(
-        self, 
-        to_email: str, 
-        subject: str, 
-        html_content: str, 
+        self,
+        to_email: str,
+        subject: str,
+        html_content: str,
         text_content: Optional[str] = None,
-        attachments: Optional[List[Tuple[str, bytes, str]]] = None
+        attachments: Optional[List[Tuple[str, bytes, str]]] = None,
     ) -> bool:
         """
         Send an email using SMTP with optional attachments
-        
+
         Args:
             to_email: Recipient email address
             subject: Email subject
@@ -47,7 +47,7 @@ class EmailService:
             text_content: Plain text fallback content
             attachments: List of tuples (filename, file_content, mime_type)
                         Example: [("report.csv", csv_bytes, "text/csv")]
-            
+
         Returns:
             True if email sent successfully, False otherwise
         """
@@ -57,11 +57,11 @@ class EmailService:
                 message = MIMEMultipart("mixed")
             else:
                 message = MIMEMultipart("alternative")
-                
+
             message["Subject"] = subject
             message["From"] = f"{self.sender_name} <{self.sender_email}>"
             message["To"] = to_email
-            
+
             # Create alternative part for text and HTML
             if attachments:
                 alternative_part = MIMEMultipart("alternative")
@@ -78,56 +78,48 @@ class EmailService:
                     message.attach(text_part)
                 html_part = MIMEText(html_content, "html")
                 message.attach(html_part)
-            
+
             # Add attachments if provided
             if attachments:
                 for filename, file_content, mime_type in attachments:
                     # Create attachment part
                     part = MIMEBase("application", "octet-stream")
                     part.set_payload(file_content)
-                    
+
                     # Encode to base64
                     encoders.encode_base64(part)
-                    
+
                     # Add header with filename
-                    part.add_header(
-                        "Content-Disposition",
-                        f"attachment; filename={filename}"
-                    )
-                    
+                    part.add_header("Content-Disposition", f"attachment; filename={filename}")
+
                     message.attach(part)
-            
+
             # Send email
             with smtplib.SMTP(self.smtp_host, self.smtp_port) as server:
                 server.starttls()
                 if self.smtp_username and self.smtp_password:
                     server.login(self.smtp_username, self.smtp_password)
                 server.send_message(message)
-            
+
             return True
         except Exception as e:
             print(f"Error sending email to {to_email}: {str(e)}")
             return False
-    
-    def generate_daily_summary_html(
-        self,
-        company_name: str,
-        internship_summaries: List[Dict],
-        date: datetime
-    ) -> str:
+
+    def generate_daily_summary_html(self, company_name: str, internship_summaries: List[Dict], date: datetime) -> str:
         """
         Generate HTML content for daily applicant summary email
-        
+
         Args:
             company_name: Name of the company
             internship_summaries: List of internship summaries with applicants
             date: Date for the summary
-            
+
         Returns:
             HTML string for the email
         """
         total_applications = sum(len(summary['applicants']) for summary in internship_summaries)
-        
+
         html = f"""
         <!DOCTYPE html>
         <html>
@@ -293,7 +285,7 @@ class EmailService:
                     <p><strong>{total_applications}</strong> new application(s) across <strong>{len(internship_summaries)}</strong> internship posting(s)</p>
                 </div>
         """
-        
+
         if total_applications == 0:
             html += """
                 <div class="no-applicants">
@@ -304,7 +296,7 @@ class EmailService:
             for summary in internship_summaries:
                 internship_title = summary['internship_title']
                 applicants = summary['applicants']
-                
+
                 html += f"""
                 <div class="internship-section">
                     <h3>{internship_title}</h3>
@@ -312,18 +304,18 @@ class EmailService:
                         {len(applicants)} new application(s)
                     </div>
                 """
-                
+
                 for applicant in applicants:
                     match_score = applicant.get('match_score', 0)
                     match_class = 'low' if match_score < 60 else ('medium' if match_score < 80 else '')
-                    
+
                     skills_html = ""
                     if applicant.get('top_skills'):
                         skills_html = '<div class="skills">'
                         for skill in applicant['top_skills'][:5]:  # Show top 5 skills
                             skills_html += f'<span class="skill-tag">{skill}</span>'
                         skills_html += '</div>'
-                    
+
                     html += f"""
                     <div class="applicant-card">
                         <div class="applicant-header">
@@ -333,30 +325,30 @@ class EmailService:
                         <div class="applicant-details">
                             <div><strong>Email:</strong> {applicant['email']}</div>
                     """
-                    
+
                     if applicant.get('phone'):
                         html += f"""<div><strong>Phone:</strong> {applicant['phone']}</div>"""
-                    
+
                     if applicant.get('experience_years') is not None:
                         html += f"""<div><strong>Experience:</strong> {applicant['experience_years']} years</div>"""
-                    
+
                     html += f"""
                             <div><strong>Applied:</strong> {applicant['applied_at']}</div>
                     """
-                    
+
                     if applicant.get('key_strengths'):
                         html += f"""<div><strong>Key Strengths:</strong> {applicant['key_strengths']}</div>"""
-                    
+
                     html += skills_html
                     html += """
                         </div>
                     </div>
                     """
-                
+
                 html += """
                 </div>
                 """
-        
+
         html += f"""
                 <div style="text-align: center; margin-top: 30px;">
                     <a href="{os.getenv('FRONTEND_URL', 'http://localhost:3000')}/company/dashboard" class="cta-button">
@@ -373,28 +365,23 @@ class EmailService:
         </body>
         </html>
         """
-        
+
         return html
-    
-    def generate_daily_summary_text(
-        self,
-        company_name: str,
-        internship_summaries: List[Dict],
-        date: datetime
-    ) -> str:
+
+    def generate_daily_summary_text(self, company_name: str, internship_summaries: List[Dict], date: datetime) -> str:
         """
         Generate plain text content for daily applicant summary email
-        
+
         Args:
             company_name: Name of the company
             internship_summaries: List of internship summaries with applicants
             date: Date for the summary
-            
+
         Returns:
             Plain text string for the email
         """
         total_applications = sum(len(summary['applicants']) for summary in internship_summaries)
-        
+
         text = f"""
 SKILLSYNC - DAILY APPLICANT SUMMARY
 {date.strftime("%A, %B %d, %Y")}
@@ -407,39 +394,39 @@ Here's your daily summary of new internship applications.
 {total_applications} new application(s) across {len(internship_summaries)} internship posting(s)
 
 """
-        
+
         if total_applications == 0:
             text += "No new applications received in the last 24 hours.\n"
         else:
             for summary in internship_summaries:
                 internship_title = summary['internship_title']
                 applicants = summary['applicants']
-                
+
                 text += f"\n{'-' * 60}\n"
                 text += f"INTERNSHIP: {internship_title}\n"
                 text += f"{len(applicants)} new application(s)\n"
                 text += f"{'-' * 60}\n\n"
-                
+
                 for i, applicant in enumerate(applicants, 1):
                     text += f"{i}. {applicant['name']} - {applicant.get('match_score', 0)}% Match\n"
                     text += f"   Email: {applicant['email']}\n"
-                    
+
                     if applicant.get('phone'):
                         text += f"   Phone: {applicant['phone']}\n"
-                    
+
                     if applicant.get('experience_years') is not None:
                         text += f"   Experience: {applicant['experience_years']} years\n"
-                    
+
                     text += f"   Applied: {applicant['applied_at']}\n"
-                    
+
                     if applicant.get('top_skills'):
                         text += f"   Top Skills: {', '.join(applicant['top_skills'][:5])}\n"
-                    
+
                     if applicant.get('key_strengths'):
                         text += f"   Key Strengths: {applicant['key_strengths']}\n"
-                    
+
                     text += "\n"
-        
+
         text += f"""
 {'=' * 60}
 
@@ -451,7 +438,7 @@ You're receiving this because you have active internship postings.
 
 Manage Email Preferences | Unsubscribe
 """
-        
+
         return text
 
 

@@ -22,25 +22,25 @@ class InternshipDocumentParser:
     Service for parsing internship job description documents
     Supports PDF, DOCX, DOC, and TXT formats
     """
-    
+
     def __init__(self):
         """Initialize Gemini AI key manager for intelligent extraction"""
         self.key_manager = get_gemini_key_manager()
         logger.info("✅ InternshipDocumentParser initialized with GeminiKeyManager")
-    
+
     @staticmethod
     def extract_text_from_file(file_path: str) -> str:
         """
         Extract text from document file (PDF, DOCX, or TXT)
-        
+
         Args:
             file_path: Path to the document file
-            
+
         Returns:
             Extracted text content
         """
         file_extension = os.path.splitext(file_path)[1].lower()
-        
+
         try:
             if file_extension == '.pdf':
                 return InternshipDocumentParser._extract_from_pdf(file_path)
@@ -53,7 +53,7 @@ class InternshipDocumentParser:
         except Exception as e:
             logger.error(f"  Error extracting text from {file_extension}: {e}")
             raise Exception(f"Failed to extract text from document: {str(e)}")
-    
+
     @staticmethod
     def _extract_from_pdf(file_path: str) -> str:
         """Extract text from PDF using PyMuPDF"""
@@ -65,7 +65,7 @@ class InternshipDocumentParser:
             return text.strip()
         except Exception as e:
             raise Exception(f"Error reading PDF: {str(e)}")
-    
+
     @staticmethod
     def _extract_from_docx(file_path: str) -> str:
         """Extract text from DOCX file"""
@@ -75,7 +75,7 @@ class InternshipDocumentParser:
             return text.strip()
         except Exception as e:
             raise Exception(f"Error reading DOCX: {str(e)}")
-    
+
     @staticmethod
     def _extract_from_txt(file_path: str) -> str:
         """Extract text from TXT file"""
@@ -85,14 +85,14 @@ class InternshipDocumentParser:
             return text.strip()
         except Exception as e:
             raise Exception(f"Error reading TXT: {str(e)}")
-    
+
     def extract_internship_details(self, document_text: str) -> Dict:
         """
         Extract structured internship information from document text using Gemini AI
-        
+
         Args:
             document_text: Raw text extracted from document
-            
+
         Returns:
             Dictionary with internship details:
             - title: Job title/position
@@ -158,10 +158,10 @@ Document Text:
 
 Return ONLY the JSON object, no markdown, no explanation.
 """
-        
+
         try:
             logger.info("📤 Extracting internship details using Gemini AI...")
-            
+
             # Use key manager with retry logic
             # Increased token limit to handle longer descriptions
             result_text = self.key_manager.generate_content(
@@ -170,25 +170,27 @@ Return ONLY the JSON object, no markdown, no explanation.
                 purpose="internship_parsing",
                 temperature=0.1,
                 max_output_tokens=12000,  # Increased from 8000 to allow fuller descriptions
-                max_retries=3
+                max_retries=3,
             )
-            
+
             # Clean up markdown code blocks if present
             result_text = re.sub(r'^```json\s*', '', result_text)
             result_text = re.sub(r'^```\s*', '', result_text)
             result_text = re.sub(r'\s*```$', '', result_text)
             result_text = result_text.strip()
-            
+
             logger.info(f"📝 AI Response: {result_text[:300]}...")
-            
+
             structured_data = json.loads(result_text)
-            
+
             # Validate and set defaults
             structured_data = self._validate_and_normalize(structured_data, document_text)
-            
-            logger.info(f"✅ Extracted internship: '{structured_data.get('title')}' with {len(structured_data.get('required_skills', []))} required and {len(structured_data.get('preferred_skills', []))} preferred skills")
+
+            logger.info(
+                f"✅ Extracted internship: '{structured_data.get('title')}' with {len(structured_data.get('required_skills', []))} required and {len(structured_data.get('preferred_skills', []))} preferred skills"
+            )
             return structured_data
-            
+
         except json.JSONDecodeError as e:
             logger.error(f"  JSON parsing error: {e}")
             logger.error(f"Response text: {result_text if 'result_text' in locals() else 'N/A'}")
@@ -197,17 +199,18 @@ Return ONLY the JSON object, no markdown, no explanation.
         except Exception as e:
             logger.error(f"  Error in internship extraction: {e}")
             import traceback
+
             logger.error(f"Traceback: {traceback.format_exc()}")
             return self._create_fallback_structure(document_text)
-    
+
     def _validate_and_normalize(self, data: Dict, original_text: str) -> Dict:
         """
         Validate and normalize extracted data
-        
+
         Args:
             data: Extracted structured data
             original_text: Original document text
-            
+
         Returns:
             Validated and normalized data
         """
@@ -224,74 +227,84 @@ Return ONLY the JSON object, no markdown, no explanation.
                         title = line
                         break
             data['title'] = title
-        
+
         # Ensure description is present and substantial (use original text if not extracted properly)
         if not data.get('description') or len(str(data.get('description', '')).strip()) < 100:
             # Use more of the original text if description is too short
             data['description'] = original_text[:5000]  # Increased from 2000 to 5000 chars
             logger.warning(f"⚠️ Description was too short or missing, using first 5000 chars from document")
-        
+
         # Ensure skills are lists
         if not isinstance(data.get('required_skills'), list):
             data['required_skills'] = []
         if not isinstance(data.get('preferred_skills'), list):
             data['preferred_skills'] = []
-        
+
         # Remove duplicates from skills (case-insensitive)
         required_lower = {s.lower(): s for s in data['required_skills']}
         data['required_skills'] = list(required_lower.values())
-        
+
         # Remove preferred skills that are already in required
-        data['preferred_skills'] = [
-            s for s in data['preferred_skills'] 
-            if s.lower() not in required_lower
-        ]
-        
+        data['preferred_skills'] = [s for s in data['preferred_skills'] if s.lower() not in required_lower]
+
         # Limit skills: max 7 required, max 7 preferred, max 15 total
         original_required_count = len(data['required_skills'])
         original_preferred_count = len(data['preferred_skills'])
-        
+
         # Limit required skills to 7
         if len(data['required_skills']) > 7:
             logger.warning(f"⚠️ Required skills ({len(data['required_skills'])}) exceeds limit of 7. Trimming to top 7.")
             data['required_skills'] = data['required_skills'][:7]
-        
+
         # Limit preferred skills to 7
         if len(data['preferred_skills']) > 7:
-            logger.warning(f"⚠️ Preferred skills ({len(data['preferred_skills'])}) exceeds limit of 7. Trimming to top 7.")
+            logger.warning(
+                f"⚠️ Preferred skills ({len(data['preferred_skills'])}) exceeds limit of 7. Trimming to top 7."
+            )
             data['preferred_skills'] = data['preferred_skills'][:7]
-        
+
         # Ensure total skills don't exceed 15
         total_skills = len(data['required_skills']) + len(data['preferred_skills'])
         if total_skills > 15:
             # Prioritize required skills, trim preferred if needed
             available_for_preferred = 15 - len(data['required_skills'])
             if available_for_preferred < len(data['preferred_skills']):
-                logger.warning(f"⚠️ Total skills ({total_skills}) exceeds limit of 15. Trimming preferred skills to {available_for_preferred}.")
+                logger.warning(
+                    f"⚠️ Total skills ({total_skills}) exceeds limit of 15. Trimming preferred skills to {available_for_preferred}."
+                )
                 data['preferred_skills'] = data['preferred_skills'][:available_for_preferred]
-        
+
         # Log if we had to trim
         final_required_count = len(data['required_skills'])
         final_preferred_count = len(data['preferred_skills'])
         if original_required_count != final_required_count or original_preferred_count != final_preferred_count:
-            logger.info(f"📊 Skills adjusted: Required {original_required_count}→{final_required_count}, Preferred {original_preferred_count}→{final_preferred_count}, Total: {final_required_count + final_preferred_count}/15")
-        
+            logger.info(
+                f"📊 Skills adjusted: Required {original_required_count}→{final_required_count}, Preferred {original_preferred_count}→{final_preferred_count}, Total: {final_required_count + final_preferred_count}/15"
+            )
+
         # Normalize experience values
         data['min_experience'] = float(data.get('min_experience', 0) or 0)
         data['max_experience'] = float(data.get('max_experience', 5) or 5)
-        
+
         # Ensure max >= min
         if data['max_experience'] < data['min_experience']:
             data['max_experience'] = data['min_experience'] + 2
-        
+
         # Clean up null vs None
-        for key in ['location', 'duration', 'stipend', 'required_education', 
-                    'start_date', 'application_deadline', 'company_info']:
+        for key in [
+            'location',
+            'duration',
+            'stipend',
+            'required_education',
+            'start_date',
+            'application_deadline',
+            'company_info',
+        ]:
             if data.get(key) == 'null' or data.get(key) == '':
                 data[key] = None
-        
+
         return data
-    
+
     def _create_fallback_structure(self, document_text: str) -> Dict:
         """
         Create a fallback structure when AI parsing fails
@@ -306,16 +319,18 @@ Return ONLY the JSON object, no markdown, no explanation.
                 if any(keyword in line.lower() for keyword in ['intern', 'position', 'role']):
                     title = line
                     break
-        
+
         # Try basic skill extraction
         basic_skills = self._extract_skills_basic(document_text)
-        
+
         # Respect skill limits: max 7 required, max 7 preferred, max 15 total
         required_skills = basic_skills[:7]  # Max 7 required
         preferred_skills = basic_skills[7:15]  # Max 7 preferred (total won't exceed 15)
-        
-        logger.warning(f"⚠️ Using fallback structure - AI parsing failed. Extracted {len(required_skills)} required and {len(preferred_skills)} preferred skills using basic method")
-        
+
+        logger.warning(
+            f"⚠️ Using fallback structure - AI parsing failed. Extracted {len(required_skills)} required and {len(preferred_skills)} preferred skills using basic method"
+        )
+
         return {
             "title": title,
             "description": document_text[:2000],  # Use first 2000 chars
@@ -330,63 +345,95 @@ Return ONLY the JSON object, no markdown, no explanation.
             "start_date": None,
             "application_deadline": None,
             "company_info": None,
-            "parsing_status": "fallback"
+            "parsing_status": "fallback",
         }
-    
+
     def _extract_skills_basic(self, text: str) -> List[str]:
         """
         Basic skill extraction using keyword matching (fallback method)
         """
         skill_patterns = {
-            'Python', 'Java', 'JavaScript', 'TypeScript', 'C++', 'C#', 'Go', 'Rust',
-            'React', 'Angular', 'Vue.js', 'Node.js', 'Django', 'Flask', 'Spring',
-            'SQL', 'MongoDB', 'PostgreSQL', 'MySQL', 'Redis',
-            'AWS', 'Azure', 'GCP', 'Docker', 'Kubernetes',
-            'Git', 'CI/CD', 'REST API', 'GraphQL', 'Microservices',
-            'Machine Learning', 'Deep Learning', 'NLP', 'AI',
-            'HTML', 'CSS', 'Tailwind', 'Bootstrap'
+            'Python',
+            'Java',
+            'JavaScript',
+            'TypeScript',
+            'C++',
+            'C#',
+            'Go',
+            'Rust',
+            'React',
+            'Angular',
+            'Vue.js',
+            'Node.js',
+            'Django',
+            'Flask',
+            'Spring',
+            'SQL',
+            'MongoDB',
+            'PostgreSQL',
+            'MySQL',
+            'Redis',
+            'AWS',
+            'Azure',
+            'GCP',
+            'Docker',
+            'Kubernetes',
+            'Git',
+            'CI/CD',
+            'REST API',
+            'GraphQL',
+            'Microservices',
+            'Machine Learning',
+            'Deep Learning',
+            'NLP',
+            'AI',
+            'HTML',
+            'CSS',
+            'Tailwind',
+            'Bootstrap',
         }
-        
+
         text_lower = text.lower()
         found_skills = []
-        
+
         for skill in skill_patterns:
             if skill.lower() in text_lower:
                 found_skills.append(skill)
-        
+
         return found_skills[:20]  # Limit to 20 skills
-    
+
     def parse_from_file(self, file_path: str) -> Dict:
         """
         Complete parsing pipeline: extract text + parse internship details
-        
+
         Args:
             file_path: Path to the internship document file
-            
+
         Returns:
             Dictionary with complete internship details
         """
         logger.info(f"📄 Starting document parsing for: {file_path}")
-        
+
         # Step 1: Extract text from file
         document_text = self.extract_text_from_file(file_path)
         logger.info(f"✅ Extracted {len(document_text)} characters from document")
-        
+
         if len(document_text) < 50:
             raise ValueError("Document is too short or empty. Please provide a valid job description.")
-        
+
         # Step 2: Extract structured internship details
         internship_details = self.extract_internship_details(document_text)
-        
+
         # Add the original text for reference
         internship_details['original_document_text'] = document_text
-        
+
         logger.info(f"🎉 Document parsing complete!")
         return internship_details
 
 
 # Singleton instance
 _internship_document_parser = None
+
 
 def get_internship_document_parser() -> InternshipDocumentParser:
     """Get singleton instance of InternshipDocumentParser"""
