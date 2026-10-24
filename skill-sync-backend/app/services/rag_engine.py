@@ -5,6 +5,7 @@ Handles embeddings, vector storage, and similarity matching
 
 import os
 import logging
+import threading
 from typing import List, Dict, Optional, Tuple
 import chromadb
 from chromadb.config import Settings
@@ -437,5 +438,35 @@ class RAGEngine:
             return 0
 
 
-# Global RAG engine instance
-rag_engine = RAGEngine()
+class LazyRAGEngine:
+    """
+    Builds the shared RAGEngine on first attribute access.
+
+    RAGEngine loads a SentenceTransformer model and opens ChromaDB, which takes
+    seconds and may hit the network. Deferring it keeps imports of app.main,
+    the scripts and the test suite fast, and makes sure the model loads once.
+    """
+
+    def __init__(self, factory=RAGEngine):
+        self._factory = factory
+        self._engine = None
+        self._lock = threading.Lock()
+
+    def get(self) -> RAGEngine:
+        """Return the shared engine, building it the first time."""
+        if self._engine is None:
+            with self._lock:
+                if self._engine is None:
+                    self._engine = self._factory()
+        return self._engine
+
+    @property
+    def is_initialized(self) -> bool:
+        return self._engine is not None
+
+    def __getattr__(self, name):
+        return getattr(self.get(), name)
+
+
+# Global RAG engine instance, built lazily on first use
+rag_engine = LazyRAGEngine()

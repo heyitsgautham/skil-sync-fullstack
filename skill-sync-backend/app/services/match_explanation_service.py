@@ -53,7 +53,7 @@ class MatchExplanationService:
             from app.models.internship import Internship
             from app.models.resume import Resume
             from app.models.explainability import CandidateExplanation
-            from app.services.rag_engine import RAGEngine
+            from app.services.rag_engine import rag_engine
             
             # Fetch candidate, resume, and internship data
             candidate = db_session.query(User).filter(User.id == candidate_id).first()
@@ -90,9 +90,6 @@ class MatchExplanationService:
             required_education = internship.education_level or 'Bachelor'
             skill_weights = internship.skill_weights or []
             rubric_weights = internship.rubric_weights or {}
-            
-            # Initialize RAG engine for semantic score
-            rag_engine = RAGEngine()
             
             # Get embeddings
             resume_embedding = None
