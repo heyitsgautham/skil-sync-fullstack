@@ -10,7 +10,7 @@ dependencies = [
     "uvicorn[standard]>=0.30",
     "python-multipart>=0.0.9",
     # Database
-    "sqlalchemy==1.4.53",
+    "sqlalchemy==2.1.6",
     "psycopg2-binary>=2.9",
     "alembic>=1.13",
     # Authentication and security
