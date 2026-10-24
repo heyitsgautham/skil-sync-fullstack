@@ -43,3 +43,40 @@ def client(db_session):
     with TestClient(app) as test_client:
         yield test_client
     app.dependency_overrides.clear()
+
+
+@pytest.fixture
+def make_user(db_session):
+    """Create and persist a user with the given role."""
+    from app.models.user import User, UserRole
+    from app.utils.security import get_password_hash
+
+    counter = {"n": 0}
+
+    def _make_user(role=UserRole.student, password="password123", **fields):
+        counter["n"] += 1
+        user = User(
+            email=fields.pop("email", f"{role.value}{counter['n']}@example.com"),
+            full_name=fields.pop("full_name", f"Test {role.value.title()} {counter['n']}"),
+            hashed_password=get_password_hash(password),
+            role=role,
+            **fields,
+        )
+        db_session.add(user)
+        db_session.commit()
+        db_session.refresh(user)
+        return user
+
+    return _make_user
+
+
+@pytest.fixture
+def auth_headers():
+    """Build an Authorization header carrying a valid JWT for a user."""
+    from app.utils.security import create_access_token
+
+    def _auth_headers(user):
+        token = create_access_token({"sub": user.email, "role": user.role.value})
+        return {"Authorization": f"Bearer {token}"}
+
+    return _auth_headers
