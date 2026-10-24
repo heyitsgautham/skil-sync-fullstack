@@ -34,8 +34,8 @@ class TestAdminUserManagement:
     @pytest.fixture
     def test_user_id(self, admin_token):
         """Create a test user and return their ID"""
-        # Register a test student
-        response = client.post(
+        # Register a test student; it may already exist from an earlier run
+        client.post(
             "/auth/register",
             json={
                 "email": TEST_STUDENT_EMAIL,
@@ -154,8 +154,8 @@ class TestAdminUserManagement:
 
     def test_non_admin_cannot_update_users(self):
         """Test that non-admin users cannot update other users"""
-        # First, create a student user
-        student_response = client.post(
+        # First, create a student user; it may already exist from an earlier run
+        client.post(
             "/auth/register",
             json={
                 "email": "student.nonadmin@example.com",

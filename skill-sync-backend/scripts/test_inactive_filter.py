@@ -46,7 +46,7 @@ matches_without_filter = (
 )
 
 inactive_ids_in_results = set()
-for match, user in matches_without_filter:
+for _match, user in matches_without_filter:
     if user.is_active == 0:
         inactive_ids_in_results.add(user.id)
         print(f"  🐛 BUG: Inactive student ID {user.id} ({user.full_name}) found in results!")
@@ -69,7 +69,7 @@ matches_with_filter = (
 )
 
 inactive_ids_in_filtered = set()
-for match, user in matches_with_filter:
+for _match, user in matches_with_filter:
     if user.is_active == 0:
         inactive_ids_in_filtered.add(user.id)
         print(f"  🐛 BUG: Inactive student ID {user.id} ({user.full_name}) STILL found!")

@@ -57,7 +57,7 @@ def inspect_sqlite():
     print("\n🔢 Embeddings count per collection:")
     try:
         cursor.execute("""
-            SELECT c.name, COUNT(e.id) 
+            SELECT c.name, COUNT(e.id)
             FROM collections c
             LEFT JOIN embeddings e ON c.id = e.collection_id
             GROUP BY c.id, c.name

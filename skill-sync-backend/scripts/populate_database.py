@@ -367,7 +367,7 @@ def main():
 
     try:
         # 1. Create admin user
-        admin = create_admin_user(db)
+        create_admin_user(db)
 
         # 2. Create 50 students with resumes
         student_count = create_50_students(db)

@@ -147,7 +147,7 @@ class MatchingEngine:
         return similarity
 
     def _calculate_skills_match(
-        self, candidate_skills: list[str], required_skills: list[str], preferred_skills: list[str] = []
+        self, candidate_skills: list[str], required_skills: list[str], preferred_skills: list[str] | None = None
     ) -> float:
         """
         Calculate skills match score
@@ -161,7 +161,7 @@ class MatchingEngine:
         # Normalize skills for comparison (lowercase, trim)
         candidate_skills_normalized = [s.lower().strip() for s in candidate_skills]
         required_skills_normalized = [s.lower().strip() for s in required_skills]
-        preferred_skills_normalized = [s.lower().strip() for s in preferred_skills]
+        preferred_skills_normalized = [s.lower().strip() for s in preferred_skills or []]
 
         # Count matched required skills
         matched_required = sum(

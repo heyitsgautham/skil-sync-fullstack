@@ -32,8 +32,8 @@ def add_indexes():
         # Check if indexes already exist
         result = db.execute(
             text("""
-            SELECT indexname FROM pg_indexes 
-            WHERE tablename = 'users' 
+            SELECT indexname FROM pg_indexes
+            WHERE tablename = 'users'
             AND indexname IN ('idx_users_phone', 'idx_users_linkedin_url', 'idx_users_github_url')
         """)
         )
@@ -46,7 +46,7 @@ def add_indexes():
             logger.info("Creating index on users.phone...")
             db.execute(
                 text("""
-                CREATE INDEX idx_users_phone ON users(phone) 
+                CREATE INDEX idx_users_phone ON users(phone)
                 WHERE phone IS NOT NULL AND role = 'student'
             """)
             )
@@ -59,7 +59,7 @@ def add_indexes():
             logger.info("Creating index on users.linkedin_url...")
             db.execute(
                 text("""
-                CREATE INDEX idx_users_linkedin_url ON users(linkedin_url) 
+                CREATE INDEX idx_users_linkedin_url ON users(linkedin_url)
                 WHERE linkedin_url IS NOT NULL AND role = 'student'
             """)
             )
@@ -72,7 +72,7 @@ def add_indexes():
             logger.info("Creating index on users.github_url...")
             db.execute(
                 text("""
-                CREATE INDEX idx_users_github_url ON users(github_url) 
+                CREATE INDEX idx_users_github_url ON users(github_url)
                 WHERE github_url IS NOT NULL AND role = 'student'
             """)
             )

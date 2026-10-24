@@ -22,10 +22,10 @@ def migrate():
 
         # Check if column already exists (PostgreSQL)
         check_query = text("""
-            SELECT COUNT(*) 
-            FROM information_schema.columns 
-            WHERE table_schema = 'public' 
-            AND table_name = 'users' 
+            SELECT COUNT(*)
+            FROM information_schema.columns
+            WHERE table_schema = 'public'
+            AND table_name = 'users'
             AND column_name = 'mailing_email'
         """)
 
@@ -39,7 +39,7 @@ def migrate():
         # Add mailing_email column (PostgreSQL syntax)
         print("📝 Adding mailing_email column...")
         add_column_query = text("""
-            ALTER TABLE users 
+            ALTER TABLE users
             ADD COLUMN mailing_email VARCHAR(255) NULL
         """)
         db.execute(add_column_query)
@@ -47,8 +47,8 @@ def migrate():
         # Set default value for existing company accounts (use their current email)
         print("📧 Setting default mailing_email for existing companies...")
         update_query = text("""
-            UPDATE users 
-            SET mailing_email = email 
+            UPDATE users
+            SET mailing_email = email
             WHERE role = 'company' AND mailing_email IS NULL
         """)
         db.execute(update_query)

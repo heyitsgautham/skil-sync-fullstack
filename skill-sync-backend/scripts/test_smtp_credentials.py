@@ -90,11 +90,11 @@ def test_smtp_credentials():
             <div class="success">
                 ✅ Your SMTP credentials are working correctly!
             </div>
-            
+
             <p>Hello from SkillSync!</p>
-            
+
             <p>This is a test email to verify that your SMTP configuration is working properly.</p>
-            
+
             <div class="info">
                 <strong>📧 Email Configuration Details:</strong><br>
                 SMTP Host: """
@@ -109,7 +109,7 @@ def test_smtp_credentials():
         + email_service.sender_email
         + """&gt;
             </div>
-            
+
             <p><strong>What this means:</strong></p>
             <ul>
                 <li>✅ SMTP server connection successful</li>
@@ -117,11 +117,11 @@ def test_smtp_credentials():
                 <li>✅ Email delivery functional</li>
                 <li>✅ Feature 4: Clustered Email Notifications is ready!</li>
             </ul>
-            
+
             <p>You can now use the daily summary email feature to send professional notifications to companies.</p>
-            
+
             <hr style="margin: 30px 0; border: none; border-top: 1px solid #ddd;">
-            
+
             <p style="font-size: 12px; color: #666; text-align: center;">
                 This is an automated test email from SkillSync<br>
                 Feature 4: Clustered Email Notifications Implementation<br>
@@ -136,24 +136,24 @@ def test_smtp_credentials():
     text_content = f"""
     SKILLSYNC - SMTP TEST SUCCESSFUL!
     ==================================
-    
+
     Hello from SkillSync!
-    
+
     This is a test email to verify that your SMTP configuration is working properly.
-    
+
     Email Configuration Details:
     - SMTP Host: {email_service.smtp_host}
     - SMTP Port: {email_service.smtp_port}
     - Sender: {email_service.sender_name} <{email_service.sender_email}>
-    
+
     What this means:
     ✓ SMTP server connection successful
     ✓ Authentication working
     ✓ Email delivery functional
     ✓ Feature 4: Clustered Email Notifications is ready!
-    
+
     You can now use the daily summary email feature to send professional notifications to companies.
-    
+
     ---
     This is an automated test email from SkillSync
     Feature 4: Clustered Email Notifications Implementation

@@ -35,9 +35,9 @@ def migrate():
         print("Checking existing columns...")
         result = db.execute(
             text("""
-            SELECT column_name 
-            FROM information_schema.columns 
-            WHERE table_name = 'users' 
+            SELECT column_name
+            FROM information_schema.columns
+            WHERE table_name = 'users'
             AND column_name IN ('phone', 'phone_visible', 'linkedin_url', 'github_url', 'hr_contact_name')
         """)
         )
@@ -51,7 +51,7 @@ def migrate():
             print("Adding 'phone' column...")
             db.execute(
                 text("""
-                ALTER TABLE users 
+                ALTER TABLE users
                 ADD COLUMN phone VARCHAR(50)
             """)
             )
@@ -65,7 +65,7 @@ def migrate():
             print("Adding 'phone_visible' column...")
             db.execute(
                 text("""
-                ALTER TABLE users 
+                ALTER TABLE users
                 ADD COLUMN phone_visible BOOLEAN DEFAULT TRUE
             """)
             )
@@ -79,7 +79,7 @@ def migrate():
             print("Adding 'linkedin_url' column...")
             db.execute(
                 text("""
-                ALTER TABLE users 
+                ALTER TABLE users
                 ADD COLUMN linkedin_url VARCHAR(500)
             """)
             )
@@ -93,7 +93,7 @@ def migrate():
             print("Adding 'github_url' column...")
             db.execute(
                 text("""
-                ALTER TABLE users 
+                ALTER TABLE users
                 ADD COLUMN github_url VARCHAR(500)
             """)
             )
@@ -107,7 +107,7 @@ def migrate():
             print("Adding 'hr_contact_name' column...")
             db.execute(
                 text("""
-                ALTER TABLE users 
+                ALTER TABLE users
                 ADD COLUMN hr_contact_name VARCHAR(255)
             """)
             )
@@ -122,16 +122,16 @@ def migrate():
             # Students: phone visible by default
             db.execute(
                 text("""
-                UPDATE users 
-                SET phone_visible = TRUE 
+                UPDATE users
+                SET phone_visible = TRUE
                 WHERE role = 'student'
             """)
             )
             # Companies: phone not visible by default (privacy)
             db.execute(
                 text("""
-                UPDATE users 
-                SET phone_visible = FALSE 
+                UPDATE users
+                SET phone_visible = FALSE
                 WHERE role = 'company'
             """)
             )

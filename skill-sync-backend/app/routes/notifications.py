@@ -10,7 +10,7 @@ from sqlalchemy import and_
 from sqlalchemy.orm import Session
 
 from app.database.connection import get_db
-from app.models import Application, Internship, Resume, User, UserRole
+from app.models import Application, Internship, User, UserRole
 from app.services.email_service import email_service
 from app.utils.security import get_current_user
 
@@ -92,9 +92,6 @@ def send_daily_summary(
         for app in internship_apps:
             # Get student details
             student = db.query(User).filter(User.id == app.student_id).first()
-
-            # Get resume details
-            resume = db.query(Resume).filter(Resume.id == app.resume_id).first()
 
             if not student:
                 continue

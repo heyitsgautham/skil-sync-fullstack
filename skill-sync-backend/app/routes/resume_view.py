@@ -35,7 +35,7 @@ def get_optional_user(token: str | None = Query(None), db: Session = Depends(get
         from app.utils.security import get_current_user_direct
 
         return get_current_user_direct(db)
-    except:
+    except Exception:
         raise HTTPException(status_code=401, detail="Authentication required")
 
 

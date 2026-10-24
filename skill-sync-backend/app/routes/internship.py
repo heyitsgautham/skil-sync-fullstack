@@ -265,7 +265,7 @@ def post_internship(
         db.refresh(new_internship)
 
         # Store embedding in vector DB
-        embedding_id = rag_engine.store_internship_embedding(
+        rag_engine.store_internship_embedding(
             internship_id=str(new_internship.id),
             title=new_internship.title,
             description=new_internship.description,
@@ -747,7 +747,7 @@ async def apply_to_internship(
         candidate_embedding = resume_to_use.embedding or []
         try:
             internship_embedding = rag_engine.get_internship_embedding(str(internship.id))
-        except:
+        except Exception:
             internship_embedding = []
 
         # Calculate match score

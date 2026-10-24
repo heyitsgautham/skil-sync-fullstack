@@ -279,35 +279,35 @@ def generate_candidate_selection_email_html(
                 <h1>🎉 Congratulations!</h1>
                 <p>You've been selected for the next round</p>
             </div>
-            
+
             <div class="greeting">
                 Dear {candidate_name},
             </div>
-            
+
             <p class="body-text">
-                We are pleased to inform you that you have been selected to proceed to the next round 
+                We are pleased to inform you that you have been selected to proceed to the next round
                 of the recruitment process for the following position:
             </p>
-            
+
             <div class="internship-info">
                 <h3>{internship_title}</h3>
                 <p>at {company_name}</p>
             </div>
-            
+
             <div class="message-box">
                 <div class="message-content">{message}</div>
             </div>
-            
+
             <p class="body-text">
                 Please log in to your SkillSync dashboard to view more details and next steps.
             </p>
-            
+
             <div style="text-align: center;">
                 <a href="{os.getenv('FRONTEND_URL', 'http://localhost:3000')}/student/dashboard" class="cta-button">
                     View Dashboard
                 </a>
             </div>
-            
+
             <div class="footer">
                 <p><strong>Best regards,</strong></p>
                 <p style="font-size: 16px; color: #34495e; margin-top: 5px;">{company_name}</p>
@@ -334,7 +334,7 @@ CONGRATULATIONS - SELECTED FOR NEXT ROUND
 
 Dear {candidate_name},
 
-We are pleased to inform you that you have been selected to proceed to the next round 
+We are pleased to inform you that you have been selected to proceed to the next round
 of the recruitment process for the following position:
 
 INTERNSHIP: {internship_title}

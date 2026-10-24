@@ -116,9 +116,9 @@ def verify_system():
             # Check application columns
             result = conn.execute(
                 text("""
-                SELECT column_name 
-                FROM information_schema.columns 
-                WHERE table_name = 'applications' 
+                SELECT column_name
+                FROM information_schema.columns
+                WHERE table_name = 'applications'
                 AND column_name IN ('application_similarity_score', 'used_tailored_resume')
             """)
             )

@@ -73,7 +73,7 @@ def check_env_configuration():
         try:
             server_part = DATABASE_URL.split("@")[1]
             print(f"   Database server: {server_part}")
-        except:
+        except IndexError:
             pass
 
     print("\n✅ Environment configuration looks good!")
@@ -105,8 +105,8 @@ def test_database_connection():
             # Check tables
             result = conn.execute(
                 text("""
-                SELECT table_name 
-                FROM information_schema.tables 
+                SELECT table_name
+                FROM information_schema.tables
                 WHERE table_schema = 'public'
                 ORDER BY table_name;
             """)

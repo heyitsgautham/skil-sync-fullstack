@@ -14,7 +14,7 @@ from datetime import datetime, timedelta
 from sqlalchemy import and_
 
 from app.database.connection import get_db
-from app.models import Application, Internship, Resume, User, UserRole
+from app.models import Application, Internship, User, UserRole
 from app.services.email_service import email_service
 
 
@@ -96,9 +96,6 @@ def send_daily_summaries_to_all_companies():
                 for app in internship_apps:
                     # Get student details
                     student = db.query(User).filter(User.id == app.student_id).first()
-
-                    # Get resume details
-                    resume = db.query(Resume).filter(Resume.id == app.resume_id).first()
 
                     if not student:
                         continue

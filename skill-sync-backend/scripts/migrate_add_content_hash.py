@@ -51,7 +51,7 @@ def migrate_add_content_hash():
             result = conn.execute(
                 text("""
                 SELECT column_name, table_name
-                FROM information_schema.columns 
+                FROM information_schema.columns
                 WHERE table_name IN ('resumes', 'internships')
                 AND column_name = 'content_hash';
             """)

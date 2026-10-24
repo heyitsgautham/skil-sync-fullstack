@@ -63,7 +63,7 @@ def run_migration():
             # Index for student-based queries (recommendations)
             conn.execute(
                 text("""
-                CREATE INDEX IF NOT EXISTS idx_student_match_score 
+                CREATE INDEX IF NOT EXISTS idx_student_match_score
                 ON student_internship_matches(student_id, base_similarity_score DESC)
             """)
             )
@@ -72,7 +72,7 @@ def run_migration():
             # Index for internship-based queries (candidate ranking)
             conn.execute(
                 text("""
-                CREATE INDEX IF NOT EXISTS idx_internship_match_score 
+                CREATE INDEX IF NOT EXISTS idx_internship_match_score
                 ON student_internship_matches(internship_id, base_similarity_score DESC)
             """)
             )
@@ -81,7 +81,7 @@ def run_migration():
             # Unique constraint to prevent duplicates
             conn.execute(
                 text("""
-                CREATE UNIQUE INDEX IF NOT EXISTS idx_unique_student_internship 
+                CREATE UNIQUE INDEX IF NOT EXISTS idx_unique_student_internship
                 ON student_internship_matches(student_id, internship_id)
             """)
             )
@@ -94,7 +94,7 @@ def run_migration():
             try:
                 conn.execute(
                     text("""
-                    ALTER TABLE applications 
+                    ALTER TABLE applications
                     ADD COLUMN IF NOT EXISTS application_similarity_score INTEGER
                 """)
                 )
@@ -109,7 +109,7 @@ def run_migration():
             try:
                 conn.execute(
                     text("""
-                    ALTER TABLE applications 
+                    ALTER TABLE applications
                     ADD COLUMN IF NOT EXISTS used_tailored_resume INTEGER DEFAULT 0
                 """)
                 )
@@ -124,7 +124,7 @@ def run_migration():
             print("\n📊 Step 4: Creating index on applications...")
             conn.execute(
                 text("""
-                CREATE INDEX IF NOT EXISTS idx_application_student_internship 
+                CREATE INDEX IF NOT EXISTS idx_application_student_internship
                 ON applications(student_id, internship_id)
             """)
             )
@@ -167,7 +167,7 @@ def verify_migration():
         result = conn.execute(
             text("""
             SELECT EXISTS (
-                SELECT FROM information_schema.tables 
+                SELECT FROM information_schema.tables
                 WHERE table_name = 'student_internship_matches'
             )
         """)
@@ -180,7 +180,7 @@ def verify_migration():
         # Check if indexes exist
         result = conn.execute(
             text("""
-            SELECT COUNT(*) FROM pg_indexes 
+            SELECT COUNT(*) FROM pg_indexes
             WHERE tablename = 'student_internship_matches'
         """)
         )
@@ -190,9 +190,9 @@ def verify_migration():
         # Check if applications columns exist
         result = conn.execute(
             text("""
-            SELECT column_name 
-            FROM information_schema.columns 
-            WHERE table_name = 'applications' 
+            SELECT column_name
+            FROM information_schema.columns
+            WHERE table_name = 'applications'
             AND column_name IN ('application_similarity_score', 'used_tailored_resume')
         """)
         )

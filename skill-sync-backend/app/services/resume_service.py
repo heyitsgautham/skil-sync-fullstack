@@ -102,9 +102,6 @@ class ResumeService:
             structured_data = intelligence_service.extract_structured_data(resume_text)
             logger.info(f"✅ Structured data extracted - {len(structured_data.get('all_skills', []))} skills found")
 
-            # Combine data
-            parsed_data = {**basic_data, **structured_data, 'parsed_content': resume_text}
-
             # Deactivate old active resumes if this is a base resume
             if deactivate_others and not is_tailored:
                 db.query(Resume).filter(

@@ -26,7 +26,7 @@ def check_collections():
     if resume_data['ids']:
         print(f"Resume IDs: {resume_data['ids']}")
         print("\nResume Metadata:")
-        for i, (id, metadata) in enumerate(zip(resume_data['ids'], resume_data['metadatas'])):
+        for i, (id, metadata) in enumerate(zip(resume_data['ids'], resume_data['metadatas'], strict=True)):
             print(f"  {i + 1}. {id}")
             print(f"     - Resume ID: {metadata.get('resume_id')}")
             print(f"     - Student ID: {metadata.get('student_id')}")
@@ -43,7 +43,9 @@ def check_collections():
     if internship_data['ids']:
         print(f"Internship IDs: {internship_data['ids'][:10]}...")  # Show first 10
         print("\nSample Internship Metadata:")
-        for i, (id, metadata) in enumerate(zip(internship_data['ids'][:5], internship_data['metadatas'][:5])):
+        for i, (id, metadata) in enumerate(
+            zip(internship_data['ids'][:5], internship_data['metadatas'][:5], strict=True)
+        ):
             print(f"  {i + 1}. {id}")
             print(f"     - Internship ID: {metadata.get('internship_id')}")
             print(f"     - Title: {metadata.get('title')}")

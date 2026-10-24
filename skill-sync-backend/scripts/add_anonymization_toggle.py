@@ -29,8 +29,8 @@ def add_anonymization_toggle():
 
         # Check if column already exists
         check_query = text("""
-            SELECT column_name 
-            FROM information_schema.columns 
+            SELECT column_name
+            FROM information_schema.columns
             WHERE table_name='users' AND column_name='anonymization_enabled'
         """)
 
@@ -42,7 +42,7 @@ def add_anonymization_toggle():
 
         # Add the column
         alter_query = text("""
-            ALTER TABLE users 
+            ALTER TABLE users
             ADD COLUMN anonymization_enabled BOOLEAN DEFAULT FALSE
         """)
 
@@ -53,8 +53,8 @@ def add_anonymization_toggle():
 
         # Verify the column was added
         verify_query = text("""
-            SELECT column_name, data_type, column_default 
-            FROM information_schema.columns 
+            SELECT column_name, data_type, column_default
+            FROM information_schema.columns
             WHERE table_name='users' AND column_name='anonymization_enabled'
         """)
 
