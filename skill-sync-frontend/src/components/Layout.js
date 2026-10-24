@@ -22,7 +22,6 @@ import {
     Menu as MenuIcon,
     Dashboard as DashboardIcon,
     Work as WorkIcon,
-    Upload as UploadIcon,
     Star as StarIcon,
     Person as PersonIcon,
     Logout as LogoutIcon,

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Typography } from '@mui/material';
-import { motion, useMotionValue, useTransform, animate } from 'framer-motion';
+import { useMotionValue, useTransform, animate } from 'framer-motion';
 
 const AnimatedCounter = ({ value, duration = 2, prefix = '', suffix = '', ...props }) => {
     const count = useMotionValue(0);

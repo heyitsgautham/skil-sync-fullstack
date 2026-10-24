@@ -22,7 +22,6 @@ import {
     Close as CloseIcon,
     ArrowUpward as ArrowUpwardIcon,
     ArrowDownward as ArrowDownwardIcon,
-    CloudUpload as CloudUploadIcon,
     Description as DescriptionIcon,
 } from '@mui/icons-material';
 import toast from 'react-hot-toast';

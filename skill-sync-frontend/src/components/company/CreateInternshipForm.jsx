@@ -220,7 +220,7 @@ const CreateInternshipForm = () => {
     setSuccess('');
 
     try {
-      const response = await axios.post(
+      await axios.post(
         `${API_BASE_URL}/internship/post`,
         formData,
         {
