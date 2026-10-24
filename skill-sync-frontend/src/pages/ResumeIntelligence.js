@@ -1122,7 +1122,7 @@ const ResumeIntelligence = () => {
                 )}
 
                 {/* Empty State */}
-                {!loading && !parsedData && !file && myResumes.length === 0 && (
+                {!loading && !loadingResumes && !parsedData && !file && myResumes.length === 0 && (
                     <Paper
                         elevation={0}
                         sx={{
