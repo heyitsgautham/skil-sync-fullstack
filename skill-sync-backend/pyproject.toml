@@ -72,7 +72,7 @@ branch = true
 show_missing = true
 skip_covered = true
 # Raise this as tests land. CI fails if coverage drops below it.
-fail_under = 17
+fail_under = 20
 
 [tool.ruff]
 line-length = 120
