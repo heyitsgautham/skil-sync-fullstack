@@ -2,6 +2,7 @@
 Email Service - Handle email notifications for SkillSync
 """
 
+import logging
 import os
 import smtplib
 from datetime import datetime
@@ -12,6 +13,7 @@ from email.mime.text import MIMEText
 
 from dotenv import load_dotenv
 
+logger = logging.getLogger(__name__)
 load_dotenv()
 
 
@@ -103,7 +105,7 @@ class EmailService:
 
             return True
         except Exception as e:
-            print(f"Error sending email to {to_email}: {str(e)}")
+            logger.error("Error sending email to %s: %s", to_email, e)
             return False
 
     def generate_daily_summary_html(self, company_name: str, internship_summaries: list[dict], date: datetime) -> str:

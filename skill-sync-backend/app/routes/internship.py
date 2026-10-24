@@ -2,6 +2,7 @@
 Internship API Routes
 """
 
+import logging
 import os
 
 from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile, status
@@ -16,6 +17,8 @@ from app.services.matching_engine import MatchingEngine
 from app.services.parser_service import InternshipParser
 from app.services.rag_engine import rag_engine
 from app.utils.security import get_current_user
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/internship", tags=["Internship"])
 
@@ -120,10 +123,7 @@ def extract_skills_from_description(request: SkillExtractionRequest, current_use
         )
 
     except Exception as e:
-        import traceback
-
-        print(f"Error extracting skills: {str(e)}")
-        print(f"Traceback: {traceback.format_exc()}")
+        logger.exception("Error extracting skills")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Error extracting skills: {str(e)}"
         )
@@ -476,10 +476,7 @@ def match_internships(top_k: int = 10, db: Session = Depends(get_db), current_us
         return recommendations
 
     except Exception as e:
-        import traceback
-
-        print(f"Error in match_internships: {str(e)}")
-        print(f"Traceback: {traceback.format_exc()}")
+        logger.exception("Error in match_internships")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Error generating recommendations: {str(e)}"
         )
