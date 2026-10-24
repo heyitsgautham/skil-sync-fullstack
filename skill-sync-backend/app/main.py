@@ -3,23 +3,25 @@ SkillSync Backend - Main Application Entry Point
 FastAPI application for intelligent internship matching platform
 """
 
+import os
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+
 from app.routes import (
-    auth,
-    health,
-    resume,
-    internship,
-    recommendations,
-    intelligent_filtering,
-    students,
     admin,
+    auth,
+    candidate_emails,
+    health,
+    intelligent_filtering,
+    internship,
     notifications,
     profile,
+    recommendations,
+    resume,
     resume_view,
-    candidate_emails,
+    students,
 )
-import os
 
 # Initialize FastAPI app
 app = FastAPI(
@@ -32,7 +34,7 @@ app = FastAPI(
 
 # Try to initialize database tables (optional for initial setup)
 try:
-    from app.database.connection import engine, Base
+    from app.database.connection import Base, engine
 
     Base.metadata.create_all(bind=engine)
     print("✓ Database tables created successfully")

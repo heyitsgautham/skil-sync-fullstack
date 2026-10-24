@@ -2,19 +2,18 @@
 Script to create 50 students with resumes that match internships
 """
 
-import sys
 import os
+import sys
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
+
 from sqlalchemy.orm import Session
-from app.database.connection import SessionLocal, engine, Base
-from app.models.user import User, UserRole
+
+from app.database.connection import Base, SessionLocal, engine
 from app.models.resume import Resume
-from app.models.internship import Internship
+from app.models.user import User, UserRole
 from app.utils.security import get_password_hash
-import json
-from datetime import datetime
 
 # Create all tables
 Base.metadata.create_all(bind=engine)
@@ -598,4 +597,4 @@ if __name__ == "__main__":
     for i, student in enumerate(students[:10], 1):
         print(f"{i}. {student['email']}")
     print(f"\n... and {len(students) - 10} more students")
-    print(f"\nCheck STUDENT_CREDENTIALS.txt for complete list")
+    print("\nCheck STUDENT_CREDENTIALS.txt for complete list")

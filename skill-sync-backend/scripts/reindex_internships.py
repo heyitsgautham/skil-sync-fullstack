@@ -2,12 +2,13 @@
 Script to re-index all internships in the vector database
 """
 
-import sys
 import os
+import sys
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from sqlalchemy.orm import Session
+
 from app.database.connection import SessionLocal
 from app.models.internship import Internship
 from app.models.user import User, UserRole

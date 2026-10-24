@@ -4,14 +4,14 @@ Database Migration Script
 Creates all database tables based on SQLAlchemy models
 """
 
-import sys
 import os
+import sys
 
 # Add parent directory to path
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-from app.database.connection import engine, Base
-from app.models import User, Internship, Resume, Application
+import app.models  # noqa: F401  (registers every model on Base.metadata)
+from app.database.connection import Base, engine
 
 
 def create_tables():

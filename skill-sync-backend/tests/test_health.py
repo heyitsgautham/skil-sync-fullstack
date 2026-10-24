@@ -2,7 +2,6 @@
 Health check endpoint tests - Minimal smoke tests for CI
 """
 
-import pytest
 from fastapi import status
 
 

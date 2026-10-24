@@ -8,12 +8,10 @@ This service provides on-demand anonymization of resumes:
 - Controlled by admin toggle per company
 """
 
-import os
-import re
 import logging
+import re
 import tempfile
-from typing import Optional, List, Tuple, BinaryIO
-from io import BytesIO
+
 import fitz  # PyMuPDF for better text extraction and redaction
 
 logger = logging.getLogger(__name__)
@@ -30,10 +28,10 @@ class ResumeAnonymizationService:
         self,
         input_pdf_path: str,
         full_name: str,
-        email: Optional[str] = None,
-        phone: Optional[str] = None,
-        linkedin_url: Optional[str] = None,
-        github_url: Optional[str] = None,
+        email: str | None = None,
+        phone: str | None = None,
+        linkedin_url: str | None = None,
+        github_url: str | None = None,
     ) -> bytes:
         """
         Anonymize a PDF resume and return as bytes (in-memory, no file storage)
@@ -109,7 +107,7 @@ class ResumeAnonymizationService:
                     for inst in instances:
                         page.add_redact_annot(inst, fill=(0, 0, 0))
                         total_redactions += 1
-                        logger.info(f"🔗 Redacted LinkedIn URL")
+                        logger.info("🔗 Redacted LinkedIn URL")
 
                 # Find and redact GitHub URLs (ALL GitHub links - profile AND projects)
                 github_pattern = r'(?:https?://)?(?:www\.)?github\.com/[\w-]+(?:/[\w-]+)*'
@@ -137,7 +135,7 @@ class ResumeAnonymizationService:
                             for inst in instances:
                                 page.add_redact_annot(inst, fill=(0, 0, 0))
                                 total_redactions += 1
-                                logger.info(f"📞 Redacted phone number")
+                                logger.info("📞 Redacted phone number")
 
                 # Step 3: Remove ALL clickable links (make entire resume unclickable)
                 links = page.get_links()
@@ -145,7 +143,7 @@ class ResumeAnonymizationService:
                     # Delete all hyperlinks to make them unclickable
                     # This removes the clickable functionality but keeps the text visible
                     page.delete_link(link)
-                    logger.info(f"🔓 Removed clickable link functionality")
+                    logger.info("🔓 Removed clickable link functionality")
 
                 # Apply all redactions on this page
                 page.apply_redactions()
@@ -165,11 +163,11 @@ class ResumeAnonymizationService:
     def _build_redaction_patterns(
         self,
         full_name: str,
-        email: Optional[str],
-        phone: Optional[str],
-        linkedin_url: Optional[str],
-        github_url: Optional[str],
-    ) -> List[str]:
+        email: str | None,
+        phone: str | None,
+        linkedin_url: str | None,
+        github_url: str | None,
+    ) -> list[str]:
         """
         Build list of EXACT text strings to redact
 
@@ -218,7 +216,7 @@ class ResumeAnonymizationService:
 
         return patterns
 
-    def verify_anonymization(self, pdf_path: str, full_name: str, email: Optional[str] = None) -> dict:
+    def verify_anonymization(self, pdf_path: str, full_name: str, email: str | None = None) -> dict:
         """
         Verify that PII has been removed from PDF
 

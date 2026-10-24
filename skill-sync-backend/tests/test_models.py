@@ -2,9 +2,8 @@
 Database models tests - Minimal smoke tests for CI
 """
 
-import pytest
-from app.models.user import User, UserRole
 from app.models.internship import Internship
+from app.models.user import User, UserRole
 
 
 def test_models_import():

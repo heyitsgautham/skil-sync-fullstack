@@ -3,8 +3,9 @@ Database Migration Script: Add Content Hash for Caching
 Adds content_hash columns to resumes and internships tables for detecting changes
 """
 
-import sys
 import os
+import sys
+
 from sqlalchemy import text
 
 # Add parent directory to path for imports

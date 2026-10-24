@@ -3,8 +3,8 @@ Simple SMTP Credentials Test
 Sends a test email to verify SMTP configuration
 """
 
-import sys
 import os
+import sys
 
 # Add parent directory to path for imports
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -133,7 +133,7 @@ def test_smtp_credentials():
     """
     )
 
-    text_content = """
+    text_content = f"""
     SKILLSYNC - SMTP TEST SUCCESSFUL!
     ==================================
     
@@ -142,9 +142,9 @@ def test_smtp_credentials():
     This is a test email to verify that your SMTP configuration is working properly.
     
     Email Configuration Details:
-    - SMTP Host: {host}
-    - SMTP Port: {port}
-    - Sender: {name} <{email}>
+    - SMTP Host: {email_service.smtp_host}
+    - SMTP Port: {email_service.smtp_port}
+    - Sender: {email_service.sender_name} <{email_service.sender_email}>
     
     What this means:
     ✓ SMTP server connection successful
@@ -158,12 +158,7 @@ def test_smtp_credentials():
     This is an automated test email from SkillSync
     Feature 4: Clustered Email Notifications Implementation
     Date: November 6, 2025
-    """.format(
-        host=email_service.smtp_host,
-        port=email_service.smtp_port,
-        name=email_service.sender_name,
-        email=email_service.sender_email,
-    )
+    """
 
     print(f"Sending test email to: {recipient}")
     print("Please wait...\n")

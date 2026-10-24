@@ -10,15 +10,15 @@ This service implements "Strategy A: Pre-computed Base Similarity"
 """
 
 import logging
-from typing import List, Dict, Optional
-from sqlalchemy.orm import Session
-from sqlalchemy import delete
 from datetime import datetime
 
-from app.models.user import User, UserRole
-from app.models.resume import Resume
+from sqlalchemy import delete
+from sqlalchemy.orm import Session
+
 from app.models.internship import Internship
+from app.models.resume import Resume
 from app.models.student_internship_match import StudentInternshipMatch
+from app.models.user import User, UserRole
 from app.services.matching_engine import MatchingEngine
 from app.services.rag_engine import rag_engine
 
@@ -41,9 +41,9 @@ class BatchMatchingService:
     def compute_all_matches(
         self,
         force_recompute: bool = False,
-        student_ids: Optional[List[int]] = None,
-        internship_ids: Optional[List[int]] = None,
-    ) -> Dict:
+        student_ids: list[int] | None = None,
+        internship_ids: list[int] | None = None,
+    ) -> dict:
         """
         Compute base similarity scores for all student-internship pairs.
 
@@ -146,7 +146,7 @@ class BatchMatchingService:
             "avg_time_per_match": duration / matches_computed if matches_computed > 0 else 0,
         }
 
-        logger.info(f"🎉 Batch computation complete!")
+        logger.info("🎉 Batch computation complete!")
         logger.info(f"   Students: {result['students_processed']}")
         logger.info(f"   Internships: {result['internships_processed']}")
         logger.info(f"   Matches computed: {result['matches_computed']}")
@@ -156,7 +156,7 @@ class BatchMatchingService:
 
         return result
 
-    def _calculate_match(self, student: User, resume: Resume, internship: Internship) -> Optional[Dict]:
+    def _calculate_match(self, student: User, resume: Resume, internship: Internship) -> dict | None:
         """
         Calculate similarity score between a student and an internship.
 
@@ -187,7 +187,7 @@ class BatchMatchingService:
             candidate_embedding = rag_engine.get_resume_embedding(resume_chroma_id)
             if candidate_embedding is None:
                 candidate_embedding = []
-        except Exception as e:
+        except Exception:
             candidate_embedding = []
 
         # Get internship embedding from RAG engine
@@ -196,7 +196,7 @@ class BatchMatchingService:
             internship_embedding = rag_engine.get_internship_embedding(internship_chroma_id)
             if internship_embedding is None:
                 internship_embedding = []
-        except Exception as e:
+        except Exception:
             internship_embedding = []
 
         # Calculate match score
@@ -219,7 +219,7 @@ class BatchMatchingService:
             'last_computed': datetime.now(),
         }
 
-    def compute_matches_for_student(self, student_id: int) -> Dict:
+    def compute_matches_for_student(self, student_id: int) -> dict:
         """
         Compute matches for a specific student (useful after resume upload).
 
@@ -232,7 +232,7 @@ class BatchMatchingService:
         logger.info(f"Computing matches for student {student_id}...")
         return self.compute_all_matches(force_recompute=True, student_ids=[student_id])
 
-    def compute_matches_for_internship(self, internship_id: int) -> Dict:
+    def compute_matches_for_internship(self, internship_id: int) -> dict:
         """
         Compute matches for a specific internship (useful after internship posting).
 

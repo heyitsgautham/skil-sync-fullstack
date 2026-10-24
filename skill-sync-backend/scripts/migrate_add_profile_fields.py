@@ -10,14 +10,15 @@ Adds the following fields to the users table:
 - hr_contact_name (String) - HR contact name (for companies)
 """
 
-import sys
 import os
+import sys
 
 # Add parent directory to path
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from sqlalchemy import text
-from app.database.connection import engine, get_db
+
+from app.database.connection import get_db
 
 
 def migrate():

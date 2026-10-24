@@ -4,14 +4,13 @@ Extracts evidence snippets from resumes to support claims about skills, experien
 Uses Gemini API to identify exact text spans that prove extracted information
 """
 
-import logging
-from typing import List, Dict, Optional, Tuple
-from datetime import datetime
 import json
-import re
+import logging
+from datetime import datetime
+
+from google.genai import types
 
 from app.utils.gemini_key_manager import get_gemini_key_manager
-from google.genai import types
 
 logger = logging.getLogger(__name__)
 
@@ -24,7 +23,7 @@ class ProvenanceService:
         self.key_manager = get_gemini_key_manager()
         logger.info("✅ ProvenanceService initialized")
 
-    def extract_skill_provenance(self, resume_text: str, skills: List[str]) -> Dict[str, any]:
+    def extract_skill_provenance(self, resume_text: str, skills: list[str]) -> dict[str, any]:
         """
         Extract evidence snippets for each skill from resume text
 
@@ -99,7 +98,7 @@ Only include snippets that clearly demonstrate the skill. If no evidence found f
             logger.error(f"  Error extracting skill provenance: {e}")
             return {skill: [] for skill in skills}
 
-    def extract_experience_provenance(self, resume_text: str, experiences: List[Dict]) -> List[Dict]:
+    def extract_experience_provenance(self, resume_text: str, experiences: list[dict]) -> list[dict]:
         """
         Extract evidence snippets for work experiences
 
@@ -181,7 +180,7 @@ Extract all relevant details from the resume text.
             logger.error(f"  Error extracting experience provenance: {e}")
             return []
 
-    def extract_project_provenance(self, resume_text: str, projects: List[Dict]) -> List[Dict]:
+    def extract_project_provenance(self, resume_text: str, projects: list[dict]) -> list[dict]:
         """
         Extract evidence snippets for projects
 
@@ -263,7 +262,7 @@ Extract all relevant technical details.
             logger.error(f"  Error extracting project provenance: {e}")
             return []
 
-    def calculate_extraction_confidence(self, evidences: Dict[str, List[Dict]]) -> Dict[str, float]:
+    def calculate_extraction_confidence(self, evidences: dict[str, list[dict]]) -> dict[str, float]:
         """
         Calculate confidence scores for extraction quality
 
@@ -328,10 +327,10 @@ Extract all relevant technical details.
     def store_provenance(
         self,
         resume_id: int,
-        skill_evidences: Dict,
-        experience_evidences: List[Dict],
-        project_evidences: List[Dict],
-        confidence_scores: Dict[str, float],
+        skill_evidences: dict,
+        experience_evidences: list[dict],
+        project_evidences: list[dict],
+        confidence_scores: dict[str, float],
         db_session,
     ) -> bool:
         """

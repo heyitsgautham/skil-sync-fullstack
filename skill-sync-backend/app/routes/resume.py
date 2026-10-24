@@ -3,15 +3,13 @@ Resume API Routes
 """
 
 import os
-import shutil
-from typing import List
-from fastapi import APIRouter, Depends, UploadFile, File, HTTPException, status
-from sqlalchemy.orm import Session
+
+from fastapi import APIRouter, Depends, File, HTTPException, UploadFile, status
 from pydantic import BaseModel
+from sqlalchemy.orm import Session
 
 from app.database.connection import get_db
-from app.models import User, Resume, UserRole
-from app.services.parser_service import ResumeParser
+from app.models import Resume, User, UserRole
 from app.services.rag_engine import rag_engine
 from app.utils.security import get_current_user
 
@@ -23,7 +21,7 @@ class ResumeResponse(BaseModel):
     id: int
     student_id: int
     file_name: str
-    extracted_skills: List[str] = []
+    extracted_skills: list[str] = []
     is_active: int
     created_at: str | None = None
 
@@ -82,7 +80,7 @@ async def upload_resume(
         )
 
 
-@router.get("/my-resumes", response_model=List[ResumeResponse])
+@router.get("/my-resumes", response_model=list[ResumeResponse])
 def get_my_resumes(db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     """
     Get all resumes for current student (excluding tailored resumes)

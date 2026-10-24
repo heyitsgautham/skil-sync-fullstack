@@ -3,10 +3,10 @@ Student Routes
 Endpoints for student-specific operations like profile management
 """
 
-from typing import List
 from fastapi import APIRouter, Depends, HTTPException, status
-from sqlalchemy.orm import Session
 from pydantic import BaseModel, Field
+from sqlalchemy.orm import Session
+
 from app.database.connection import get_db
 from app.models.user import User, UserRole
 from app.utils.security import get_current_user
@@ -18,7 +18,7 @@ router = APIRouter()
 class UpdateProfileRequest(BaseModel):
     """Student profile update request model"""
 
-    skills: List[str] = Field(default=None, description="List of student skills")
+    skills: list[str] = Field(default=None, description="List of student skills")
     total_experience_years: float = Field(default=None, description="Total years of experience")
 
 

@@ -6,16 +6,16 @@ Fix Missing Embeddings Script
 This script identifies resumes without embeddings and regenerates them.
 """
 
-import sys
 import os
+import sys
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from app.database.connection import get_db
 from app.models.resume import Resume
 from app.models.user import User, UserRole
-from app.services.rag_engine import rag_engine
 from app.services.parser_service import ResumeParser
+from app.services.rag_engine import rag_engine
 
 
 def find_missing_embeddings():
@@ -92,11 +92,11 @@ def fix_missing_embeddings(missing_embeddings):
                 continue
 
             # Parse and index the resume
-            print(f"   📖 Parsing resume...")
+            print("   📖 Parsing resume...")
             parsed_data = parser.parse_resume(file_path)
 
             if not parsed_data:
-                print(f"     Failed to parse resume")
+                print("     Failed to parse resume")
                 fail_count += 1
                 continue
 
@@ -104,7 +104,7 @@ def fix_missing_embeddings(missing_embeddings):
             resume.parsed_data = parsed_data
 
             # Generate embedding
-            print(f"   🔢 Generating embedding...")
+            print("   🔢 Generating embedding...")
             embedding_id = rag_engine.add_resume_to_vector_db(resume_id=str(resume.id), parsed_data=parsed_data)
 
             if embedding_id:
@@ -113,7 +113,7 @@ def fix_missing_embeddings(missing_embeddings):
                 print(f"   ✅ Successfully generated embedding: {embedding_id}")
                 success_count += 1
             else:
-                print(f"     Failed to generate embedding")
+                print("     Failed to generate embedding")
                 fail_count += 1
 
         except Exception as e:

@@ -3,8 +3,8 @@ Clean up ChromaDB by removing duplicate and old resume entries
 Keep only UUID-based entries that match current database records
 """
 
-import sys
 import os
+import sys
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 

@@ -4,10 +4,10 @@ Test script to verify S3 auto-upload fix for Resume Intelligence
 Tests the /filter/parse-resume endpoint used by intelligent-analyzer
 """
 
-import requests
-import os
 import sys
 from pathlib import Path
+
+import requests
 
 # Configuration
 BASE_URL = "http://localhost:8000"
@@ -40,7 +40,7 @@ def test_resume_upload_with_s3():
 
     token = login_response.json()["access_token"]
     headers = {"Authorization": f"Bearer {token}"}
-    print(f"✅ Logged in successfully")
+    print("✅ Logged in successfully")
 
     # Step 2: Upload resume via /filter/parse-resume
     print("\n2️⃣ Uploading resume via Resume Intelligence endpoint...")
@@ -59,7 +59,7 @@ def test_resume_upload_with_s3():
         return False
 
     result = upload_response.json()
-    print(f"✅ Resume uploaded successfully")
+    print("✅ Resume uploaded successfully")
 
     # Step 3: Verify S3 key is present
     print("\n3️⃣ Verifying S3 upload...")
@@ -72,7 +72,7 @@ def test_resume_upload_with_s3():
         print(f"📋 Response: {result}")
         return False
 
-    print(f"✅ SUCCESS: Resume uploaded to S3")
+    print("✅ SUCCESS: Resume uploaded to S3")
     print(f"   📁 S3 Key: {s3_key}")
     print(f"   🆔 Resume ID: {resume_id}")
 
@@ -99,7 +99,7 @@ def test_resume_upload_with_s3():
     company_login = requests.post(LOGIN_ENDPOINT, json={"email": "hr@techcorp.com", "password": "TechCorp@2024"})
 
     if company_login.status_code != 200:
-        print(f"   ⚠️  Company login failed, skipping HR view test")
+        print("   ⚠️  Company login failed, skipping HR view test")
         return True  # Still pass the main test
 
     company_token = company_login.json()["access_token"]
@@ -114,8 +114,8 @@ def test_resume_upload_with_s3():
     resume_url_data = resume_url_response.json()
 
     if "presigned_url" in resume_url_data:
-        print(f"   ✅ HR can view resume via presigned URL")
-        print(f"   🔗 URL generated successfully")
+        print("   ✅ HR can view resume via presigned URL")
+        print("   🔗 URL generated successfully")
     else:
         print(f"   ⚠️  Resume viewing may have issues: {resume_url_data}")
 

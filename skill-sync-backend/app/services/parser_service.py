@@ -4,10 +4,9 @@ Resume Parser Service - Extract text and metadata from PDF/DOCX/TXT files
 
 import os
 import re
-from typing import Dict, List, Optional
+
 import fitz  # PyMuPDF
 from docx import Document
-import pdfplumber
 
 
 class ResumeParser:
@@ -63,14 +62,14 @@ class ResumeParser:
             Extracted text content
         """
         try:
-            with open(file_path, 'r', encoding='utf-8') as file:
+            with open(file_path, encoding='utf-8') as file:
                 text = file.read()
             return text.strip()
         except Exception as e:
             raise Exception(f"Error extracting text from TXT: {str(e)}")
 
     @staticmethod
-    def parse_resume(file_path: str) -> Dict[str, any]:
+    def parse_resume(file_path: str) -> dict[str, any]:
         """
         Parse resume file and extract text content
 
@@ -97,7 +96,7 @@ class ResumeParser:
         return {"parsed_content": text, "extracted_skills": skills, "file_type": file_extension}
 
     @staticmethod
-    def extract_skills(text: str) -> List[str]:
+    def extract_skills(text: str) -> list[str]:
         """
         Extract skills from resume text using pattern matching
 
@@ -149,7 +148,7 @@ class InternshipParser:
     """Service for parsing internship descriptions"""
 
     @staticmethod
-    def extract_skills_from_description(description: str) -> List[str]:
+    def extract_skills_from_description(description: str) -> list[str]:
         """
         Extract required skills from internship description
 
@@ -162,7 +161,7 @@ class InternshipParser:
         return ResumeParser.extract_skills(description)
 
     @staticmethod
-    def parse_internship(data: Dict) -> Dict[str, any]:
+    def parse_internship(data: dict) -> dict[str, any]:
         """
         Parse internship posting data
 

@@ -3,7 +3,7 @@
 file_path = "app/services/resume_anonymization_service.py"
 
 # Read the file
-with open(file_path, 'r', encoding='utf-8') as f:
+with open(file_path, encoding='utf-8') as f:
     lines = f.readlines()
 
 # Find and replace the problematic section

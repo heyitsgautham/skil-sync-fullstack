@@ -11,13 +11,12 @@ This ensures we only flag active candidates who are actually participating in th
 reducing false positives from incomplete or inactive profiles.
 """
 
-from sqlalchemy.orm import Session
-from sqlalchemy import or_, and_, func
-from typing import List, Dict, Optional
-from app.models.user import User, UserRole
 import logging
 import re
-from urllib.parse import urlparse
+
+from sqlalchemy.orm import Session
+
+from app.models.user import User, UserRole
 
 logger = logging.getLogger(__name__)
 
@@ -30,7 +29,7 @@ class CandidateFlaggingService:
     """
 
     @staticmethod
-    def normalize_url(url: Optional[str]) -> Optional[str]:
+    def normalize_url(url: str | None) -> str | None:
         """
         Normalize URLs for comparison (remove protocols, www, trailing slashes)
 
@@ -58,7 +57,7 @@ class CandidateFlaggingService:
         return url
 
     @staticmethod
-    def normalize_phone(phone: Optional[str]) -> Optional[str]:
+    def normalize_phone(phone: str | None) -> str | None:
         """
         Normalize phone numbers for comparison (remove all non-digits)
 
@@ -77,7 +76,7 @@ class CandidateFlaggingService:
         return digits if digits else None
 
     @staticmethod
-    def detect_flagged_candidates(db: Session) -> Dict[int, Dict]:
+    def detect_flagged_candidates(db: Session) -> dict[int, dict]:
         """
         Detect all flagged candidates globally across the platform
 
@@ -192,7 +191,7 @@ class CandidateFlaggingService:
         return flagged_candidates
 
     @staticmethod
-    def get_flag_info_for_candidates(candidate_ids: List[int], db: Session) -> Dict[int, Dict]:
+    def get_flag_info_for_candidates(candidate_ids: list[int], db: Session) -> dict[int, dict]:
         """
         Get flagging information for a specific list of candidates
 
@@ -215,7 +214,7 @@ class CandidateFlaggingService:
         return result
 
     @staticmethod
-    def format_flag_reason(reasons: List[str]) -> str:
+    def format_flag_reason(reasons: list[str]) -> str:
         """
         Format flag reasons into human-readable text
 

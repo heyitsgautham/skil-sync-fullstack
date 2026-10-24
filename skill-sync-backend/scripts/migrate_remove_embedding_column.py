@@ -10,8 +10,8 @@ Revises: N/A
 Create Date: 2025-11-05
 """
 
-from alembic import op
 import sqlalchemy as sa
+from alembic import op
 from sqlalchemy.dialects import postgresql
 
 # revision identifiers

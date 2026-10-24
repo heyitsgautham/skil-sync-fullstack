@@ -3,15 +3,14 @@ RAG (Retrieval-Augmented Generation) Engine
 Handles embeddings, vector storage, and similarity matching
 """
 
-import os
 import logging
+import os
 import threading
-from typing import List, Dict, Optional, Tuple
+
 import chromadb
 from chromadb.config import Settings
-from sentence_transformers import SentenceTransformer
-import numpy as np
 from dotenv import load_dotenv
+from sentence_transformers import SentenceTransformer
 
 from app.utils.gemini_key_manager import get_gemini_key_manager
 
@@ -48,7 +47,7 @@ class RAGEngine:
         self.key_manager = get_gemini_key_manager()
         logger.info("✅ RAGEngine initialized with GeminiKeyManager")
 
-    def generate_embedding(self, text: str) -> List[float]:
+    def generate_embedding(self, text: str) -> list[float]:
         """
         Generate embedding vector for text using HuggingFace
 
@@ -62,7 +61,7 @@ class RAGEngine:
         return embedding.tolist()
 
     def store_resume_embedding(
-        self, resume_id: str, content: str, skills: List[str], metadata: Optional[Dict] = None
+        self, resume_id: str, content: str, skills: list[str], metadata: dict | None = None
     ) -> str:
         """
         Store resume embedding in vector database
@@ -104,8 +103,8 @@ class RAGEngine:
         internship_id: str,
         title: str,
         description: str,
-        required_skills: List[str],
-        metadata: Optional[Dict] = None,
+        required_skills: list[str],
+        metadata: dict | None = None,
     ) -> str:
         """
         Store internship embedding in vector database
@@ -144,7 +143,7 @@ class RAGEngine:
 
         return f"internship_{internship_id}"
 
-    def find_matching_internships(self, resume_id: str, top_k: int = 10) -> List[Dict]:
+    def find_matching_internships(self, resume_id: str, top_k: int = 10) -> list[dict]:
         """
         Find matching internships for a resume using cosine similarity
 
@@ -251,7 +250,7 @@ class RAGEngine:
             print(f"Traceback: {traceback.format_exc()}")
             return []
 
-    def find_matching_candidates(self, internship_id: str, top_k: int = 20) -> List[Dict]:
+    def find_matching_candidates(self, internship_id: str, top_k: int = 20) -> list[dict]:
         """
         Find matching candidates for an internship using cosine similarity
 
@@ -323,7 +322,7 @@ class RAGEngine:
             print(f"Error finding matches: {str(e)}")
             return []
 
-    def get_resume_embedding(self, resume_id: str) -> Optional[List[float]]:
+    def get_resume_embedding(self, resume_id: str) -> list[float] | None:
         """
         Retrieve resume embedding from vector database
 
@@ -346,7 +345,7 @@ class RAGEngine:
             print(f"Error retrieving resume embedding: {str(e)}")
             return None
 
-    def get_internship_embedding(self, internship_id: str) -> Optional[List[float]]:
+    def get_internship_embedding(self, internship_id: str) -> list[float] | None:
         """
         Retrieve internship embedding from vector database
 

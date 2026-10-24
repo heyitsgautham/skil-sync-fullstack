@@ -58,7 +58,7 @@ def check_env_configuration():
         print("  DATABASE_URL not found in .env file")
         return False
 
-    print(f"✅ DATABASE_URL found in .env")
+    print("✅ DATABASE_URL found in .env")
 
     # Check for placeholder
     if "YOUR_PASSWORD" in DATABASE_URL:
@@ -85,8 +85,8 @@ def test_database_connection():
     print_header("STEP 3: Testing Database Connection")
 
     try:
-        from sqlalchemy import create_engine, text
         from dotenv import load_dotenv
+        from sqlalchemy import create_engine, text
 
         load_dotenv()
         DATABASE_URL = os.getenv("DATABASE_URL")
@@ -99,7 +99,7 @@ def test_database_connection():
             result = conn.execute(text("SELECT version();"))
             version = result.fetchone()[0]
 
-            print(f"\n✅ Connection successful!")
+            print("\n✅ Connection successful!")
             print(f"   PostgreSQL version: {version[:60]}...")
 
             # Check tables
@@ -124,7 +124,7 @@ def test_database_connection():
         return True
 
     except Exception as e:
-        print(f"\n  Connection failed!")
+        print("\n  Connection failed!")
         print(f"   Error: {str(e)}")
         print("\n   Common solutions:")
         print("   1. Ensure PostgreSQL is running")
@@ -139,24 +139,15 @@ def test_table_creation():
     print_header("STEP 4: Testing Table Creation")
 
     try:
-        from sqlalchemy import create_engine
         from dotenv import load_dotenv
+        from sqlalchemy import create_engine
 
         load_dotenv()
         DATABASE_URL = os.getenv("DATABASE_URL")
 
-        # Import Base and models
+        # Import Base and the models package, which registers every table on Base.metadata
+        import app.models  # noqa: F401
         from app.database.connection import Base
-        from app.models import (
-            User,
-            Internship,
-            Resume,
-            Application,
-            StudentInternshipMatch,
-            CandidateExplanation,
-            AuditLog,
-            FairnessCheck,
-        )
 
         engine = create_engine(DATABASE_URL, pool_pre_ping=True)
 
@@ -170,14 +161,11 @@ def test_table_creation():
         print("   - resumes")
         print("   - applications")
         print("   - student_internship_matches")
-        print("   - candidate_explanations")
-        print("   - audit_logs")
-        print("   - fairness_checks")
 
         return True
 
     except Exception as e:
-        print(f"\n  Table creation failed!")
+        print("\n  Table creation failed!")
         print(f"   Error: {str(e)}")
         return False
 

@@ -3,8 +3,9 @@ Database Migration Script: Add Tailored Resume Support
 Adds columns to resumes table to support hybrid matching with tailored resumes
 """
 
-import sys
 import os
+import sys
+
 from sqlalchemy import text
 
 # Add parent directory to path for imports

@@ -4,13 +4,13 @@ Test script for parser service
 Tests resume parsing from PDF and DOCX files
 """
 
-import sys
 import os
+import sys
 
 # Add parent directory to path
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-from app.services.parser_service import ResumeParser, InternshipParser
+from app.services.parser_service import InternshipParser, ResumeParser
 
 
 def test_skill_extraction():

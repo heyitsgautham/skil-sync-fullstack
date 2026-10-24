@@ -2,11 +2,13 @@
 Resume Model - Student resume storage and metadata
 """
 
-from sqlalchemy import Column, Integer, String, Text, DateTime, ForeignKey, JSON
+import uuid
+
+from sqlalchemy import JSON, Column, DateTime, ForeignKey, Integer, String, Text
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
+
 from app.database.connection import Base
-import uuid
 
 
 class Resume(Base):

@@ -4,7 +4,7 @@ Resume Service - Reusable resume upload and processing functions
 
 import os
 import shutil
-from typing import Optional
+
 from fastapi import UploadFile
 from sqlalchemy.orm import Session
 
@@ -24,8 +24,8 @@ class ResumeService:
         student_id: int,
         db: Session,
         is_tailored: bool = False,
-        internship_id: Optional[int] = None,
-        base_resume_id: Optional[int] = None,
+        internship_id: int | None = None,
+        base_resume_id: int | None = None,
         deactivate_others: bool = True,
     ) -> Resume:
         """
@@ -75,7 +75,7 @@ class ResumeService:
             # Upload to S3 if enabled
             s3_key = None
             if s3_service.is_enabled():
-                logger.info(f"☁️ Uploading to S3...")
+                logger.info("☁️ Uploading to S3...")
                 s3_key = s3_service.upload_resume(
                     file_path=file_path,
                     student_id=student_id,
@@ -86,18 +86,18 @@ class ResumeService:
                 if s3_key:
                     logger.info(f"✅ Uploaded to S3: {s3_key}")
                 else:
-                    logger.warning(f"⚠️ S3 upload failed, will use local storage only")
+                    logger.warning("⚠️ S3 upload failed, will use local storage only")
             else:
-                logger.info(f"ℹ️ S3 not enabled, using local storage only")
+                logger.info("ℹ️ S3 not enabled, using local storage only")
 
             # Parse resume - first extract raw text
-            logger.info(f"🔍 Parsing resume (basic extraction)...")
+            logger.info("🔍 Parsing resume (basic extraction)...")
             basic_data = ResumeParser.parse_resume(file_path)
             resume_text = basic_data.get('parsed_content', '')
             logger.info(f"✅ Extracted raw text ({len(resume_text)} chars)")
 
             # Use Gemini for intelligent extraction
-            logger.info(f"🧠 Performing intelligent extraction with Gemini...")
+            logger.info("🧠 Performing intelligent extraction with Gemini...")
             intelligence_service = ResumeIntelligenceService()
             structured_data = intelligence_service.extract_structured_data(resume_text)
             logger.info(f"✅ Structured data extracted - {len(structured_data.get('all_skills', []))} skills found")
@@ -112,7 +112,7 @@ class ResumeService:
                 ).update({"is_active": 0})
 
             # Generate embedding directly (for faster matching)
-            logger.info(f"🔢 Generating embedding vector...")
+            logger.info("🔢 Generating embedding vector...")
             embedding = None
             extracted_skills = structured_data.get('all_skills', basic_data.get('extracted_skills', []))
             if resume_text and extracted_skills:
@@ -121,7 +121,7 @@ class ResumeService:
                 logger.info(f"✅ Generated embedding: dimension {len(embedding) if embedding else 0}")
 
             # Create new resume record
-            logger.info(f"💾 Creating resume record in database...")
+            logger.info("💾 Creating resume record in database...")
             new_resume = Resume(
                 student_id=student_id,
                 file_path=file_path,
@@ -142,7 +142,7 @@ class ResumeService:
             logger.info(f"✅ Resume record prepared with ID: {new_resume.id}")
 
             # Store in vector DB (ChromaDB) for semantic search
-            logger.info(f"📚 Storing in vector database (ChromaDB)...")
+            logger.info("📚 Storing in vector database (ChromaDB)...")
 
             # Build metadata (ChromaDB doesn't accept None values)
             metadata = {"student_id": student_id, "file_name": file.filename, "is_tailored": is_tailored}
@@ -161,7 +161,7 @@ class ResumeService:
             # Commit everything together (atomic operation)
             db.commit()
             db.refresh(new_resume)
-            logger.info(f"✅ All changes committed to database")
+            logger.info("✅ All changes committed to database")
 
             logger.info(f"🎉 {resume_type.capitalize()} resume processing complete!")
             return new_resume

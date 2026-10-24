@@ -3,7 +3,6 @@ Quick diagnostic script to test the API endpoint directly
 """
 
 import requests
-import json
 
 # Test the actual API endpoint
 BASE_URL = "http://localhost:8000"
@@ -22,7 +21,7 @@ if response.status_code != 200:
     exit(1)
 
 token = response.json()["access_token"]
-print(f"✅ Logged in successfully")
+print("✅ Logged in successfully")
 
 headers = {"Authorization": f"Bearer {token}"}
 
@@ -33,7 +32,7 @@ internship_title = "Full Stack Software Engineer Intern"
 print(f"✅ Testing with: {internship_title} (ID: {internship_id})")
 
 # Test ranking endpoint with discovery mode (all candidates)
-print(f"\n3️⃣ Testing ranking endpoint (discovery mode)...")
+print("\n3️⃣ Testing ranking endpoint (discovery mode)...")
 response = requests.post(
     f"{BASE_URL}/api/filter/rank-candidates/{internship_id}",
     headers=headers,
@@ -61,14 +60,14 @@ for candidate in candidates:
         print(f"  🐛 BUG: Found inactive student - {candidate_name} (ID: {candidate_id})")
 
 if not inactive_found:
-    print(f"  ✅ SUCCESS: No inactive students found in results!")
-    print(f"  ✅ Filter is working correctly in the API!")
+    print("  ✅ SUCCESS: No inactive students found in results!")
+    print("  ✅ Filter is working correctly in the API!")
 else:
     print(f"\n  ❌ PROBLEM: Found {len(inactive_found)} inactive students:")
     for student in inactive_found:
         print(f"    - {student}")
-    print(f"\n  ⚠️ The backend server may not have reloaded yet.")
-    print(f"  ⚠️ Try restarting the uvicorn server manually.")
+    print("\n  ⚠️ The backend server may not have reloaded yet.")
+    print("  ⚠️ Try restarting the uvicorn server manually.")
 
 print("\n" + "=" * 80)
 print("DIAGNOSTIC COMPLETE")

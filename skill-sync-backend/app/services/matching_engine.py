@@ -3,13 +3,9 @@ Matching Engine - Core system for matching candidates to internships
 Combines semantic matching (embeddings) with rule-based scoring
 """
 
-import os
-import json
-import re
 import logging
-from typing import Dict, List, Optional, Tuple
+
 import numpy as np
-from datetime import datetime
 from dotenv import load_dotenv
 
 from app.utils.gemini_key_manager import get_gemini_key_manager
@@ -51,11 +47,11 @@ class MatchingEngine:
 
     def calculate_match_score(
         self,
-        candidate_data: Dict,
-        internship_data: Dict,
-        candidate_embedding: List[float],
-        internship_embedding: List[float],
-    ) -> Dict:
+        candidate_data: dict,
+        internship_data: dict,
+        candidate_embedding: list[float],
+        internship_embedding: list[float],
+    ) -> dict:
         """
         Calculate comprehensive match score between candidate and internship
 
@@ -123,7 +119,7 @@ class MatchingEngine:
 
         return match_result
 
-    def _calculate_cosine_similarity(self, vec1: List[float], vec2: List[float]) -> float:
+    def _calculate_cosine_similarity(self, vec1: list[float], vec2: list[float]) -> float:
         """Calculate cosine similarity between two vectors"""
         # DO NOT USE FALLBACK SCORES - Log error and raise exception instead
         if vec1 is None or vec2 is None or len(vec1) == 0 or len(vec2) == 0:
@@ -151,7 +147,7 @@ class MatchingEngine:
         return similarity
 
     def _calculate_skills_match(
-        self, candidate_skills: List[str], required_skills: List[str], preferred_skills: List[str] = []
+        self, candidate_skills: list[str], required_skills: list[str], preferred_skills: list[str] = []
     ) -> float:
         """
         Calculate skills match score
@@ -215,7 +211,7 @@ class MatchingEngine:
             # Above maximum - slight penalty for overqualification
             return 85.0
 
-    def _calculate_education_match(self, candidate_education: List[Dict], required_education: str) -> float:
+    def _calculate_education_match(self, candidate_education: list[dict], required_education: str) -> float:
         """
         Calculate education match score
 
@@ -259,7 +255,7 @@ class MatchingEngine:
         else:
             return 50.0
 
-    def _calculate_additional_credentials(self, projects: List[Dict], certifications: List[Dict]) -> float:
+    def _calculate_additional_credentials(self, projects: list[dict], certifications: list[dict]) -> float:
         """
         Calculate score based on projects and certifications
 
@@ -286,7 +282,7 @@ class MatchingEngine:
 
         return min(score, 100)
 
-    def _get_matched_skills(self, candidate_skills: List[str], required_skills: List[str]) -> List[str]:
+    def _get_matched_skills(self, candidate_skills: list[str], required_skills: list[str]) -> list[str]:
         """Get list of matched skills"""
         candidate_skills_normalized = [s.lower().strip() for s in candidate_skills]
         matched = []
@@ -300,7 +296,7 @@ class MatchingEngine:
 
         return matched
 
-    def _get_missing_skills(self, candidate_skills: List[str], required_skills: List[str]) -> List[str]:
+    def _get_missing_skills(self, candidate_skills: list[str], required_skills: list[str]) -> list[str]:
         """Get list of missing required skills"""
         matched = self._get_matched_skills(candidate_skills, required_skills)
         return [skill for skill in required_skills if skill not in matched]
@@ -309,7 +305,7 @@ class MatchingEngine:
         """Calculate experience gap (negative = under, positive = over, 0 = perfect)"""
         return candidate_exp - min_exp
 
-    def generate_match_explanation(self, candidate_data: Dict, internship_data: Dict, match_result: Dict) -> str:
+    def generate_match_explanation(self, candidate_data: dict, internship_data: dict, match_result: dict) -> str:
         """
         Generate human-readable explanation for match score using Gemini
 
@@ -369,7 +365,7 @@ Format as bullet points. Be specific and reference actual skills/experience.
             logger.error(f"  Error generating explanation: {e}")
             return self._generate_fallback_explanation(match_result)
 
-    def _generate_fallback_explanation(self, match_result: Dict) -> str:
+    def _generate_fallback_explanation(self, match_result: dict) -> str:
         """Generate basic explanation without LLM"""
         score = match_result['overall_score']
         matched = match_result['match_details']['matched_skills']
@@ -393,7 +389,7 @@ Format as bullet points. Be specific and reference actual skills/experience.
 
         return explanation
 
-    def rank_candidates(self, candidates: List[Dict], internship_data: Dict, limit: int = 50) -> List[Dict]:
+    def rank_candidates(self, candidates: list[dict], internship_data: dict, limit: int = 50) -> list[dict]:
         """
         Rank all candidates for an internship with explanations
 
@@ -415,7 +411,7 @@ Format as bullet points. Be specific and reference actual skills/experience.
             internship_embedding = self.rag_engine.generate_embedding(jd_text)
 
         print(f"\n🔍 RANKING {len(candidates)} CANDIDATES")
-        print(f"=" * 70)
+        print("=" * 70)
 
         candidates_with_embedding = 0
         candidates_without_embedding = 0
@@ -458,11 +454,11 @@ Format as bullet points. Be specific and reference actual skills/experience.
                 }
             )
 
-        print(f"\n📊 RANKING SUMMARY:")
+        print("\n📊 RANKING SUMMARY:")
         print(f"   Total candidates: {len(candidates)}")
         print(f"   ✅ With embeddings: {candidates_with_embedding}")
         print(f"   ⚠️  Without embeddings: {candidates_without_embedding}")
-        print(f"=" * 70)
+        print("=" * 70)
         print()
 
         # Sort by match score (descending)

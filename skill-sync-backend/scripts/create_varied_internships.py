@@ -3,8 +3,8 @@
 Create varied internships to test RAG matching system
 """
 
-import sys
 import os
+import sys
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
@@ -159,7 +159,7 @@ def create_varied_internships():
         print(f"   Skills: {', '.join(data['required_skills'][:3])}...")
         print(f"   Embedding ID: {embedding_id}\n")
 
-    print(f"\n🎉 Successfully created varied internships!")
+    print("\n🎉 Successfully created varied internships!")
     print(f"Total active internships: {db.query(Internship).filter(Internship.is_active == 1).count()}")
 
 

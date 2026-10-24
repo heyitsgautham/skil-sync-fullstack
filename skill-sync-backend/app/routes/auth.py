@@ -3,13 +3,13 @@ Authentication Routes
 Endpoints for user registration and login
 """
 
-from typing import List, Optional
 from fastapi import APIRouter, Depends, HTTPException, status
-from sqlalchemy.orm import Session
 from pydantic import BaseModel, EmailStr, Field
+from sqlalchemy.orm import Session
+
 from app.database.connection import get_db
-from app.services.auth_service import AuthService
 from app.models.user import User, UserRole
+from app.services.auth_service import AuthService
 from app.utils.security import get_current_user
 
 router = APIRouter()
@@ -58,7 +58,7 @@ class UserResponse(BaseModel):
     role: str
     is_active: int  # 1 = active, 0 = inactive
     created_at: str
-    anonymization_enabled: Optional[bool] = False  # Resume anonymization toggle (for companies)
+    anonymization_enabled: bool | None = False  # Resume anonymization toggle (for companies)
 
     class Config:
         from_attributes = True
@@ -120,7 +120,7 @@ async def login(request: LoginRequest, db: Session = Depends(get_db)):
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Login failed: {str(e)}")
 
 
-@router.get("/users", response_model=List[UserResponse])
+@router.get("/users", response_model=list[UserResponse])
 async def list_users(db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     """
     List all users (Admin only)
@@ -199,15 +199,15 @@ async def get_analytics(db: Session = Depends(get_db), current_user: User = Depe
 class UpdateUserRequest(BaseModel):
     """Update user request model"""
 
-    full_name: Optional[str] = Field(None, min_length=2, max_length=255)
-    role: Optional[UserRole] = None  # Deprecated: Role changes not allowed for security
-    is_active: Optional[int] = Field(None, ge=0, le=1)
-    phone: Optional[str] = None
-    linkedin_url: Optional[str] = None
-    github_url: Optional[str] = None
-    hr_contact_name: Optional[str] = None
-    mailing_email: Optional[EmailStr] = None
-    anonymization_enabled: Optional[bool] = None  # Admin can toggle resume anonymization for companies
+    full_name: str | None = Field(None, min_length=2, max_length=255)
+    role: UserRole | None = None  # Deprecated: Role changes not allowed for security
+    is_active: int | None = Field(None, ge=0, le=1)
+    phone: str | None = None
+    linkedin_url: str | None = None
+    github_url: str | None = None
+    hr_contact_name: str | None = None
+    mailing_email: EmailStr | None = None
+    anonymization_enabled: bool | None = None  # Admin can toggle resume anonymization for companies
 
     class Config:
         use_enum_values = True

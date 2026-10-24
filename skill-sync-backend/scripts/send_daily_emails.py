@@ -3,18 +3,18 @@ Daily Email Scheduler - Schedule daily summary emails for all companies
 This script should be run as a cron job or scheduled task at midnight daily
 """
 
-import sys
 import os
+import sys
 
 # Add parent directory to path for imports
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from datetime import datetime, timedelta
-from sqlalchemy.orm import Session
+
 from sqlalchemy import and_
 
 from app.database.connection import get_db
-from app.models import User, Internship, Application, Resume, UserRole
+from app.models import Application, Internship, Resume, User, UserRole
 from app.services.email_service import email_service
 
 
@@ -24,7 +24,7 @@ def send_daily_summaries_to_all_companies():
     This function should be called once per day at midnight
     """
     print(f"\n{'=' * 60}")
-    print(f"Starting Daily Email Summary Job")
+    print("Starting Daily Email Summary Job")
     print(f"Time: {datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S UTC')}")
     print(f"{'=' * 60}\n")
 
@@ -58,7 +58,7 @@ def send_daily_summaries_to_all_companies():
             )
 
             if not internships:
-                print(f"  ⊘ No active internships. Skipping.")
+                print("  ⊘ No active internships. Skipping.")
                 companies_skipped += 1
                 continue
 
@@ -75,7 +75,7 @@ def send_daily_summaries_to_all_companies():
             )
 
             if not recent_applications:
-                print(f"  ⊘ No new applications in the last 24 hours. Skipping.")
+                print("  ⊘ No new applications in the last 24 hours. Skipping.")
                 companies_skipped += 1
                 continue
 
@@ -137,7 +137,7 @@ def send_daily_summaries_to_all_companies():
                     total_applications += len(applicants)
 
             if not internship_summaries:
-                print(f"  ⊘ No valid application data. Skipping.")
+                print("  ⊘ No valid application data. Skipping.")
                 companies_skipped += 1
                 continue
 
@@ -169,7 +169,7 @@ def send_daily_summaries_to_all_companies():
 
         # Print summary
         print(f"\n{'=' * 60}")
-        print(f"Daily Email Summary Job Complete")
+        print("Daily Email Summary Job Complete")
         print(f"{'=' * 60}")
         print(f"Total companies processed: {len(companies)}")
         print(f"Emails sent successfully: {emails_sent}")

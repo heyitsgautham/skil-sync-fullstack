@@ -3,13 +3,14 @@ Test script to verify the new Gemini API key manager works correctly
 Tests key rotation, retry logic, and API calls
 """
 
-import sys
 import os
+import sys
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from app.utils.gemini_key_manager import get_gemini_key_manager
 import logging
+
+from app.utils.gemini_key_manager import get_gemini_key_manager
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')

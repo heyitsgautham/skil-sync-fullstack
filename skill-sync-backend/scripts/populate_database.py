@@ -4,18 +4,17 @@ Creates admin, 50 students with resumes, and 3 companies with internships
 """
 
 import sys
-import os
 from pathlib import Path
 
 # Add parent directory to path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from sqlalchemy.orm import Session
-from app.database.connection import SessionLocal, engine, Base
-from app.models import User, UserRole, Resume, Internship
+
 from passlib.context import CryptContext
-from datetime import datetime, timedelta, timezone
-import shutil
+from sqlalchemy.orm import Session
+
+from app.database.connection import Base, SessionLocal, engine
+from app.models import Internship, Resume, User, UserRole
 
 # Password hashing
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
@@ -50,9 +49,9 @@ def create_admin_user(db: Session):
     db.commit()
     db.refresh(admin)
 
-    print(f"✓ Admin user created")
-    print(f"  Email: admin@skillsync.com")
-    print(f"  Password: Admin@123")
+    print("✓ Admin user created")
+    print("  Email: admin@skillsync.com")
+    print("  Password: Admin@123")
 
     return admin
 
@@ -160,10 +159,10 @@ def create_50_students(db: Session):
     db.commit()
 
     print(f"\n✓ Successfully created {created_count} students")
-    print(f"  Password for students 1-50: Student@123")
-    print(f"  Password for Alex Kumar: Alex2024")
-    print(f"  Password for Priya Sharma: Priya2024")
-    print(f"  Password for Rahul Verma: Rahul2024")
+    print("  Password for students 1-50: Student@123")
+    print("  Password for Alex Kumar: Alex2024")
+    print("  Password for Priya Sharma: Priya2024")
+    print("  Password for Rahul Verma: Rahul2024")
 
     return created_count
 
@@ -380,7 +379,7 @@ def main():
         print("\n" + "=" * 60)
         print("DATABASE POPULATION COMPLETE!")
         print("=" * 60)
-        print(f"\n✓ Admin user: 1")
+        print("\n✓ Admin user: 1")
         print(f"✓ Students: {student_count}")
         print(f"✓ Companies: {company_count}")
         print(f"✓ Internships: {internship_count}")

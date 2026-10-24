@@ -3,11 +3,13 @@ Health Check Routes
 System health and status endpoints
 """
 
-from fastapi import APIRouter, Depends
-from sqlalchemy.orm import Session
-from sqlalchemy import text
-from app.database.connection import get_db
 from datetime import datetime
+
+from fastapi import APIRouter, Depends
+from sqlalchemy import text
+from sqlalchemy.orm import Session
+
+from app.database.connection import get_db
 
 router = APIRouter()
 

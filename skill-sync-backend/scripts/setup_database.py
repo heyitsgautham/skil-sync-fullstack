@@ -3,7 +3,6 @@ Quick Database Setup Script
 Interactively configure PostgreSQL connection
 """
 
-import os
 import sys
 from pathlib import Path
 
@@ -17,7 +16,7 @@ def update_env_file(password):
         return False
 
     # Read the file
-    with open(env_path, 'r') as f:
+    with open(env_path) as f:
         lines = f.readlines()
 
     # Update the DATABASE_URL line
@@ -28,7 +27,7 @@ def update_env_file(password):
                 lines[i] = f'DATABASE_URL=postgresql://gauthamkrishna:{password}@localhost:5432/skillsync\n'
             else:
                 # No password (trust authentication)
-                lines[i] = f'DATABASE_URL=postgresql://gauthamkrishna@localhost:5432/skillsync\n'
+                lines[i] = 'DATABASE_URL=postgresql://gauthamkrishna@localhost:5432/skillsync\n'
             updated = True
             break
 

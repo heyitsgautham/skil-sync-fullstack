@@ -14,7 +14,6 @@ from pathlib import Path
 # Add parent directory to path
 sys.path.append(str(Path(__file__).parent.parent))
 
-from sqlalchemy import text
 from app.database.connection import SessionLocal
 from app.models import Resume
 from app.services.s3_service import s3_service
@@ -178,7 +177,7 @@ def migrate_resumes_to_s3(force=False):
                 print(f"  ✅ Uploaded to S3: {s3_key}")
                 success_count += 1
             else:
-                print(f"    Failed to upload to S3")
+                print("    Failed to upload to S3")
                 error_count += 1
 
             print()
@@ -237,11 +236,11 @@ def verify_resume_access():
             url = s3_service.generate_presigned_url(resume.s3_key)
 
             if url:
-                print(f"    ✅ URL generated successfully")
+                print("    ✅ URL generated successfully")
                 print(f"    🔗 {url[:80]}...")
                 success += 1
             else:
-                print(f"      Failed to generate URL")
+                print("      Failed to generate URL")
                 failed += 1
             print()
 

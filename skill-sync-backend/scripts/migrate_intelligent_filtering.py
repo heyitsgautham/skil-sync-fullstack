@@ -3,18 +3,16 @@ Database Migration Script - Update schema for Intelligent Filtering System
 Adds fields for structured resume parsing and intelligent matching
 """
 
-import sys
 import os
+import sys
 
 # Add the project root to Python path
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from app.database.connection import engine, Base
-from app.models.user import User
-from app.models.resume import Resume
-from app.models.internship import Internship
-from app.models.application import Application
 from sqlalchemy import text
+
+import app.models  # noqa: F401  (registers every model on Base.metadata)
+from app.database.connection import Base, engine
 
 
 def migrate_database():

@@ -15,18 +15,18 @@ Usage:
     python scripts/backfill_student_matches.py
 """
 
-import sys
 import os
+import sys
 import time
 
 # Add parent directory to path
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from app.database.connection import get_db
-from app.models.user import User, UserRole
-from app.models.resume import Resume
 from app.models.internship import Internship
+from app.models.resume import Resume
 from app.models.student_internship_match import StudentInternshipMatch
+from app.models.user import User, UserRole
 from app.services.batch_matching_service import BatchMatchingService
 
 
@@ -57,7 +57,7 @@ def check_existing_data():
     # Count existing matches
     existing_matches = db.query(StudentInternshipMatch).count()
 
-    print(f"\n📊 Current Database State:")
+    print("\n📊 Current Database State:")
     print(f"   • Students with active resumes: {students_with_resumes}")
     print(f"   • Active internships: {active_internships}")
     print(f"   • Existing pre-computed matches: {existing_matches}")
@@ -110,7 +110,7 @@ def run_backfill():
         print("🎉 Backfill Complete!")
         print("=" * 70)
 
-        print(f"\n📊 Statistics:")
+        print("\n📊 Statistics:")
         print(f"   • Students processed: {result['students_processed']}")
         print(f"   • Internships processed: {result['internships_processed']}")
         print(f"   • Matches computed: {result['matches_computed']}")

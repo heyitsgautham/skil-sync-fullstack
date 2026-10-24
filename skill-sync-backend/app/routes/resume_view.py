@@ -3,21 +3,20 @@ Resume View/Download Routes with Anonymization Support
 Handles viewing and downloading resumes with on-demand anonymization
 """
 
+import logging
 import os
 import tempfile
-import logging
-from datetime import datetime, timedelta
-from typing import Optional
-from fastapi import APIRouter, Depends, HTTPException, status, Query
-from fastapi.responses import StreamingResponse, FileResponse
-from sqlalchemy.orm import Session
 from io import BytesIO
+
 import jwt
+from fastapi import APIRouter, Depends, HTTPException, Query, status
+from fastapi.responses import FileResponse, StreamingResponse
+from sqlalchemy.orm import Session
 
 from app.database.connection import get_db
-from app.models import User, Resume, UserRole
-from app.services.s3_service import s3_service
+from app.models import Resume, User, UserRole
 from app.services.resume_anonymization_service import anonymization_service
+from app.services.s3_service import s3_service
 from app.utils.security import get_current_user
 
 router = APIRouter(prefix="/resumes", tags=["Resume Viewing"])
@@ -27,7 +26,7 @@ logger = logging.getLogger(__name__)
 TEMP_TOKEN_SECRET = os.getenv("TEMP_TOKEN_SECRET", "your-secret-key-change-in-production")
 
 
-def get_optional_user(token: Optional[str] = Query(None), db: Session = Depends(get_db)):
+def get_optional_user(token: str | None = Query(None), db: Session = Depends(get_db)):
     """Get current user or None if using temporary token"""
     if token:
         # Using temporary token, skip user authentication
@@ -43,7 +42,7 @@ def get_optional_user(token: Optional[str] = Query(None), db: Session = Depends(
 @router.get("/{resume_id}/view")
 async def view_resume(
     resume_id: int,
-    token: Optional[str] = Query(None, description="Temporary access token"),
+    token: str | None = Query(None, description="Temporary access token"),
     db: Session = Depends(get_db),
 ):
     """
@@ -158,7 +157,7 @@ async def view_resume(
                         headers={"Content-Disposition": f'inline; filename="{resume.file_name}"'},
                     )
 
-        except Exception as e:
+        except Exception:
             # Clean up temp file on error
             if temp_file_path and os.path.exists(temp_file_path):
                 os.remove(temp_file_path)
@@ -265,7 +264,7 @@ async def download_resume(
                 else:
                     return FileResponse(pdf_path, media_type="application/pdf", filename=resume.file_name)
 
-        except Exception as e:
+        except Exception:
             if temp_file_path and os.path.exists(temp_file_path):
                 os.remove(temp_file_path)
             raise

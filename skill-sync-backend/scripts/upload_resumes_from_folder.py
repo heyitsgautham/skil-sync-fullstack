@@ -3,24 +3,25 @@ Upload and populate DB with resumes from the Resumes folder
 Creates student accounts and uploads their resumes automatically
 """
 
-import sys
 import os
+import sys
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+import shutil
+import time
+import traceback
+from datetime import datetime
+
+from dotenv import load_dotenv
 
 from app.database.connection import get_db
 from app.models.resume import Resume
 from app.models.user import User, UserRole
 from app.services.parser_service import ResumeParser
-from app.services.resume_intelligence_service import ResumeIntelligenceService
 from app.services.rag_engine import rag_engine
+from app.services.resume_intelligence_service import ResumeIntelligenceService
 from app.services.s3_service import s3_service
-import time
-from datetime import datetime
-import traceback
-import shutil
-from pathlib import Path
-from dotenv import load_dotenv
 
 # Resume folder path
 RESUME_FOLDER = "/Users/gauthamkrishna/Projects/presidio/skill-sync/Resumes"
@@ -87,7 +88,7 @@ def upload_and_parse_resume(file_path: str, student_id: int, file_name: str, db)
         # Upload to S3 if enabled
         s3_key = None
         if s3_service.is_enabled():
-            print(f"   ☁️  Uploading to S3...")
+            print("   ☁️  Uploading to S3...")
             s3_key = s3_service.upload_resume(
                 file_path=destination_path,
                 student_id=student_id,
@@ -99,13 +100,13 @@ def upload_and_parse_resume(file_path: str, student_id: int, file_name: str, db)
                 print(f"   ✅ S3 Upload successful: {s3_key}")
 
         # Parse resume - extract raw text
-        print(f"   🔍 Parsing resume...")
+        print("   🔍 Parsing resume...")
         basic_data = ResumeParser.parse_resume(destination_path)
         resume_text = basic_data.get('parsed_content', '')
         print(f"   ✅ Extracted {len(resume_text)} characters")
 
         # Use Gemini for intelligent extraction
-        print(f"   🧠 Extracting structured data with Gemini...")
+        print("   🧠 Extracting structured data with Gemini...")
         intelligence_service = ResumeIntelligenceService()
         structured_data = intelligence_service.extract_structured_data(resume_text)
         skills = structured_data.get('all_skills', [])
@@ -118,7 +119,7 @@ def upload_and_parse_resume(file_path: str, student_id: int, file_name: str, db)
         db.query(Resume).filter(Resume.student_id == student_id, Resume.is_active == 1).update({"is_active": 0})
 
         # Generate embedding
-        print(f"   🔢 Generating embedding...")
+        print("   🔢 Generating embedding...")
         embedding = None
         if resume_text and skills:
             embedding_text = f"{resume_text}\n\nSkills: {', '.join(skills)}"
@@ -126,7 +127,7 @@ def upload_and_parse_resume(file_path: str, student_id: int, file_name: str, db)
             print(f"   ✅ Generated embedding: dimension {len(embedding) if embedding else 0}")
 
         # Create new resume record
-        print(f"   💾 Creating resume record...")
+        print("   💾 Creating resume record...")
         new_resume = Resume(
             student_id=student_id,
             file_path=destination_path,
@@ -143,7 +144,7 @@ def upload_and_parse_resume(file_path: str, student_id: int, file_name: str, db)
         db.flush()
 
         # Store in ChromaDB
-        print(f"   📚 Storing in ChromaDB...")
+        print("   📚 Storing in ChromaDB...")
         if resume_text and skills:
             try:
                 embedding_id = rag_engine.store_resume_embedding(

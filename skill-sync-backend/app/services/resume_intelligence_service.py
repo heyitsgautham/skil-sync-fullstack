@@ -3,12 +3,11 @@ Resume Intelligence Service - Core Intelligence System for Resume Filtering
 Uses Google Gemini for structured extraction and HuggingFace embeddings for matching
 """
 
-import os
 import json
-import re
 import logging
-from typing import Dict, List, Optional, Tuple
+import re
 from datetime import datetime
+
 from dotenv import load_dotenv
 
 from app.utils.gemini_key_manager import get_gemini_key_manager
@@ -29,7 +28,7 @@ class ResumeIntelligenceService:
         self.key_manager = get_gemini_key_manager()
         logger.info("✅ ResumeIntelligenceService initialized with GeminiKeyManager")
 
-    def extract_structured_data(self, resume_text: str) -> Dict:
+    def extract_structured_data(self, resume_text: str) -> dict:
         """
         Extract structured information from resume using Gemini
 
@@ -160,7 +159,7 @@ Return ONLY the JSON object, no markdown, no explanation.
             logger.error(f"  Error in structured extraction: {e}")
             return self._create_fallback_structure(resume_text)
 
-    def _calculate_total_experience(self, experiences: List[Dict]) -> int:
+    def _calculate_total_experience(self, experiences: list[dict]) -> int:
         """
         Calculate total months of work experience, handling overlaps
 
@@ -228,7 +227,7 @@ Return ONLY the JSON object, no markdown, no explanation.
 
         return total_months
 
-    def _create_fallback_structure(self, resume_text: str) -> Dict:
+    def _create_fallback_structure(self, resume_text: str) -> dict:
         """
         Create a fallback structure when Gemini parsing fails
         Uses basic regex extraction
@@ -254,7 +253,7 @@ Return ONLY the JSON object, no markdown, no explanation.
             "all_skills": [],
         }
 
-    def generate_candidate_summary(self, structured_data: Dict) -> str:
+    def generate_candidate_summary(self, structured_data: dict) -> str:
         """
         Generate a concise candidate summary using Gemini
 
@@ -293,7 +292,7 @@ Write in third person. Be specific and highlight key strengths.
             logger.error(f"  Error generating summary: {e}")
             return f"Candidate with {structured_data.get('total_experience_years', 0)} years of experience"
 
-    def extract_key_achievements(self, structured_data: Dict) -> List[str]:
+    def extract_key_achievements(self, structured_data: dict) -> list[str]:
         """
         Extract top 3-5 key achievements from experience using Gemini
 

@@ -7,9 +7,9 @@ import sys
 sys.path.insert(0, '.')
 
 from app.database.connection import get_db
-from app.models.user import User, UserRole
 from app.models.internship import Internship
 from app.models.student_internship_match import StudentInternshipMatch
+from app.models.user import User, UserRole
 
 db = next(get_db())
 
@@ -20,7 +20,7 @@ print("=" * 80)
 # Get inactive students
 inactive_students = db.query(User).filter(User.role == UserRole.student, User.is_active == 0).all()
 
-print(f"\n🚫 Inactive Students (should NOT appear in rankings):")
+print("\n🚫 Inactive Students (should NOT appear in rankings):")
 print("-" * 80)
 for student in inactive_students:
     print(f"  - ID: {student.id}, Name: {student.full_name}")
@@ -76,7 +76,7 @@ for match, user in matches_with_filter:
 
 if not inactive_ids_in_filtered:
     print(f"  ✅ No inactive students found (Total results: {len(matches_with_filter)})")
-    print(f"  ✅ Filter is working correctly!")
+    print("  ✅ Filter is working correctly!")
 else:
     print(f"  ❌ PROBLEM: Found {len(inactive_ids_in_filtered)} inactive students")
 

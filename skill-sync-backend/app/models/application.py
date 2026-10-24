@@ -2,11 +2,13 @@
 Application Model - Student applications to internships
 """
 
-from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Text
+import enum
+
+from sqlalchemy import Column, DateTime, ForeignKey, Integer, String, Text
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
+
 from app.database.connection import Base
-import enum
 
 
 class ApplicationStatus(str, enum.Enum):

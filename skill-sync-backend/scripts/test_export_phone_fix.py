@@ -3,14 +3,14 @@ Test script to verify phone number export fix
 Tests both CSV and XLSX export formats
 """
 
-import sys
 import os
+import sys
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-import requests
-import json
 from pathlib import Path
+
+import requests
 
 # API Configuration
 BASE_URL = "http://localhost:8000"
@@ -69,9 +69,9 @@ def test_export(token, internship_id, format_type):
 
         # For CSV, let's read and check the phone numbers
         if format_type == "csv":
-            with open(filepath, 'r', encoding='utf-8') as f:
+            with open(filepath, encoding='utf-8') as f:
                 lines = f.readlines()
-                print(f"\n📋 First few lines of CSV:")
+                print("\n📋 First few lines of CSV:")
                 for i, line in enumerate(lines[:3]):
                     print(f"   Line {i + 1}: {line.strip()}")
 
@@ -93,9 +93,9 @@ def test_export(token, internship_id, format_type):
 
                             # Check for formula indicators
                             if phone.startswith('=') or phone.startswith('+'):
-                                print(f"      ⚠️  WARNING: Phone may be interpreted as formula!")
+                                print("      ⚠️  WARNING: Phone may be interpreted as formula!")
                             elif phone.startswith("'"):
-                                print(f"      ✅ Good: Prefixed with apostrophe (text format)")
+                                print("      ✅ Good: Prefixed with apostrophe (text format)")
 
         return True
     else:

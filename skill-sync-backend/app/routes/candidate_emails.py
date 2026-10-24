@@ -2,14 +2,14 @@
 Candidate Email Routes - Send emails to selected candidates
 """
 
-from typing import List
-from fastapi import APIRouter, Depends, HTTPException, status
-from sqlalchemy.orm import Session
-from pydantic import BaseModel
 import os
 
+from fastapi import APIRouter, Depends, HTTPException, status
+from pydantic import BaseModel
+from sqlalchemy.orm import Session
+
 from app.database.connection import get_db
-from app.models import User, Internship, UserRole
+from app.models import Internship, User, UserRole
 from app.services.email_service import email_service
 from app.utils.security import get_current_user
 
@@ -20,7 +20,7 @@ class CandidateEmailRequest(BaseModel):
     """Request model for sending emails to candidates"""
 
     internship_id: int
-    candidate_ids: List[int]
+    candidate_ids: list[int]
     subject: str
     message: str
 
@@ -32,7 +32,7 @@ class CandidateEmailResponse(BaseModel):
     message: str
     emails_sent: int
     failed_emails: int
-    details: List[dict]
+    details: list[dict]
 
 
 @router.post("/send-to-candidates", response_model=CandidateEmailResponse)

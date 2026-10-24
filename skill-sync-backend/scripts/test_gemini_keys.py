@@ -7,6 +7,7 @@ Reads API keys from .env file
 import os
 import sys
 import time
+
 from dotenv import load_dotenv
 
 # Load environment variables from .env file

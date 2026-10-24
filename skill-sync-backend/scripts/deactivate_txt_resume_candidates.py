@@ -2,13 +2,12 @@
 Script to deactivate all candidates whose resumes are .txt files
 """
 
-import sys
 import os
+import sys
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-from sqlalchemy.orm import Session
-from app.database.connection import SessionLocal, engine
+from app.database.connection import SessionLocal
 from app.models.resume import Resume
 from app.models.user import User
 
@@ -72,16 +71,16 @@ def deactivate_txt_resume_candidates():
                 if user.is_active == 1:
                     user.is_active = 0
                     deactivated_count += 1
-                    print(f"   ✅ Status changed to: Inactive")
+                    print("   ✅ Status changed to: Inactive")
                 else:
-                    print(f"   ℹ️  Already inactive")
+                    print("   ℹ️  Already inactive")
 
         # Commit all changes
         db.commit()
 
         print()
         print("=" * 80)
-        print(f"✅ DEACTIVATION COMPLETE")
+        print("✅ DEACTIVATION COMPLETE")
         print(f"Total candidates deactivated: {deactivated_count}")
         print("=" * 80)
 

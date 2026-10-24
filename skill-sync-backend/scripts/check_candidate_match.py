@@ -3,14 +3,14 @@
 Check candidate matching details for Aanya vs Hari
 """
 
-import sys
 import os
+import sys
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
+from dotenv import load_dotenv
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from dotenv import load_dotenv
 
 load_dotenv()
 
@@ -20,10 +20,10 @@ engine = create_engine(DATABASE_URL)
 Session = sessionmaker(bind=engine)
 db = Session()
 
-from app.models.user import User
+from app.models.internship import Internship
 from app.models.resume import Resume
 from app.models.student_internship_match import StudentInternshipMatch
-from app.models.internship import Internship
+from app.models.user import User
 
 print("=" * 80)
 print("CANDIDATE MATCHING ANALYSIS")
@@ -196,21 +196,21 @@ if common_internship_ids:
 
         aanya_semantic_contrib = aanya_match.semantic_similarity * 0.35
         hari_semantic_contrib = hari_match.semantic_similarity * 0.35
-        print(f"Semantic Similarity (35%):")
+        print("Semantic Similarity (35%):")
         print(f"  Aanya: {aanya_match.semantic_similarity:.1f}% × 0.35 = {aanya_semantic_contrib:.2f}")
         print(f"  Hari:  {hari_match.semantic_similarity:.1f}% × 0.35 = {hari_semantic_contrib:.2f}")
         print(f"  Difference: {abs(aanya_semantic_contrib - hari_semantic_contrib):.2f}")
 
         aanya_skills_contrib = aanya_match.skills_match_score * 0.30
         hari_skills_contrib = hari_match.skills_match_score * 0.30
-        print(f"\nSkills Match (30%):")
+        print("\nSkills Match (30%):")
         print(f"  Aanya: {aanya_match.skills_match_score:.1f}% × 0.30 = {aanya_skills_contrib:.2f}")
         print(f"  Hari:  {hari_match.skills_match_score:.1f}% × 0.30 = {hari_skills_contrib:.2f}")
         print(f"  Difference: {abs(aanya_skills_contrib - hari_skills_contrib):.2f}")
 
         aanya_exp_contrib = aanya_match.experience_match_score * 0.20
         hari_exp_contrib = hari_match.experience_match_score * 0.20
-        print(f"\nExperience Match (20%):")
+        print("\nExperience Match (20%):")
         print(f"  Aanya: {aanya_match.experience_match_score:.1f}% × 0.20 = {aanya_exp_contrib:.2f}")
         print(f"  Hari:  {hari_match.experience_match_score:.1f}% × 0.20 = {hari_exp_contrib:.2f}")
         print(f"  Difference: {abs(aanya_exp_contrib - hari_exp_contrib):.2f}")

@@ -2,12 +2,12 @@
 S3 Service - Cloud storage for resume files
 """
 
+import logging
 import os
+from datetime import datetime
+
 import boto3
 from botocore.exceptions import ClientError
-from typing import Optional
-import logging
-from datetime import datetime
 
 logger = logging.getLogger(__name__)
 
@@ -54,8 +54,8 @@ class S3Service:
         student_id: int,
         file_name: str,
         is_tailored: bool = False,
-        internship_id: Optional[int] = None,
-    ) -> Optional[str]:
+        internship_id: int | None = None,
+    ) -> str | None:
         """
         Upload resume to S3
 
@@ -109,7 +109,7 @@ class S3Service:
             logger.error(f"  Unexpected error during S3 upload: {str(e)}")
             return None
 
-    def generate_presigned_url(self, s3_key: str, expiration: int = 3600) -> Optional[str]:
+    def generate_presigned_url(self, s3_key: str, expiration: int = 3600) -> str | None:
         """
         Generate a public URL for resume access (bucket is public)
 

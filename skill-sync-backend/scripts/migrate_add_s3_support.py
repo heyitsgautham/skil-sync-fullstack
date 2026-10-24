@@ -3,7 +3,6 @@ Database Migration: Add S3 support to resumes table
 Adds s3_key column to store S3 object keys for cloud storage
 """
 
-import os
 import sys
 from pathlib import Path
 
@@ -11,7 +10,8 @@ from pathlib import Path
 sys.path.append(str(Path(__file__).parent.parent))
 
 from sqlalchemy import text
-from app.database.connection import engine, SessionLocal
+
+from app.database.connection import SessionLocal
 
 
 def migrate_add_s3_key():

@@ -4,19 +4,19 @@ This script reads resume text files and updates the database with parsed content
 """
 
 import sys
-import os
 from pathlib import Path
 
 # Add parent directory to path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
+import hashlib
+
 from sqlalchemy.orm import Session
+
 from app.database.connection import SessionLocal
 from app.models.resume import Resume
 from app.models.user import User, UserRole
-from app.services.parser_service import ResumeParser
 from app.services.rag_engine import rag_engine
-import hashlib
 
 
 def hash_content(content: str) -> str:
@@ -30,7 +30,7 @@ def read_resume_file(file_path: str) -> str:
         # Try different encodings
         for encoding in ['utf-8', 'latin-1', 'cp1252']:
             try:
-                with open(file_path, 'r', encoding=encoding) as f:
+                with open(file_path, encoding=encoding) as f:
                     return f.read()
             except UnicodeDecodeError:
                 continue
@@ -122,7 +122,7 @@ def main():
                 resume.extracted_skills = skills
                 student.skills = skills
 
-                print(f"  ✅ Parsed successfully")
+                print("  ✅ Parsed successfully")
                 print(f"     Skills found: {len(skills)}")
 
                 # Index in ChromaDB
@@ -138,7 +138,7 @@ def main():
                             'resume_id': resume.id,
                         },
                     )
-                    print(f"  ✅ Indexed in ChromaDB")
+                    print("  ✅ Indexed in ChromaDB")
                 except Exception as e:
                     print(f"  ⚠️  ChromaDB indexing failed: {str(e)[:100]}")
 

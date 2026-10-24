@@ -3,15 +3,15 @@ Recommendations API Routes - AI-powered matching
 """
 
 import os
-from typing import List, Optional
-from fastapi import APIRouter, Depends, HTTPException, status, Query
-from sqlalchemy.orm import Session
-from sqlalchemy import and_, or_, func
-from pydantic import BaseModel
 from datetime import datetime, timedelta
 
+from fastapi import APIRouter, Depends, HTTPException, Query, status
+from pydantic import BaseModel
+from sqlalchemy import and_, func, or_
+from sqlalchemy.orm import Session
+
 from app.database.connection import get_db
-from app.models import User, Resume, Internship, UserRole
+from app.models import Internship, Resume, User, UserRole
 from app.services.rag_engine import rag_engine
 from app.services.s3_service import s3_service
 from app.utils.security import get_current_user
@@ -24,13 +24,13 @@ class InternshipMatch(BaseModel):
     internship_id: int
     title: str
     description: str
-    required_skills: List[str]
+    required_skills: list[str]
     location: str
     duration: str
     stipend: str
     match_score: int
-    posted_date: Optional[str] = None
-    experience_level: Optional[str] = None
+    posted_date: str | None = None
+    experience_level: str | None = None
 
 
 class PaginatedInternshipResponse(BaseModel):
@@ -38,14 +38,14 @@ class PaginatedInternshipResponse(BaseModel):
     page: int
     page_size: int
     total_pages: int
-    items: List[InternshipMatch]
+    items: list[InternshipMatch]
 
 
 class CandidateMatch(BaseModel):
     student_id: int
     student_name: str
     resume_id: int
-    skills: List[str]
+    skills: list[str]
     match_score: int
 
 
@@ -55,15 +55,15 @@ def get_recommendations_for_student(
     page: int = Query(1, ge=1, description="Page number"),
     page_size: int = Query(10, ge=1, le=100, description="Items per page"),
     # Filtering
-    min_score: Optional[int] = Query(None, ge=0, le=100, description="Minimum match score"),
-    max_score: Optional[int] = Query(None, ge=0, le=100, description="Maximum match score"),
-    skills: Optional[str] = Query(None, description="Comma-separated skills to filter"),
-    location: Optional[str] = Query(None, description="Location filter"),
-    experience_level: Optional[str] = Query(None, description="Experience level filter"),
-    days_posted: Optional[int] = Query(None, ge=1, description="Filter by days since posted"),
+    min_score: int | None = Query(None, ge=0, le=100, description="Minimum match score"),
+    max_score: int | None = Query(None, ge=0, le=100, description="Maximum match score"),
+    skills: str | None = Query(None, description="Comma-separated skills to filter"),
+    location: str | None = Query(None, description="Location filter"),
+    experience_level: str | None = Query(None, description="Experience level filter"),
+    days_posted: int | None = Query(None, ge=1, description="Filter by days since posted"),
     # Sorting
-    sort_by: Optional[str] = Query("score", description="Sort by: score, date, title"),
-    sort_order: Optional[str] = Query("desc", description="Sort order: asc, desc"),
+    sort_by: str | None = Query("score", description="Sort by: score, date, title"),
+    sort_order: str | None = Query("desc", description="Sort order: asc, desc"),
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
@@ -204,7 +204,7 @@ def get_recommendations_for_student(
     )
 
 
-@router.get("/candidates/{internship_id}", response_model=List[CandidateMatch])
+@router.get("/candidates/{internship_id}", response_model=list[CandidateMatch])
 def get_recommended_candidates(
     internship_id: int, top_k: int = 20, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)
 ):
@@ -268,7 +268,7 @@ def get_recommended_candidates(
 @router.get("/resume/{student_id}")
 def get_candidate_resume_url(
     student_id: int,
-    internship_id: Optional[int] = Query(None, description="Internship ID to verify access"),
+    internship_id: int | None = Query(None, description="Internship ID to verify access"),
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
@@ -281,8 +281,9 @@ def get_candidate_resume_url(
     - Tracks resume views for analytics
     """
     import logging
-    import jwt
     from datetime import datetime, timedelta
+
+    import jwt
 
     logger = logging.getLogger(__name__)
 
