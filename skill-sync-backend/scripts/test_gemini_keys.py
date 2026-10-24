@@ -3,6 +3,7 @@ Test script to check which Gemini API keys are working
 Uses the NEW google-genai SDK (not google.generativeai)
 Reads API keys from .env file
 """
+
 import os
 import sys
 import time
@@ -22,7 +23,7 @@ api_keys = {
     "achievement_extraction": os.getenv("GEMINI_KEY_ACHIEVEMENT_EXTRACTION"),
     "fallback_1": os.getenv("GEMINI_KEY_FALLBACK_1"),
     "fallback_2": os.getenv("GEMINI_KEY_FALLBACK_2"),
-    "fallback_3": os.getenv("GEMINI_KEY_FALLBACK_3")
+    "fallback_3": os.getenv("GEMINI_KEY_FALLBACK_3"),
 }
 
 # Remove None values (keys not set in .env)
@@ -44,30 +45,27 @@ invalid_keys = []
 
 for username, api_key in api_keys.items():
     print(f"Testing: {username}...", end=" ")
-    
+
     try:
         # Set the API key as environment variable (new SDK requirement)
         os.environ['GEMINI_API_KEY'] = api_key
-        
+
         # Import the NEW SDK
         from google import genai
-        
+
         # Create client
         client = genai.Client(api_key=api_key)
-        
+
         # Try a simple generation with Gemini 2.5 Flash
-        response = client.models.generate_content(
-            model="gemini-2.5-flash",
-            contents="Say 'OK'"
-        )
-        
+        response = client.models.generate_content(model="gemini-2.5-flash", contents="Say 'OK'")
+
         if response and response.text:
             print("✅ WORKING")
             working_keys.append((username, api_key))
         else:
             print("⚠️  NO RESPONSE")
             invalid_keys.append((username, api_key, "No response"))
-            
+
     except Exception as e:
         error_msg = str(e)
         if "429" in error_msg or "quota" in error_msg.lower() or "rate" in error_msg.lower():
@@ -79,7 +77,7 @@ for username, api_key in api_keys.items():
         else:
             print(f"  ERROR: {error_msg[:50]}")
             invalid_keys.append((username, api_key, error_msg[:100]))
-    
+
     # Small delay to avoid hitting rate limits during testing
     time.sleep(1)
 

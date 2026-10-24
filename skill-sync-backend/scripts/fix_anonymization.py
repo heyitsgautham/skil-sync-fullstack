@@ -13,13 +13,13 @@ skip_until = -1
 for i, line in enumerate(lines):
     if skip_until > 0 and i < skip_until:
         continue
-    
+
     # Found the start of Step 3
     if i < len(lines) - 1 and '# Step 3: Redact clickable links' in line:
         # Add the line
         new_lines.append("                # Step 3: Redact clickable links (GitHub, LinkedIn, Email only)\n")
         skip_until = i + 1
-        
+
         # Find the end of this section (where "# Apply all redactions" appears)
         for j in range(i + 1, len(lines)):
             if '# Apply all redactions on this page' in lines[j]:
@@ -46,9 +46,13 @@ for i, line in enumerate(lines):
                 new_lines.append("                            logger.info(f\"Redacting email clickable link\")\n")
                 new_lines.append("                        \n")
                 new_lines.append("                        # Redact email provider links\n")
-                new_lines.append("                        elif any(provider in uri for provider in ['gmail.com', 'outlook.com', 'hotmail.com', 'yahoo.com']):\n")
+                new_lines.append(
+                    "                        elif any(provider in uri for provider in ['gmail.com', 'outlook.com', 'hotmail.com', 'yahoo.com']):\n"
+                )
                 new_lines.append("                            should_redact = True\n")
-                new_lines.append("                            logger.info(f\"Redacting email provider clickable link\")\n")
+                new_lines.append(
+                    "                            logger.info(f\"Redacting email provider clickable link\")\n"
+                )
                 new_lines.append("                        \n")
                 new_lines.append("                        # Black out completely and make unclickable\n")
                 new_lines.append("                        if should_redact:\n")
@@ -56,7 +60,7 @@ for i, line in enumerate(lines):
                 new_lines.append("                            page.add_redact_annot(rect, fill=(0, 0, 0))\n")
                 new_lines.append("                            total_redactions += 1\n")
                 new_lines.append("                \n")
-                
+
                 # Add the "Apply all redactions" line
                 new_lines.append(lines[j])
                 skip_until = j + 1

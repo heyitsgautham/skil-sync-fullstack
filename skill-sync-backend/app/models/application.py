@@ -11,6 +11,7 @@ import enum
 
 class ApplicationStatus(str, enum.Enum):
     """Application status enumeration"""
+
     pending = "pending"
     shortlisted = "shortlisted"
     rejected = "rejected"
@@ -20,11 +21,12 @@ class ApplicationStatus(str, enum.Enum):
 class Application(Base):
     """
     Application database model with hybrid matching support.
-    
+
     Supports both:
     - Pre-computed base similarity (from student_internship_matches)
     - Application-specific similarity (calculated at application time with tailored resume)
     """
+
     __tablename__ = "applications"
 
     id = Column(Integer, primary_key=True, index=True)
@@ -33,12 +35,12 @@ class Application(Base):
     resume_id = Column(Integer, ForeignKey("resumes.id"), nullable=False)
     status = Column(String(50), default=ApplicationStatus.pending.value)
     cover_letter = Column(Text, nullable=True)
-    
+
     # Hybrid matching scores (Strategy B: Application-Specific Similarity)
     match_score = Column(Integer, nullable=True)  # Legacy/overall AI matching score (0-100)
     application_similarity_score = Column(Integer, nullable=True)  # NEW: Score with tailored resume
     used_tailored_resume = Column(Integer, default=0)  # 1 if tailored resume used, 0 if not
-    
+
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
 

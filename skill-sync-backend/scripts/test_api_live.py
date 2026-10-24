@@ -1,6 +1,7 @@
 """
 Quick diagnostic script to test the API endpoint directly
 """
+
 import requests
 import json
 
@@ -13,10 +14,7 @@ print("=" * 80)
 
 # First, let's login as a company user
 print("\n1️⃣ Logging in as company user...")
-login_data = {
-    "email": "hr@techcorp.com",
-    "password": "TechCorp2024"
-}
+login_data = {"email": "hr@techcorp.com", "password": "TechCorp2024"}
 
 response = requests.post(f"{BASE_URL}/api/auth/login", json=login_data)
 if response.status_code != 200:
@@ -26,9 +24,7 @@ if response.status_code != 200:
 token = response.json()["access_token"]
 print(f"✅ Logged in successfully")
 
-headers = {
-    "Authorization": f"Bearer {token}"
-}
+headers = {"Authorization": f"Bearer {token}"}
 
 # Use a known internship ID (from database)
 print("\n2️⃣ Using internship ID 1 (Full Stack Software Engineer Intern)...")
@@ -41,10 +37,7 @@ print(f"\n3️⃣ Testing ranking endpoint (discovery mode)...")
 response = requests.post(
     f"{BASE_URL}/api/filter/rank-candidates/{internship_id}",
     headers=headers,
-    params={
-        "only_applicants": False,
-        "limit": 100
-    }
+    params={"only_applicants": False, "limit": 100},
 )
 
 if response.status_code != 200:
@@ -62,7 +55,7 @@ inactive_found = []
 for candidate in candidates:
     candidate_id = candidate.get("candidate_id") or candidate.get("student_id")
     candidate_name = candidate.get("candidate_name") or candidate.get("student_name")
-    
+
     if candidate_id in [71, 72]:
         inactive_found.append(f"ID {candidate_id}: {candidate_name}")
         print(f"  🐛 BUG: Found inactive student - {candidate_name} (ID: {candidate_id})")

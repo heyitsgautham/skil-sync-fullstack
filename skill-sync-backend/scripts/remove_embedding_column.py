@@ -36,23 +36,25 @@ def remove_embedding_column():
     print("=" * 80)
     print("🔧 Removing Redundant Embedding Column from PostgreSQL")
     print("=" * 80)
-    
+
     # Check if column exists
     print("\n📊 Step 1: Checking if 'embedding' column exists...")
     if not check_column_exists():
         print("✅ Column 'embedding' does not exist. Nothing to do!")
         return
-    
+
     print("✅ Column 'embedding' found in resumes table")
-    
+
     # Show current state
     db = SessionLocal()
     try:
-        result = db.execute(text("""
+        result = db.execute(
+            text("""
             SELECT COUNT(*) as total,
                    SUM(CASE WHEN embedding IS NOT NULL THEN 1 ELSE 0 END) as with_embedding
             FROM resumes
-        """))
+        """)
+        )
         row = result.fetchone()
         print(f"\n📊 Current state:")
         print(f"   Total resumes: {row[0]}")
@@ -62,17 +64,17 @@ def remove_embedding_column():
         print(f"⚠️  Could not check current state: {e}")
     finally:
         db.close()
-    
+
     # Confirm with user
     print(f"\n⚠️  WARNING: This will permanently remove the 'embedding' column!")
     print(f"   Embeddings will only be stored in ChromaDB going forward.")
     print(f"   The 'embedding_id' column will remain as a reference.\n")
-    
+
     response = input("Continue? (yes/no): ").strip().lower()
     if response != 'yes':
         print("  Migration cancelled by user")
         return
-    
+
     # Remove the column
     print("\n🗑️  Step 2: Removing 'embedding' column...")
     db = SessionLocal()
@@ -86,14 +88,14 @@ def remove_embedding_column():
         return
     finally:
         db.close()
-    
+
     # Verify removal
     print("\n✓ Step 3: Verifying column was removed...")
     if not check_column_exists():
         print("✅ Verification successful! Column 'embedding' has been removed.")
     else:
         print("⚠️  Warning: Column still exists. Manual intervention may be needed.")
-    
+
     print("\n" + "=" * 80)
     print("🎉 Migration Complete!")
     print("=" * 80)
@@ -117,5 +119,6 @@ if __name__ == "__main__":
     except Exception as e:
         print(f"\n\n  Unexpected error: {e}")
         import traceback
+
         traceback.print_exc()
         sys.exit(1)

@@ -17,4 +17,5 @@ def test_root_endpoint(client):
 def test_health_module_imports():
     """Test that health module imports successfully"""
     from app.routes import health
+
     assert health is not None

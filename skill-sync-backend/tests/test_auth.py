@@ -9,6 +9,7 @@ from fastapi import status
 def test_auth_module_imports():
     """Test that auth module imports successfully"""
     from app.routes import auth
+
     assert auth is not None
 
 

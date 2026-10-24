@@ -12,13 +12,14 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')
 
 from app.services.parser_service import ResumeParser, InternshipParser
 
+
 def test_skill_extraction():
     """Test skill extraction from text"""
-    
+
     print("=" * 60)
     print("Testing Skill Extraction")
     print("=" * 60)
-    
+
     # Test resume text
     resume_text = """
     John Doe
@@ -39,14 +40,14 @@ def test_skill_extraction():
     EDUCATION:
     B.S. in Computer Science
     """
-    
+
     print("\nExtracting skills from resume text...")
     skills = ResumeParser.extract_skills(resume_text)
-    
+
     print(f"\n✓ Extracted {len(skills)} skills:")
     for skill in sorted(skills)[:20]:  # Show first 20
         print(f"  - {skill}")
-    
+
     # Test internship description
     internship_desc = """
     We are looking for a Full-Stack Developer Intern with the following skills:
@@ -56,36 +57,37 @@ def test_skill_extraction():
     - Familiarity with Docker and AWS is a plus
     - Understanding of Agile methodologies
     """
-    
+
     print("\n" + "-" * 60)
     print("\nExtracting skills from internship description...")
     skills = InternshipParser.extract_skills_from_description(internship_desc)
-    
+
     print(f"\n✓ Extracted {len(skills)} skills:")
     for skill in sorted(skills)[:20]:  # Show first 20
         print(f"  - {skill}")
-    
+
     print("\n" + "=" * 60)
     print("✓ Skill extraction tests completed successfully!")
     print("=" * 60)
-    
+
     return True
+
 
 def test_file_parsing():
     """Test parsing actual files if they exist"""
-    
+
     print("\n" + "=" * 60)
     print("Testing File Parsing")
     print("=" * 60)
-    
+
     test_files_dir = os.path.join(os.path.dirname(__file__), '..', 'tests', 'sample_files')
-    
+
     if not os.path.exists(test_files_dir):
         print(f"\nℹ Test files directory not found: {test_files_dir}")
         print("  Skipping file parsing tests")
         print("  To test file parsing, add sample PDF/DOCX files to tests/sample_files/")
         return True
-    
+
     # Test PDF parsing
     pdf_files = [f for f in os.listdir(test_files_dir) if f.endswith('.pdf')]
     for pdf_file in pdf_files:
@@ -97,7 +99,7 @@ def test_file_parsing():
             print(f"  ✓ Found {len(result['extracted_skills'])} skills")
         except Exception as e:
             print(f"  ✗ Error: {str(e)}")
-    
+
     # Test DOCX parsing
     docx_files = [f for f in os.listdir(test_files_dir) if f.endswith('.docx')]
     for docx_file in docx_files:
@@ -109,12 +111,13 @@ def test_file_parsing():
             print(f"  ✓ Found {len(result['extracted_skills'])} skills")
         except Exception as e:
             print(f"  ✗ Error: {str(e)}")
-    
+
     print("\n" + "=" * 60)
     print("✓ File parsing tests completed!")
     print("=" * 60)
-    
+
     return True
+
 
 if __name__ == "__main__":
     try:

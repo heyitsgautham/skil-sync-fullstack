@@ -15,17 +15,16 @@ from app.database.connection import engine
 
 def migrate_add_content_hash():
     """Add content_hash columns for caching embeddings"""
-    
+
     print("🔄 Starting migration: Add content_hash columns...")
-    
+
     migrations = [
         # Add content_hash to resumes table
         "ALTER TABLE resumes ADD COLUMN IF NOT EXISTS content_hash VARCHAR(64);",
-        
         # Add content_hash to internships table
         "ALTER TABLE internships ADD COLUMN IF NOT EXISTS content_hash VARCHAR(64);",
     ]
-    
+
     try:
         with engine.begin() as conn:
             for i, migration in enumerate(migrations, 1):
@@ -39,26 +38,28 @@ def migrate_add_content_hash():
                     else:
                         print(f"  ⚠️ Migration {i} note: {str(e)}")
                     continue
-        
+
         print("✅ Migration completed successfully!")
         print("\nAdded columns:")
         print("  - resumes.content_hash (VARCHAR(64)): Hash of parsed content for cache detection")
         print("  - internships.content_hash (VARCHAR(64)): Hash of description for cache detection")
-        
+
         # Verify columns were added (PostgreSQL)
         print("\n🔍 Verifying migration...")
         with engine.connect() as conn:
-            result = conn.execute(text("""
+            result = conn.execute(
+                text("""
                 SELECT column_name, table_name
                 FROM information_schema.columns 
                 WHERE table_name IN ('resumes', 'internships')
                 AND column_name = 'content_hash';
-            """))
+            """)
+            )
             columns = [(row[0], row[1]) for row in result]
-            
+
             for col_name, table_name in columns:
                 print(f"  ✅ Column '{col_name}' exists in table '{table_name}'")
-        
+
     except Exception as e:
         print(f"  Migration failed: {str(e)}")
         raise

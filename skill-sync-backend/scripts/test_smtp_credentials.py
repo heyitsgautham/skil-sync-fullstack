@@ -11,13 +11,14 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from app.services.email_service import email_service
 
+
 def test_smtp_credentials():
     """Send a test email to verify SMTP credentials"""
-    
-    print("\n" + "="*60)
+
+    print("\n" + "=" * 60)
     print("SMTP Credentials Test")
-    print("="*60 + "\n")
-    
+    print("=" * 60 + "\n")
+
     # Check if SMTP is configured
     print(f"SMTP Host: {email_service.smtp_host}")
     print(f"SMTP Port: {email_service.smtp_port}")
@@ -25,19 +26,20 @@ def test_smtp_credentials():
     print(f"Sender Email: {email_service.sender_email}")
     print(f"Sender Name: {email_service.sender_name}")
     print()
-    
+
     if not email_service.smtp_username or not email_service.smtp_password:
         print("  SMTP credentials not configured in .env file")
         print("\nPlease add these to your .env file:")
         print("SMTP_USERNAME=your-email@gmail.com")
         print("SMTP_PASSWORD=your-app-password")
         return False
-    
+
     # Test email content
     recipient = "heyitsgautham@gmail.com"
     subject = "SkillSync SMTP Test - Feature 4"
-    
-    html_content = """
+
+    html_content = (
+        """
     <!DOCTYPE html>
     <html>
     <head>
@@ -95,9 +97,17 @@ def test_smtp_credentials():
             
             <div class="info">
                 <strong>📧 Email Configuration Details:</strong><br>
-                SMTP Host: """ + email_service.smtp_host + """<br>
-                SMTP Port: """ + str(email_service.smtp_port) + """<br>
-                Sender: """ + email_service.sender_name + """ &lt;""" + email_service.sender_email + """&gt;
+                SMTP Host: """
+        + email_service.smtp_host
+        + """<br>
+                SMTP Port: """
+        + str(email_service.smtp_port)
+        + """<br>
+                Sender: """
+        + email_service.sender_name
+        + """ &lt;"""
+        + email_service.sender_email
+        + """&gt;
             </div>
             
             <p><strong>What this means:</strong></p>
@@ -121,7 +131,8 @@ def test_smtp_credentials():
     </body>
     </html>
     """
-    
+    )
+
     text_content = """
     SKILLSYNC - SMTP TEST SUCCESSFUL!
     ==================================
@@ -151,20 +162,17 @@ def test_smtp_credentials():
         host=email_service.smtp_host,
         port=email_service.smtp_port,
         name=email_service.sender_name,
-        email=email_service.sender_email
+        email=email_service.sender_email,
     )
-    
+
     print(f"Sending test email to: {recipient}")
     print("Please wait...\n")
-    
+
     try:
         success = email_service.send_email(
-            to_email=recipient,
-            subject=subject,
-            html_content=html_content,
-            text_content=text_content
+            to_email=recipient, subject=subject, html_content=html_content, text_content=text_content
         )
-        
+
         if success:
             print("=" * 60)
             print("✅ SUCCESS! Test email sent successfully!")
@@ -192,7 +200,7 @@ def test_smtp_credentials():
             print("- Get app password from: https://myaccount.google.com/apppasswords")
             print("=" * 60 + "\n")
             return False
-            
+
     except Exception as e:
         print("=" * 60)
         print("  ERROR sending email")

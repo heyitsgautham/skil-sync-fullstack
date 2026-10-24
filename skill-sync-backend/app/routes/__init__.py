@@ -9,4 +9,3 @@ from . import notifications
 from . import profile
 
 __all__ = ["auth", "health", "resume", "internship", "recommendations", "notifications", "profile"]
-

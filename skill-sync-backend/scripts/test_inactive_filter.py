@@ -1,7 +1,9 @@
 """
 Test script to verify that inactive students are filtered out from rankings
 """
+
 import sys
+
 sys.path.insert(0, '.')
 
 from app.database.connection import get_db
@@ -16,10 +18,7 @@ print("TESTING INACTIVE STUDENT FILTERING")
 print("=" * 80)
 
 # Get inactive students
-inactive_students = db.query(User).filter(
-    User.role == UserRole.student,
-    User.is_active == 0
-).all()
+inactive_students = db.query(User).filter(User.role == UserRole.student, User.is_active == 0).all()
 
 print(f"\n🚫 Inactive Students (should NOT appear in rankings):")
 print("-" * 80)
@@ -39,11 +38,12 @@ print("-" * 80)
 
 # Test Query 1: WITHOUT is_active filter (OLD BEHAVIOR)
 print("\n❌ Query WITHOUT is_active filter (OLD - WRONG):")
-matches_without_filter = db.query(StudentInternshipMatch, User).join(
-    User, StudentInternshipMatch.student_id == User.id
-).filter(
-    StudentInternshipMatch.internship_id == internship.id
-).all()
+matches_without_filter = (
+    db.query(StudentInternshipMatch, User)
+    .join(User, StudentInternshipMatch.student_id == User.id)
+    .filter(StudentInternshipMatch.internship_id == internship.id)
+    .all()
+)
 
 inactive_ids_in_results = set()
 for match, user in matches_without_filter:
@@ -58,12 +58,15 @@ else:
 
 # Test Query 2: WITH is_active filter (NEW BEHAVIOR)
 print("\n✅ Query WITH is_active filter (NEW - CORRECT):")
-matches_with_filter = db.query(StudentInternshipMatch, User).join(
-    User, StudentInternshipMatch.student_id == User.id
-).filter(
-    StudentInternshipMatch.internship_id == internship.id,
-    User.is_active == 1  # Only show active students
-).all()
+matches_with_filter = (
+    db.query(StudentInternshipMatch, User)
+    .join(User, StudentInternshipMatch.student_id == User.id)
+    .filter(
+        StudentInternshipMatch.internship_id == internship.id,
+        User.is_active == 1,  # Only show active students
+    )
+    .all()
+)
 
 inactive_ids_in_filtered = set()
 for match, user in matches_with_filter:

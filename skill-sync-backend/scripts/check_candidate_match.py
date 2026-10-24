@@ -5,6 +5,7 @@ Check candidate matching details for Aanya vs Hari
 
 import sys
 import os
+
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from sqlalchemy import create_engine
@@ -43,7 +44,9 @@ if aanya_resume:
     print(f'\nActive Resume ID: {aanya_resume.id}')
     print(f'File: {aanya_resume.file_name}')
     if aanya_resume.parsed_data:
-        print(f'Parsed Skills ({len(aanya_resume.parsed_data.get("all_skills", []))}): {aanya_resume.parsed_data.get("all_skills", [])}')
+        print(
+            f'Parsed Skills ({len(aanya_resume.parsed_data.get("all_skills", []))}): {aanya_resume.parsed_data.get("all_skills", [])}'
+        )
         print(f'Total Experience: {aanya_resume.parsed_data.get("total_experience_years", 0)} years')
 
 print('\n### HARI (ID: 63) ###')
@@ -57,7 +60,9 @@ if hari_resume:
     print(f'\nActive Resume ID: {hari_resume.id}')
     print(f'File: {hari_resume.file_name}')
     if hari_resume.parsed_data:
-        print(f'Parsed Skills ({len(hari_resume.parsed_data.get("all_skills", []))}): {hari_resume.parsed_data.get("all_skills", [])}')
+        print(
+            f'Parsed Skills ({len(hari_resume.parsed_data.get("all_skills", []))}): {hari_resume.parsed_data.get("all_skills", [])}'
+        )
         print(f'Total Experience: {hari_resume.parsed_data.get("total_experience_years", 0)} years')
 
 # Find a common internship they both match with
@@ -65,13 +70,9 @@ print("\n" + "=" * 80)
 print("FINDING COMMON INTERNSHIPS")
 print("=" * 80)
 
-aanya_matches = db.query(StudentInternshipMatch).filter(
-    StudentInternshipMatch.student_id == 15
-).all()
+aanya_matches = db.query(StudentInternshipMatch).filter(StudentInternshipMatch.student_id == 15).all()
 
-hari_matches = db.query(StudentInternshipMatch).filter(
-    StudentInternshipMatch.student_id == 63
-).all()
+hari_matches = db.query(StudentInternshipMatch).filter(StudentInternshipMatch.student_id == 63).all()
 
 print(f'\nAanya has {len(aanya_matches)} matches')
 print(f'Hari has {len(hari_matches)} matches')
@@ -87,25 +88,27 @@ if common_internship_ids:
     # Pick the first common internship
     internship_id = list(common_internship_ids)[0]
     internship = db.query(Internship).filter(Internship.id == internship_id).first()
-    
+
     print(f'\n### ANALYZING INTERNSHIP: {internship.title} ###')
     print(f'ID: {internship.id}')
     print(f'Required Skills: {internship.required_skills}')
     print(f'Preferred Skills: {internship.preferred_skills}')
     print(f'Min Experience: {internship.min_experience}')
     print(f'Max Experience: {internship.max_experience}')
-    
+
     # Get matches for both candidates
-    aanya_match = db.query(StudentInternshipMatch).filter(
-        StudentInternshipMatch.student_id == 15,
-        StudentInternshipMatch.internship_id == internship_id
-    ).first()
-    
-    hari_match = db.query(StudentInternshipMatch).filter(
-        StudentInternshipMatch.student_id == 63,
-        StudentInternshipMatch.internship_id == internship_id
-    ).first()
-    
+    aanya_match = (
+        db.query(StudentInternshipMatch)
+        .filter(StudentInternshipMatch.student_id == 15, StudentInternshipMatch.internship_id == internship_id)
+        .first()
+    )
+
+    hari_match = (
+        db.query(StudentInternshipMatch)
+        .filter(StudentInternshipMatch.student_id == 63, StudentInternshipMatch.internship_id == internship_id)
+        .first()
+    )
+
     print("\n" + "-" * 80)
     print("AANYA'S MATCH SCORES")
     print("-" * 80)
@@ -114,20 +117,20 @@ if common_internship_ids:
         print(f'Semantic Similarity: {aanya_match.semantic_similarity:.1f}%')
         print(f'Skills Match: {aanya_match.skills_match_score:.1f}%')
         print(f'Experience Match: {aanya_match.experience_match_score:.1f}%')
-        
+
         # Calculate matched/missing skills
         if aanya_resume and aanya_resume.parsed_data:
             candidate_skills = [s.lower() for s in aanya_resume.parsed_data.get('all_skills', [])]
             required_skills = [s.lower() for s in (internship.required_skills or [])]
             preferred_skills = [s.lower() for s in (internship.preferred_skills or [])]
             all_internship_skills = required_skills + preferred_skills
-            
+
             matched = [s for s in all_internship_skills if any(s in cs or cs in s for cs in candidate_skills)]
             missing = [s for s in required_skills if not any(s in cs or cs in s for cs in candidate_skills)]
-            
+
             print(f'\nMatched Skills ({len(matched)}): {matched}')
             print(f'Missing Skills ({len(missing)}): {missing}')
-    
+
     print("\n" + "-" * 80)
     print("HARI'S MATCH SCORES")
     print("-" * 80)
@@ -136,20 +139,20 @@ if common_internship_ids:
         print(f'Semantic Similarity: {hari_match.semantic_similarity:.1f}%')
         print(f'Skills Match: {hari_match.skills_match_score:.1f}%')
         print(f'Experience Match: {hari_match.experience_match_score:.1f}%')
-        
+
         # Calculate matched/missing skills
         if hari_resume and hari_resume.parsed_data:
             candidate_skills = [s.lower() for s in hari_resume.parsed_data.get('all_skills', [])]
             required_skills = [s.lower() for s in (internship.required_skills or [])]
             preferred_skills = [s.lower() for s in (internship.preferred_skills or [])]
             all_internship_skills = required_skills + preferred_skills
-            
+
             matched = [s for s in all_internship_skills if any(s in cs or cs in s for cs in candidate_skills)]
             missing = [s for s in required_skills if not any(s in cs or cs in s for cs in candidate_skills)]
-            
+
             print(f'\nMatched Skills ({len(matched)}): {matched}')
             print(f'Missing Skills ({len(missing)}): {missing}')
-    
+
     print("\n" + "=" * 80)
     print("SCORING WEIGHTS (from MatchingEngine)")
     print("=" * 80)
@@ -158,47 +161,53 @@ if common_internship_ids:
     print("Experience Match: 20%")
     print("Education Match: 10%")
     print("Projects/Certifications: 5%")
-    
+
     print("\n" + "=" * 80)
     print("ANALYSIS")
     print("=" * 80)
-    
+
     if aanya_match and hari_match:
-        print(f"\nOverall Score Difference: {abs(aanya_match.base_similarity_score - hari_match.base_similarity_score):.1f}%")
+        print(
+            f"\nOverall Score Difference: {abs(aanya_match.base_similarity_score - hari_match.base_similarity_score):.1f}%"
+        )
         print(f"  Aanya: {aanya_match.base_similarity_score:.1f}%")
         print(f"  Hari:  {hari_match.base_similarity_score:.1f}%")
-        
-        print(f"\nSemantic Similarity Difference: {abs(aanya_match.semantic_similarity - hari_match.semantic_similarity):.1f}%")
+
+        print(
+            f"\nSemantic Similarity Difference: {abs(aanya_match.semantic_similarity - hari_match.semantic_similarity):.1f}%"
+        )
         print(f"  Aanya: {aanya_match.semantic_similarity:.1f}%")
         print(f"  Hari:  {hari_match.semantic_similarity:.1f}%")
-        
+
         print(f"\nSkills Match Difference: {abs(aanya_match.skills_match_score - hari_match.skills_match_score):.1f}%")
         print(f"  Aanya: {aanya_match.skills_match_score:.1f}%")
         print(f"  Hari:  {hari_match.skills_match_score:.1f}%")
-        
-        print(f"\nExperience Match Difference: {abs(aanya_match.experience_match_score - hari_match.experience_match_score):.1f}%")
+
+        print(
+            f"\nExperience Match Difference: {abs(aanya_match.experience_match_score - hari_match.experience_match_score):.1f}%"
+        )
         print(f"  Aanya: {aanya_match.experience_match_score:.1f}%")
         print(f"  Hari:  {hari_match.experience_match_score:.1f}%")
-        
+
         # Calculate weighted contribution
         print("\n" + "-" * 80)
         print("WEIGHTED CONTRIBUTION TO OVERALL SCORE")
         print("-" * 80)
-        
+
         aanya_semantic_contrib = aanya_match.semantic_similarity * 0.35
         hari_semantic_contrib = hari_match.semantic_similarity * 0.35
         print(f"Semantic Similarity (35%):")
         print(f"  Aanya: {aanya_match.semantic_similarity:.1f}% × 0.35 = {aanya_semantic_contrib:.2f}")
         print(f"  Hari:  {hari_match.semantic_similarity:.1f}% × 0.35 = {hari_semantic_contrib:.2f}")
         print(f"  Difference: {abs(aanya_semantic_contrib - hari_semantic_contrib):.2f}")
-        
+
         aanya_skills_contrib = aanya_match.skills_match_score * 0.30
         hari_skills_contrib = hari_match.skills_match_score * 0.30
         print(f"\nSkills Match (30%):")
         print(f"  Aanya: {aanya_match.skills_match_score:.1f}% × 0.30 = {aanya_skills_contrib:.2f}")
         print(f"  Hari:  {hari_match.skills_match_score:.1f}% × 0.30 = {hari_skills_contrib:.2f}")
         print(f"  Difference: {abs(aanya_skills_contrib - hari_skills_contrib):.2f}")
-        
+
         aanya_exp_contrib = aanya_match.experience_match_score * 0.20
         hari_exp_contrib = hari_match.experience_match_score * 0.20
         print(f"\nExperience Match (20%):")

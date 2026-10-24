@@ -5,7 +5,20 @@ FastAPI application for intelligent internship matching platform
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.routes import auth, health, resume, internship, recommendations, intelligent_filtering, students, admin, notifications, profile, resume_view, candidate_emails
+from app.routes import (
+    auth,
+    health,
+    resume,
+    internship,
+    recommendations,
+    intelligent_filtering,
+    students,
+    admin,
+    notifications,
+    profile,
+    resume_view,
+    candidate_emails,
+)
 import os
 
 # Initialize FastAPI app
@@ -14,12 +27,13 @@ app = FastAPI(
     description="Intelligent internship matching platform with AI-powered recommendations",
     version="1.0.0",
     docs_url="/api/docs",
-    redoc_url="/api/redoc"
+    redoc_url="/api/redoc",
 )
 
 # Try to initialize database tables (optional for initial setup)
 try:
     from app.database.connection import engine, Base
+
     Base.metadata.create_all(bind=engine)
     print("✓ Database tables created successfully")
 except Exception as e:
@@ -50,16 +64,15 @@ app.include_router(notifications.router, prefix="/api", tags=["Notifications"])
 app.include_router(candidate_emails.router, prefix="/api", tags=["Candidate Emails"])
 app.include_router(profile.router, prefix="/api", tags=["Profile"])
 
+
 @app.get("/")
 async def root():
     """Root endpoint"""
-    return {
-        "message": "Welcome to SkillSync API",
-        "version": "1.0.0",
-        "docs": "/api/docs"
-    }
+    return {"message": "Welcome to SkillSync API", "version": "1.0.0", "docs": "/api/docs"}
+
 
 if __name__ == "__main__":
     import uvicorn
+
     port = int(os.getenv("PORT", 8000))
     uvicorn.run("app.main:app", host="0.0.0.0", port=port, reload=True)
