@@ -18,13 +18,17 @@ from datetime import datetime
 import traceback
 import shutil
 from pathlib import Path
+from dotenv import load_dotenv
 
 # Resume folder path
 RESUME_FOLDER = "/Users/gauthamkrishna/Projects/presidio/skill-sync/Resumes"
 UPLOAD_DIR = "app/public/resumes"
 
-# API key for Gemini
-GEMINI_API_KEY = "AIzaSyA_woTNrFUowjz8R5GLyz9u9TzxzbH9Xl4"
+# API key for Gemini, read from the environment (see .env.example)
+load_dotenv()
+GEMINI_API_KEY = os.environ.get("GEMINI_KEY_RESUME_PARSING") or os.environ.get("GOOGLE_API_KEY")
+if not GEMINI_API_KEY:
+    sys.exit("Set GEMINI_KEY_RESUME_PARSING or GOOGLE_API_KEY in .env before running this script")
 
 def create_student_from_resume_name(file_name: str, db) -> User:
     """

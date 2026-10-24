@@ -15,20 +15,26 @@ from app.services.rag_engine import rag_engine
 import time
 from datetime import datetime
 import traceback
+from dotenv import load_dotenv
 
-# List of working API keys (rotate through them)
-API_KEYS = [
-    ("xmyhiruthik", "AIzaSyBNSlqKRHEbqE3MUtMNAxoJ_h_-MevNEJE"),
-    ("hiruthiksudhakar", "AIzaSyCet85qQPbPp_BpMAikbuhqbcTUqXOiSl4"),
-    ("vsdeeeksha24", "AIzaSyCGBVUVzxppp64F5CrB0YX2--DOefA1UUY"),
-    ("devi", "AIzaSyDUBKEploeK1tm4CQ0GagshxJrJaB2oB7Y"),
-    ("heyitsgautham", "AIzaSyA_woTNrFUowjz8R5GLyz9u9TzxzbH9Xl4"),
-    ("hiru-viru", "AIzaSyCjbvqqSiWEmQ5RMB7U_DTXiuC7BoTG8as"),
-    ("hycinth", "AIzaSyCBwHZm43mmRkFb9CdZNMn2ntx8kZO_OB0"),
-    ("kishore3014b", "AIzaSyA597QYBJyhxdVx4uswB2EnQzkD-GS7xVw"),
-    ("thennarasu", "AIzaSyBepsyGcWc74wHeoKlq_ME0-NxS03D6sT8"),
-    ("yogasundari", "AIzaSyBZbXjFRwjPfP73-UDWGE0bq3hIT1J4_eA")
+# Gemini API keys to rotate through, read from the same GEMINI_KEY_* variables
+# that app/utils/gemini_key_manager.py uses. Set them in .env (see .env.example).
+load_dotenv()
+GEMINI_KEY_ENV_VARS = [
+    "GEMINI_KEY_RESUME_PARSING",
+    "GEMINI_KEY_MATCHING_EXPLANATION",
+    "GEMINI_KEY_SKILLS_EXTRACTION",
+    "GEMINI_KEY_EMBEDDING_GENERATION",
+    "GEMINI_KEY_CANDIDATE_SUMMARY",
+    "GEMINI_KEY_INTERNSHIP_ANALYSIS",
+    "GEMINI_KEY_ACHIEVEMENT_EXTRACTION",
+    "GEMINI_KEY_FALLBACK_1",
+    "GEMINI_KEY_FALLBACK_2",
+    "GEMINI_KEY_FALLBACK_3",
 ]
+API_KEYS = [(name, os.environ[name]) for name in GEMINI_KEY_ENV_VARS if os.environ.get(name)]
+if not API_KEYS:
+    sys.exit("No Gemini API keys found. Set at least one GEMINI_KEY_* variable in .env")
 
 def parse_single_resume(resume, db, api_key_name, api_key):
     """Parse a single resume with error handling"""
