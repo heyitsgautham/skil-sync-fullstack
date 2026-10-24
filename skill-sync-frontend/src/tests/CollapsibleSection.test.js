@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import CollapsibleSection from '../components/CollapsibleSection';
 import CodeIcon from '@mui/icons-material/Code';
@@ -51,14 +51,14 @@ describe('CollapsibleSection Component', () => {
         expect(screen.getByText('Visible Content')).toBeVisible();
     });
 
-    test('expands and collapses on click', () => {
+    test('expands and collapses on click', async () => {
         render(
             <CollapsibleSection title="Test Section">
                 <div>Toggle Content</div>
             </CollapsibleSection>
         );
 
-        const header = screen.getByText('Test Section');
+        const header = screen.getByRole('button', { name: /Test Section/ });
 
         // Initially collapsed
         expect(screen.queryByText('Toggle Content')).not.toBeVisible();
@@ -67,13 +67,14 @@ describe('CollapsibleSection Component', () => {
         fireEvent.click(header);
         expect(screen.getByText('Toggle Content')).toBeVisible();
 
-        // Click to collapse
+        // Click to collapse. MUI hides the content only when the collapse transition ends.
         fireEvent.click(header);
-        expect(screen.queryByText('Toggle Content')).not.toBeVisible();
+        expect(header).toHaveAttribute('aria-expanded', 'false');
+        await waitFor(() => expect(screen.queryByText('Toggle Content')).not.toBeVisible());
     });
 
     test('persists state to localStorage when sectionKey is provided', () => {
-        const { rerender } = render(
+        render(
             <CollapsibleSection title="Test Section" sectionKey="test_section">
                 <div>Content</div>
             </CollapsibleSection>
@@ -127,6 +128,8 @@ describe('CollapsibleSection Component', () => {
             </CollapsibleSection>
         );
 
+        // The accordion root has no accessible role, so the test reaches it by class.
+        // eslint-disable-next-line testing-library/no-container, testing-library/no-node-access
         const accordion = container.querySelector('.MuiAccordion-root');
         expect(accordion).toHaveStyle('background-color: red');
     });
