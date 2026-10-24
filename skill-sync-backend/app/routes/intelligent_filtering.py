@@ -20,7 +20,7 @@ from app.models.resume import Resume
 from app.models.application import Application
 from app.services.parser_service import ResumeParser
 from app.services.resume_intelligence_service import ResumeIntelligenceService
-from app.services.rag_engine import RAGEngine
+from app.services.rag_engine import rag_engine
 from app.services.matching_engine import MatchingEngine
 from app.services.resume_service import ResumeService
 from app.services.candidate_flagging_service import CandidateFlaggingService
@@ -32,7 +32,6 @@ router = APIRouter(prefix="/api/filter", tags=["intelligent-filtering"])
 # Initialize services
 resume_parser = ResumeParser()
 intelligence_service = ResumeIntelligenceService()
-rag_engine = RAGEngine()
 matching_engine = MatchingEngine(rag_engine)
 
 
