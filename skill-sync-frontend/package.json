@@ -29,8 +29,8 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "test:coverage": "react-scripts test --coverage --watchAll=false",
-    "lint": "eslint src/**/*.{js,jsx}",
-    "lint:fix": "eslint src/**/*.{js,jsx} --fix",
+    "lint": "eslint --max-warnings=0 --ext .js,.jsx src",
+    "lint:fix": "eslint --ext .js,.jsx src --fix",
     "eject": "react-scripts eject"
   },
   "eslintConfig": {
@@ -57,6 +57,14 @@
       "^react-router/dom$": "<rootDir>/node_modules/react-router/dist/development/dom-export.js",
       "^react-router$": "<rootDir>/node_modules/react-router/dist/development/index.js",
       "^axios$": "<rootDir>/node_modules/axios/dist/browser/axios.cjs"
+    },
+    "coverageThreshold": {
+      "global": {
+        "statements": 3,
+        "branches": 1,
+        "functions": 2,
+        "lines": 3
+      }
     }
   }
 }
