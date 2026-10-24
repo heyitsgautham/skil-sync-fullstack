@@ -4,13 +4,14 @@ Database Migration Script: Add mailing_email field to users table
 Feature 7: Company Profile Enhancement - Mailing Email
 """
 
-import sys
 import os
+import sys
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from sqlalchemy import text
-from app.database.connection import SessionLocal, engine
+
+from app.database.connection import SessionLocal
 
 
 def migrate():

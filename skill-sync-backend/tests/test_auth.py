@@ -2,9 +2,6 @@
 Authentication endpoint tests - Minimal smoke tests for CI
 """
 
-import pytest
-from fastapi import status
-
 
 def test_auth_module_imports():
     """Test that auth module imports successfully"""

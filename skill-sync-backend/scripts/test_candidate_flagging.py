@@ -3,8 +3,8 @@ Test script for Candidate Flagging Service
 Tests the detection of duplicate candidates based on mobile number, LinkedIn, and GitHub URLs
 """
 
-import sys
 import os
+import sys
 
 # Add parent directory to path to import app modules
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
@@ -85,7 +85,7 @@ def test_duplicate_detection():
         )
 
         print(f"📄 Students with uploaded resumes: {len(students_with_resumes)}")
-        print(f"ℹ️  Note: Only students with resumes will be checked for duplicates")
+        print("ℹ️  Note: Only students with resumes will be checked for duplicates")
         print()
 
         # Detect flagged candidates

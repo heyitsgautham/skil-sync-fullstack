@@ -4,11 +4,11 @@ Extracts internship details from uploaded documents (PDF, DOCX, TXT, etc.)
 Uses Google Gemini AI for intelligent extraction
 """
 
-import os
 import json
-import re
 import logging
-from typing import Dict, List, Optional
+import os
+import re
+
 import fitz  # PyMuPDF
 from docx import Document
 
@@ -80,13 +80,13 @@ class InternshipDocumentParser:
     def _extract_from_txt(file_path: str) -> str:
         """Extract text from TXT file"""
         try:
-            with open(file_path, 'r', encoding='utf-8') as file:
+            with open(file_path, encoding='utf-8') as file:
                 text = file.read()
             return text.strip()
         except Exception as e:
             raise Exception(f"Error reading TXT: {str(e)}")
 
-    def extract_internship_details(self, document_text: str) -> Dict:
+    def extract_internship_details(self, document_text: str) -> dict:
         """
         Extract structured internship information from document text using Gemini AI
 
@@ -203,7 +203,7 @@ Return ONLY the JSON object, no markdown, no explanation.
             logger.error(f"Traceback: {traceback.format_exc()}")
             return self._create_fallback_structure(document_text)
 
-    def _validate_and_normalize(self, data: Dict, original_text: str) -> Dict:
+    def _validate_and_normalize(self, data: dict, original_text: str) -> dict:
         """
         Validate and normalize extracted data
 
@@ -232,7 +232,7 @@ Return ONLY the JSON object, no markdown, no explanation.
         if not data.get('description') or len(str(data.get('description', '')).strip()) < 100:
             # Use more of the original text if description is too short
             data['description'] = original_text[:5000]  # Increased from 2000 to 5000 chars
-            logger.warning(f"⚠️ Description was too short or missing, using first 5000 chars from document")
+            logger.warning("⚠️ Description was too short or missing, using first 5000 chars from document")
 
         # Ensure skills are lists
         if not isinstance(data.get('required_skills'), list):
@@ -305,7 +305,7 @@ Return ONLY the JSON object, no markdown, no explanation.
 
         return data
 
-    def _create_fallback_structure(self, document_text: str) -> Dict:
+    def _create_fallback_structure(self, document_text: str) -> dict:
         """
         Create a fallback structure when AI parsing fails
         Uses basic text extraction and keyword matching
@@ -348,7 +348,7 @@ Return ONLY the JSON object, no markdown, no explanation.
             "parsing_status": "fallback",
         }
 
-    def _extract_skills_basic(self, text: str) -> List[str]:
+    def _extract_skills_basic(self, text: str) -> list[str]:
         """
         Basic skill extraction using keyword matching (fallback method)
         """
@@ -402,7 +402,7 @@ Return ONLY the JSON object, no markdown, no explanation.
 
         return found_skills[:20]  # Limit to 20 skills
 
-    def parse_from_file(self, file_path: str) -> Dict:
+    def parse_from_file(self, file_path: str) -> dict:
         """
         Complete parsing pipeline: extract text + parse internship details
 
@@ -427,7 +427,7 @@ Return ONLY the JSON object, no markdown, no explanation.
         # Add the original text for reference
         internship_details['original_document_text'] = document_text
 
-        logger.info(f"🎉 Document parsing complete!")
+        logger.info("🎉 Document parsing complete!")
         return internship_details
 
 

@@ -5,10 +5,8 @@ Tests for update and delete user operations
 
 import pytest
 from fastapi.testclient import TestClient
+
 from app.main import app
-from app.database.connection import get_db
-from app.models.user import User, UserRole
-from app.utils.security import create_access_token
 
 client = TestClient(app)
 

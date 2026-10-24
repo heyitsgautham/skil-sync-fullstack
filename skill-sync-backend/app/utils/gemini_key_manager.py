@@ -4,13 +4,13 @@ Handles rate limiting by rotating through multiple API keys
 Uses the NEW google-genai SDK (not google.generativeai)
 """
 
+import logging
 import os
 import time
-import logging
-from typing import Optional, Dict, Any, List
+
+from dotenv import load_dotenv
 from google import genai
 from google.genai import types
-from dotenv import load_dotenv
 
 load_dotenv()
 
@@ -126,7 +126,7 @@ class GeminiKeyManager:
         logger.error(f"  {error_message}")
         raise Exception(error_message)
 
-    def _get_key_priority_list(self, purpose: str) -> List[str]:
+    def _get_key_priority_list(self, purpose: str) -> list[str]:
         """
         Get priority-ordered list of keys to try for a given purpose
 
@@ -187,7 +187,7 @@ class GeminiKeyManager:
         purpose: str = "resume_parsing",
         temperature: float = 0.2,
         max_output_tokens: int = 8000,
-        system_instruction: Optional[str] = None,
+        system_instruction: str | None = None,
         max_retries: int = 3,
     ) -> str:
         """
@@ -255,7 +255,7 @@ class GeminiKeyManager:
         model: str = "gemini-2.5-flash",
         purpose: str = "resume_parsing",
         temperature: float = 0.2,
-        system_instruction: Optional[str] = None,
+        system_instruction: str | None = None,
         max_retries: int = 3,
     ):
         """
@@ -291,7 +291,7 @@ class GeminiKeyManager:
                 if chunk and chunk.text:
                     yield chunk.text
 
-            logger.info(f"✅ Streaming completed successfully")
+            logger.info("✅ Streaming completed successfully")
 
         except Exception as e:
             logger.error(f"  Error streaming content: {str(e)}")

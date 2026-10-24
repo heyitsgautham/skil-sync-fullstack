@@ -2,11 +2,14 @@
 User Model - Base user model for all user types (Student, Company, Admin)
 """
 
-from sqlalchemy import Column, Integer, String, DateTime, Enum as SQLEnum, JSON, Float, Boolean
-from sqlalchemy.sql import func
-from app.database.connection import Base
 import enum
 import uuid
+
+from sqlalchemy import JSON, Boolean, Column, DateTime, Float, Integer, String
+from sqlalchemy import Enum as SQLEnum
+from sqlalchemy.sql import func
+
+from app.database.connection import Base
 
 
 class UserRole(str, enum.Enum):

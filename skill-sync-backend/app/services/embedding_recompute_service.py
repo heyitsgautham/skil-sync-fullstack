@@ -4,14 +4,11 @@ Handles recomputing embeddings for resumes and internships with intelligent cach
 """
 
 import hashlib
-from typing import Dict, List, Optional
-from sqlalchemy.orm import Session
-from sqlalchemy import func
 
-from app.models import Resume, Internship, StudentInternshipMatch
+from sqlalchemy.orm import Session
+
+from app.models import Internship, Resume, StudentInternshipMatch
 from app.services.rag_engine import rag_engine
-from app.services.resume_intelligence_service import ResumeIntelligenceService
-from app.services.parser_service import ResumeParser
 
 
 class EmbeddingRecomputeService:
@@ -97,7 +94,7 @@ class EmbeddingRecomputeService:
         return False
 
     @staticmethod
-    def recompute_resume_embedding(resume: Resume, db: Session) -> Dict:
+    def recompute_resume_embedding(resume: Resume, db: Session) -> dict:
         """
         Recompute embedding for a single resume
 
@@ -156,7 +153,7 @@ class EmbeddingRecomputeService:
             return {'success': False, 'cached': False, 'resume_id': resume.id, 'error': str(e)}
 
     @staticmethod
-    def recompute_internship_embedding(internship: Internship, db: Session) -> Dict:
+    def recompute_internship_embedding(internship: Internship, db: Session) -> dict:
         """
         Recompute embedding for a single internship
 
@@ -210,7 +207,7 @@ class EmbeddingRecomputeService:
             return {'success': False, 'cached': False, 'internship_id': internship.id, 'error': str(e)}
 
     @staticmethod
-    def recompute_all_embeddings(db: Session) -> Dict:
+    def recompute_all_embeddings(db: Session) -> dict:
         """
         Recompute all embeddings for resumes and internships
 
@@ -260,7 +257,7 @@ class EmbeddingRecomputeService:
         return results
 
     @staticmethod
-    def recalculate_all_matches(db: Session) -> Dict:
+    def recalculate_all_matches(db: Session) -> dict:
         """
         Recalculate student-internship matches after embeddings are updated
 
@@ -331,7 +328,7 @@ class EmbeddingRecomputeService:
                         candidate_embedding = rag_engine.get_resume_embedding(resume_chroma_id)
                         if candidate_embedding is None:
                             candidate_embedding = []
-                    except Exception as e:
+                    except Exception:
                         candidate_embedding = []
 
                     try:
@@ -339,7 +336,7 @@ class EmbeddingRecomputeService:
                         internship_embedding = rag_engine.get_internship_embedding(internship_chroma_id)
                         if internship_embedding is None:
                             internship_embedding = []
-                    except Exception as e:
+                    except Exception:
                         internship_embedding = []
 
                     # Calculate match

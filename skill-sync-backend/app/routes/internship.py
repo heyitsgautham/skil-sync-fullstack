@@ -3,18 +3,18 @@ Internship API Routes
 """
 
 import os
-from typing import List, Optional
-from fastapi import APIRouter, Depends, HTTPException, status, UploadFile, File, Form
-from sqlalchemy.orm import Session
+
+from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile, status
 from pydantic import BaseModel
+from sqlalchemy.orm import Session
 
 from app.database.connection import get_db
-from app.models import User, Internship, UserRole, Resume, Application, StudentInternshipMatch
+from app.models import Application, Internship, Resume, StudentInternshipMatch, User, UserRole
+from app.services.internship_document_parser import get_internship_document_parser
+from app.services.job_description_analyzer import get_job_description_analyzer
+from app.services.matching_engine import MatchingEngine
 from app.services.parser_service import InternshipParser
 from app.services.rag_engine import rag_engine
-from app.services.matching_engine import MatchingEngine
-from app.services.job_description_analyzer import get_job_description_analyzer
-from app.services.internship_document_parser import get_internship_document_parser
 from app.utils.security import get_current_user
 
 router = APIRouter(prefix="/internship", tags=["Internship"])
@@ -24,14 +24,14 @@ router = APIRouter(prefix="/internship", tags=["Internship"])
 class InternshipCreate(BaseModel):
     title: str
     description: str
-    required_skills: Optional[List[str]] = None
-    preferred_skills: Optional[List[str]] = None
-    location: Optional[str] = None
-    duration: Optional[str] = None
-    stipend: Optional[str] = None
-    min_experience: Optional[float] = None
-    max_experience: Optional[float] = None
-    required_education: Optional[str] = None
+    required_skills: list[str] | None = None
+    preferred_skills: list[str] | None = None
+    location: str | None = None
+    duration: str | None = None
+    stipend: str | None = None
+    min_experience: float | None = None
+    max_experience: float | None = None
+    required_education: str | None = None
 
 
 class SkillExtractionRequest(BaseModel):
@@ -39,40 +39,40 @@ class SkillExtractionRequest(BaseModel):
 
 
 class SkillExtractionResponse(BaseModel):
-    required_skills: List[str]
-    preferred_skills: List[str]
+    required_skills: list[str]
+    preferred_skills: list[str]
 
 
 class DocumentParseResponse(BaseModel):
     title: str
     description: str
-    required_skills: List[str]
-    preferred_skills: List[str]
-    location: Optional[str] = None
-    duration: Optional[str] = None
-    stipend: Optional[str] = None
-    min_experience: Optional[float] = 0
-    max_experience: Optional[float] = 5
-    required_education: Optional[str] = None
-    start_date: Optional[str] = None
-    application_deadline: Optional[str] = None
-    company_info: Optional[str] = None
+    required_skills: list[str]
+    preferred_skills: list[str]
+    location: str | None = None
+    duration: str | None = None
+    stipend: str | None = None
+    min_experience: float | None = 0
+    max_experience: float | None = 5
+    required_education: str | None = None
+    start_date: str | None = None
+    application_deadline: str | None = None
+    company_info: str | None = None
 
 
 class InternshipResponse(BaseModel):
     id: int
     company_id: int
-    company_name: Optional[str] = None
+    company_name: str | None = None
     title: str
     description: str
-    required_skills: Optional[List[str]] = None
-    preferred_skills: Optional[List[str]] = None
-    location: Optional[str] = None
-    duration: Optional[str] = None
-    stipend: Optional[str] = None
-    min_experience: Optional[float] = None
-    max_experience: Optional[float] = None
-    required_education: Optional[str] = None
+    required_skills: list[str] | None = None
+    preferred_skills: list[str] | None = None
+    location: str | None = None
+    duration: str | None = None
+    stipend: str | None = None
+    min_experience: float | None = None
+    max_experience: float | None = None
+    required_education: str | None = None
     is_active: int
 
     class Config:
@@ -80,9 +80,9 @@ class InternshipResponse(BaseModel):
 
 
 class InternshipWithMatchScore(InternshipResponse):
-    match_score: Optional[int] = None
+    match_score: int | None = None
     has_applied: bool = False
-    application_resume_name: Optional[str] = None
+    application_resume_name: str | None = None
 
 
 @router.post("/extract-skills", response_model=SkillExtractionResponse)
@@ -151,9 +151,9 @@ async def parse_internship_document(file: UploadFile = File(...), current_user: 
 
     Supported formats: PDF, DOCX, DOC, TXT
     """
+    import logging
     import shutil
     import tempfile
-    import logging
 
     logger = logging.getLogger(__name__)
 
@@ -213,7 +213,7 @@ async def parse_internship_document(file: UploadFile = File(...), current_user: 
         if temp_file and os.path.exists(temp_file_path):
             try:
                 os.remove(temp_file_path)
-                logger.info(f"🗑️ Cleaned up temporary file")
+                logger.info("🗑️ Cleaned up temporary file")
             except Exception as cleanup_error:
                 logger.warning(f"⚠️ Could not delete temp file: {cleanup_error}")
 
@@ -286,7 +286,7 @@ def post_internship(
         )
 
 
-@router.get("/list", response_model=List[InternshipResponse])
+@router.get("/list", response_model=list[InternshipResponse])
 def list_internships(skip: int = 0, limit: int = 50, db: Session = Depends(get_db)):
     """
     List all active internships (public endpoint, no authentication required)
@@ -320,7 +320,7 @@ def list_internships(skip: int = 0, limit: int = 50, db: Session = Depends(get_d
     return result
 
 
-@router.get("/my-posts", response_model=List[InternshipResponse])
+@router.get("/my-posts", response_model=list[InternshipResponse])
 def get_my_internships(db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     """
     Get all internships posted by current company
@@ -360,7 +360,7 @@ def get_my_internships(db: Session = Depends(get_db), current_user: User = Depen
     return result
 
 
-@router.get("/match", response_model=List[InternshipWithMatchScore])
+@router.get("/match", response_model=list[InternshipWithMatchScore])
 def match_internships(top_k: int = 10, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     """
     Get AI-powered internship recommendations based on student's resume
@@ -610,7 +610,7 @@ def delete_internship(
 
 # Application Management Endpoints
 class ApplicationCreate(BaseModel):
-    cover_letter: Optional[str] = None
+    cover_letter: str | None = None
     use_tailored_resume: bool = False  # NEW: Flag to indicate tailored resume usage
 
 
@@ -620,8 +620,8 @@ class ApplicationResponse(BaseModel):
     internship_id: int
     resume_id: int
     status: str
-    match_score: Optional[int] = None
-    application_similarity_score: Optional[int] = None
+    match_score: int | None = None
+    application_similarity_score: int | None = None
     used_tailored_resume: int
     created_at: str
 
@@ -632,9 +632,9 @@ class ApplicationResponse(BaseModel):
 @router.post("/{internship_id}/apply", response_model=ApplicationResponse, status_code=status.HTTP_201_CREATED)
 async def apply_to_internship(
     internship_id: int,
-    cover_letter: Optional[str] = Form(None),
+    cover_letter: str | None = Form(None),
     use_tailored_resume: bool = Form(False),
-    tailored_resume: Optional[UploadFile] = File(None),
+    tailored_resume: UploadFile | None = File(None),
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
@@ -695,7 +695,7 @@ async def apply_to_internship(
         resume_to_use = resume  # Default to active resume
 
         if use_tailored_resume and tailored_resume:
-            logger.info(f"Processing tailored resume for application")
+            logger.info("Processing tailored resume for application")
             try:
                 from app.services.resume_service import ResumeService
 
@@ -819,7 +819,7 @@ async def apply_to_internship(
         )
 
 
-@router.get("/applications/my-applications", response_model=List[ApplicationResponse])
+@router.get("/applications/my-applications", response_model=list[ApplicationResponse])
 def get_my_applications(db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     """
     Get all applications for the current student

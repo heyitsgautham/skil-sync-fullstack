@@ -2,14 +2,14 @@
 Script to add sample internships to the database for testing
 """
 
-import sys
 import os
+import sys
 
 # Add parent directory to path to import app modules
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from app.database.connection import SessionLocal
-from app.models import User, Internship, UserRole
+from app.models import Internship, User, UserRole
 from app.services.rag_engine import rag_engine
 
 

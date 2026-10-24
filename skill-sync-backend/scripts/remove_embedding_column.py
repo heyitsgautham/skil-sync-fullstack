@@ -9,15 +9,15 @@ Usage:
     python scripts/remove_embedding_column.py
 """
 
-import os
 import sys
 from pathlib import Path
 
 # Add parent directory to path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from app.database.connection import engine, SessionLocal
-from sqlalchemy import text, inspect
+from sqlalchemy import inspect, text
+
+from app.database.connection import SessionLocal, engine
 
 
 def check_column_exists():
@@ -56,19 +56,19 @@ def remove_embedding_column():
         """)
         )
         row = result.fetchone()
-        print(f"\n📊 Current state:")
+        print("\n📊 Current state:")
         print(f"   Total resumes: {row[0]}")
         print(f"   Resumes with embedding in PostgreSQL: {row[1]}")
-        print(f"   This column is REDUNDANT - embeddings are in ChromaDB!")
+        print("   This column is REDUNDANT - embeddings are in ChromaDB!")
     except Exception as e:
         print(f"⚠️  Could not check current state: {e}")
     finally:
         db.close()
 
     # Confirm with user
-    print(f"\n⚠️  WARNING: This will permanently remove the 'embedding' column!")
-    print(f"   Embeddings will only be stored in ChromaDB going forward.")
-    print(f"   The 'embedding_id' column will remain as a reference.\n")
+    print("\n⚠️  WARNING: This will permanently remove the 'embedding' column!")
+    print("   Embeddings will only be stored in ChromaDB going forward.")
+    print("   The 'embedding_id' column will remain as a reference.\n")
 
     response = input("Continue? (yes/no): ").strip().lower()
     if response != 'yes':

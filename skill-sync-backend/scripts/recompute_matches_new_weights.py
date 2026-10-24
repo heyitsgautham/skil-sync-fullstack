@@ -3,14 +3,14 @@
 Recompute all student-internship matches with new scoring weights
 """
 
-import sys
 import os
+import sys
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
+from dotenv import load_dotenv
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from dotenv import load_dotenv
 
 load_dotenv()
 
@@ -20,10 +20,10 @@ engine = create_engine(DATABASE_URL)
 Session = sessionmaker(bind=engine)
 db = Session()
 
-from app.models.user import User
+from app.models.internship import Internship
 from app.models.resume import Resume
 from app.models.student_internship_match import StudentInternshipMatch
-from app.models.internship import Internship
+from app.models.user import User
 from app.services.matching_engine import MatchingEngine
 from app.services.rag_engine import RAGEngine
 

@@ -2,13 +2,13 @@
 Test PostgreSQL Database Connection
 """
 
-import sys
 import os
+import sys
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-from sqlalchemy import create_engine, text
 from dotenv import load_dotenv
+from sqlalchemy import create_engine, text
 
 load_dotenv()
 
@@ -50,7 +50,7 @@ def test_connection():
         return True
 
     except Exception as e:
-        print(f"\n✗ Database connection failed!")
+        print("\n✗ Database connection failed!")
         print(f"Error: {str(e)}")
         print("\nPlease ensure:")
         print("1. PostgreSQL is running")

@@ -3,16 +3,17 @@ Migration Script: Add indexes for candidate flagging performance
 Adds indexes on phone, linkedin_url, and github_url columns for faster duplicate detection
 """
 
-import sys
 import os
+import sys
 
 # Add parent directory to path
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-from sqlalchemy import create_index, Index, text
-from app.database.connection import engine, SessionLocal
-from app.models.user import User
 import logging
+
+from sqlalchemy import text
+
+from app.database.connection import SessionLocal
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)

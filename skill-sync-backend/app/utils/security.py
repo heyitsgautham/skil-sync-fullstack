@@ -2,15 +2,16 @@
 Security utilities for password hashing and JWT token management
 """
 
+import os
 from datetime import datetime, timedelta
-from typing import Optional
-from passlib.context import CryptContext
-from jose import JWTError, jwt
+
+from dotenv import load_dotenv
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
+from jose import JWTError, jwt
+from passlib.context import CryptContext
 from sqlalchemy.orm import Session
-import os
-from dotenv import load_dotenv
+
 from app.database.connection import get_db
 
 load_dotenv()
@@ -37,7 +38,7 @@ def get_password_hash(password: str) -> str:
     return pwd_context.hash(password)
 
 
-def create_access_token(data: dict, expires_delta: Optional[timedelta] = None) -> str:
+def create_access_token(data: dict, expires_delta: timedelta | None = None) -> str:
     """
     Create JWT access token
 
@@ -61,7 +62,7 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta] = None) -
     return encoded_jwt
 
 
-def decode_access_token(token: str) -> Optional[dict]:
+def decode_access_token(token: str) -> dict | None:
     """
     Decode and verify JWT access token
 

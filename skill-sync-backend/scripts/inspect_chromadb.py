@@ -5,8 +5,8 @@ This script helps you verify if embeddings were actually cleared or still exist.
 """
 
 import os
-import sys
 import sqlite3
+import sys
 from pathlib import Path
 
 # Add parent directory to path
@@ -105,7 +105,7 @@ def inspect_chroma_collections():
         if resume_count > 0:
             # Get a sample
             sample = rag_engine.resume_collection.peek(limit=5)
-            print(f"\n   Sample IDs (first 5):")
+            print("\n   Sample IDs (first 5):")
             for i, doc_id in enumerate(sample['ids'][:5], 1):
                 print(f"   {i}. {doc_id}")
                 if sample['metadatas'] and i - 1 < len(sample['metadatas']):
@@ -123,7 +123,7 @@ def inspect_chroma_collections():
         if internship_count > 0:
             # Get a sample
             sample = rag_engine.internship_collection.peek(limit=5)
-            print(f"\n   Sample IDs (first 5):")
+            print("\n   Sample IDs (first 5):")
             for i, doc_id in enumerate(sample['ids'][:5], 1):
                 print(f"   {i}. {doc_id}")
                 if sample['metadatas'] and i - 1 < len(sample['metadatas']):
@@ -182,7 +182,6 @@ def check_database_embeddings():
     try:
         from app.database.connection import get_db
         from app.models import Resume
-        from sqlalchemy import func
 
         db = next(get_db())
 
@@ -191,7 +190,7 @@ def check_database_embeddings():
         resumes_with_embedding = db.query(Resume).filter(Resume.embedding.isnot(None)).count()
         resumes_with_embedding_id = db.query(Resume).filter(Resume.embedding_id.isnot(None)).count()
 
-        print(f"\n📊 Resume Statistics:")
+        print("\n📊 Resume Statistics:")
         print(f"   Total resumes: {total_resumes}")
         print(f"   With embedding vector: {resumes_with_embedding}")
         print(f"   With embedding_id: {resumes_with_embedding_id}")
@@ -200,7 +199,7 @@ def check_database_embeddings():
         if resumes_with_embedding > 0:
             sample = db.query(Resume).filter(Resume.embedding.isnot(None)).first()
             if sample:
-                print(f"\n   Sample resume with embedding:")
+                print("\n   Sample resume with embedding:")
                 print(f"   - Resume ID: {sample.id}")
                 print(f"   - Student ID: {sample.student_id}")
                 print(f"   - Embedding ID: {sample.embedding_id}")

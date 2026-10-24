@@ -12,8 +12,8 @@ Usage:
     python scripts/hybrid_matching_quickstart.py
 """
 
-import sys
 import os
+import sys
 import time
 
 # Add parent directory to path
@@ -36,7 +36,8 @@ def run_migration():
 
     try:
         # Import and run migration
-        from scripts.migrate_hybrid_matching import run_migration as do_migration, verify_migration
+        from scripts.migrate_hybrid_matching import run_migration as do_migration
+        from scripts.migrate_hybrid_matching import verify_migration
 
         do_migration()
         verify_migration()
@@ -69,7 +70,7 @@ def compute_initial_matches():
         duration = time.time() - start_time
 
         print("\n✅ Batch computation completed!")
-        print(f"\n📊 Statistics:")
+        print("\n📊 Statistics:")
         print(f"   • Students processed: {result['students_processed']}")
         print(f"   • Internships processed: {result['internships_processed']}")
         print(f"   • Matches computed: {result['matches_computed']}")
@@ -100,6 +101,7 @@ def verify_system():
 
     try:
         from sqlalchemy import text
+
         from app.database.connection import engine
 
         with engine.connect() as conn:

@@ -9,10 +9,11 @@ from pathlib import Path
 # Add parent directory to path
 sys.path.append(str(Path(__file__).parent.parent))
 
+import os
+
 from app.database.connection import SessionLocal
 from app.models import Resume
 from app.services.s3_service import s3_service
-import os
 
 
 def fix_missing_s3_uploads(student_name=None):
@@ -64,7 +65,7 @@ def fix_missing_s3_uploads(student_name=None):
             # Check if local file exists
             if not os.path.exists(resume.file_path):
                 print(f"  ⚠️  Local file not found: {resume.file_path}")
-                print(f"  ⏭️  Skipping...")
+                print("  ⏭️  Skipping...")
                 missing_file_count += 1
                 print()
                 continue
@@ -73,7 +74,7 @@ def fix_missing_s3_uploads(student_name=None):
             print(f"  Size: {file_size:.2f} KB")
 
             # Upload to S3
-            print(f"  📤 Uploading to S3...")
+            print("  📤 Uploading to S3...")
             s3_key = s3_service.upload_resume(
                 file_path=resume.file_path,
                 student_id=resume.student_id,
@@ -96,7 +97,7 @@ def fix_missing_s3_uploads(student_name=None):
 
                 fixed_count += 1
             else:
-                print(f"    Failed to upload to S3")
+                print("    Failed to upload to S3")
                 failed_count += 1
 
             print()

@@ -2,15 +2,15 @@
 Email Notification Routes - Handle email notification endpoints
 """
 
-from typing import List, Dict, Optional
-from fastapi import APIRouter, Depends, HTTPException, status
-from sqlalchemy.orm import Session
-from sqlalchemy import and_
-from pydantic import BaseModel
 from datetime import datetime, timedelta
 
+from fastapi import APIRouter, Depends, HTTPException, status
+from pydantic import BaseModel
+from sqlalchemy import and_
+from sqlalchemy.orm import Session
+
 from app.database.connection import get_db
-from app.models import User, Internship, Application, Resume, UserRole
+from app.models import Application, Internship, Resume, User, UserRole
 from app.services.email_service import email_service
 from app.utils.security import get_current_user
 
@@ -25,7 +25,7 @@ class DailySummaryResponse(BaseModel):
     total_applications: int
     internships_with_applications: int
     email_sent: bool
-    preview_html: Optional[str] = None
+    preview_html: str | None = None
 
 
 class EmailPreviewRequest(BaseModel):

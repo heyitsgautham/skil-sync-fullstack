@@ -3,13 +3,14 @@ Script to populate LinkedIn and GitHub URLs for all students based on their name
 Converts student names to URL-friendly format (lowercase, spaces to hyphens).
 """
 
-import sys
 import os
+import sys
 
 # Add parent directory to path to import app modules
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from sqlalchemy.orm import Session
+
 from app.database.connection import SessionLocal
 from app.models.user import User, UserRole
 

@@ -3,28 +3,25 @@ Intelligent Filtering Routes - Core Intelligence System APIs
 Handles resume parsing, candidate ranking, and explainable matching
 """
 
-from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Form, Query
-from fastapi.responses import StreamingResponse
-from sqlalchemy.orm import Session
-from typing import List, Optional
-import os
-import uuid
 import io
-import csv
 from datetime import datetime
 
+from fastapi import APIRouter, Depends, File, HTTPException, Query, UploadFile
+from fastapi.responses import StreamingResponse
+from sqlalchemy.orm import Session
+
 from app.database.connection import get_db
-from app.models.user import User, UserRole
+from app.models.application import Application
 from app.models.internship import Internship
 from app.models.resume import Resume
-from app.models.application import Application
-from app.services.parser_service import ResumeParser
-from app.services.resume_intelligence_service import ResumeIntelligenceService
-from app.services.rag_engine import rag_engine
-from app.services.matching_engine import MatchingEngine
-from app.services.resume_service import ResumeService
+from app.models.user import User, UserRole
 from app.services.candidate_flagging_service import CandidateFlaggingService
-from app.utils.security import get_current_user, get_current_company
+from app.services.matching_engine import MatchingEngine
+from app.services.parser_service import ResumeParser
+from app.services.rag_engine import rag_engine
+from app.services.resume_intelligence_service import ResumeIntelligenceService
+from app.services.resume_service import ResumeService
+from app.utils.security import get_current_company, get_current_user
 
 router = APIRouter(prefix="/api/filter", tags=["intelligent-filtering"])
 
@@ -104,12 +101,12 @@ async def rank_candidates_for_internship(
     limit: int = 50,
     only_applicants: bool = False,
     # Filter parameters
-    min_match_score: Optional[float] = Query(None, ge=0, le=100, description="Minimum match score percentage"),
-    max_match_score: Optional[float] = Query(None, ge=0, le=100, description="Maximum match score percentage"),
-    min_experience: Optional[float] = Query(None, ge=0, description="Minimum years of experience"),
-    max_experience: Optional[float] = Query(None, ge=0, description="Maximum years of experience"),
-    filter_skills: Optional[str] = Query(None, description="Comma-separated list of required skills"),
-    education_level: Optional[str] = Query(None, description="Minimum education level (Bachelor, Master, PhD)"),
+    min_match_score: float | None = Query(None, ge=0, le=100, description="Minimum match score percentage"),
+    max_match_score: float | None = Query(None, ge=0, le=100, description="Maximum match score percentage"),
+    min_experience: float | None = Query(None, ge=0, description="Minimum years of experience"),
+    max_experience: float | None = Query(None, ge=0, description="Maximum years of experience"),
+    filter_skills: str | None = Query(None, description="Comma-separated list of required skills"),
+    education_level: str | None = Query(None, description="Minimum education level (Bachelor, Master, PhD)"),
     exclude_flagged: bool = Query(False, description="Exclude flagged candidates from results"),
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_company),
@@ -415,10 +412,10 @@ async def rank_candidates_for_internship(
 
                 # Generate comprehensive explanation using BOTH resumes
                 if tailored_is_different:
-                    explanation = f"✨ This candidate submitted a tailored resume specifically for this position. "
-                    explanation += f"Analysis combines both base profile (20%) and tailored application (80%). "
+                    explanation = "✨ This candidate submitted a tailored resume specifically for this position. "
+                    explanation += "Analysis combines both base profile (20%) and tailored application (80%). "
                 else:
-                    explanation = f"This candidate applied with their standard resume. "
+                    explanation = "This candidate applied with their standard resume. "
 
                 explanation += f"Overall compatibility: {round(final_score, 1)}%. "
 
@@ -576,7 +573,7 @@ async def rank_candidates_for_internship(
                 logger.info(
                     f"🔍 Filter: exclude_flagged=True → removed {pre_filter_count - len(filtered_candidates)} flagged candidates → {len(filtered_candidates)} remaining"
                 )
-                logger.info(f"🚫 Excluded candidates with is_flagged=True")
+                logger.info("🚫 Excluded candidates with is_flagged=True")
             else:
                 logger.info(
                     f"🔍 Filter: exclude_flagged=False → keeping all candidates including {total_flagged_count} flagged"
@@ -872,7 +869,7 @@ async def rank_candidates_for_internship(
                 logger.info(
                     f"🔍 Filter: exclude_flagged=True → removed {pre_filter_count - len(filtered_candidates)} flagged candidates → {len(filtered_candidates)} remaining"
                 )
-                logger.info(f"🚫 Excluded candidates with is_flagged=True")
+                logger.info("🚫 Excluded candidates with is_flagged=True")
             else:
                 logger.info(
                     f"🔍 Filter: exclude_flagged=False → keeping all candidates including {total_flagged_count} flagged"
@@ -1086,12 +1083,12 @@ async def calculate_match_score(
         try:
             resume_chroma_id = resume.embedding_id.replace('resume_', '') if resume.embedding_id else str(resume.id)
             candidate_embedding = rag_engine.get_resume_embedding(resume_chroma_id) if resume.embedding_id else None
-        except Exception as e:
+        except Exception:
             candidate_embedding = None
 
         try:
             internship_embedding = rag_engine.get_internship_embedding(str(internship.id))
-        except Exception as e:
+        except Exception:
             # Fallback: generate embedding on-the-fly if not found in ChromaDB
             internship_embedding = rag_engine.generate_embedding(f"{internship.title} {internship.description}")
 
@@ -1122,7 +1119,7 @@ async def calculate_match_score(
 
 @router.post("/bulk-parse")
 async def bulk_parse_resumes(
-    files: List[UploadFile] = File(...), db: Session = Depends(get_db), current_user: User = Depends(get_current_user)
+    files: list[UploadFile] = File(...), db: Session = Depends(get_db), current_user: User = Depends(get_current_user)
 ):
     """
     Bulk parse multiple resumes at once
@@ -1156,8 +1153,8 @@ async def bulk_parse_resumes(
 @router.post("/compute-matches")
 async def compute_batch_similarity_matches(
     force_recompute: bool = False,
-    student_id: Optional[int] = None,
-    internship_id: Optional[int] = None,
+    student_id: int | None = None,
+    internship_id: int | None = None,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
@@ -1235,17 +1232,17 @@ async def get_filtered_ranked_candidates(
     page: int = Query(1, ge=1, description="Page number"),
     page_size: int = Query(10, ge=1, le=100, description="Items per page"),
     # Filtering
-    min_score: Optional[int] = Query(None, ge=0, le=100, description="Minimum match score"),
-    max_score: Optional[int] = Query(None, ge=0, le=100, description="Maximum match score"),
-    skills: Optional[str] = Query(None, description="Comma-separated skills to filter"),
-    experience_min: Optional[float] = Query(None, ge=0, description="Minimum years of experience"),
-    experience_max: Optional[float] = Query(None, ge=0, description="Maximum years of experience"),
-    education_level: Optional[str] = Query(None, description="Education level filter"),
-    application_status: Optional[str] = Query(None, description="Filter by application status"),
+    min_score: int | None = Query(None, ge=0, le=100, description="Minimum match score"),
+    max_score: int | None = Query(None, ge=0, le=100, description="Maximum match score"),
+    skills: str | None = Query(None, description="Comma-separated skills to filter"),
+    experience_min: float | None = Query(None, ge=0, description="Minimum years of experience"),
+    experience_max: float | None = Query(None, ge=0, description="Maximum years of experience"),
+    education_level: str | None = Query(None, description="Education level filter"),
+    application_status: str | None = Query(None, description="Filter by application status"),
     only_applicants: bool = Query(False, description="Show only students who applied"),
     # Sorting
-    sort_by: Optional[str] = Query("score", description="Sort by: score, experience, name, date"),
-    sort_order: Optional[str] = Query("desc", description="Sort order: asc, desc"),
+    sort_by: str | None = Query("score", description="Sort by: score, experience, name, date"),
+    sort_order: str | None = Query("desc", description="Sort order: asc, desc"),
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_company),
 ):
@@ -1272,7 +1269,8 @@ async def get_filtered_ranked_candidates(
     - **page_size**: Items per page (default: 10, max: 100)
     """
     import logging
-    from sqlalchemy import and_, or_, func
+
+    from sqlalchemy import and_, func, or_
 
     logger = logging.getLogger(__name__)
 
@@ -1482,13 +1480,13 @@ async def export_candidate_rankings(
     internship_id: str,
     format: str = Query("csv", description="Export format: csv or xlsx"),
     # Filtering options (same as filtered endpoint)
-    min_score: Optional[int] = Query(None, ge=0, le=100, description="Minimum match score"),
-    max_score: Optional[int] = Query(None, ge=0, le=100, description="Maximum match score"),
-    skills: Optional[str] = Query(None, description="Comma-separated skills to filter"),
-    experience_min: Optional[float] = Query(None, ge=0, description="Minimum years of experience"),
-    experience_max: Optional[float] = Query(None, ge=0, description="Maximum years of experience"),
-    education_level: Optional[str] = Query(None, description="Education level filter"),
-    application_status: Optional[str] = Query(None, description="Filter by application status"),
+    min_score: int | None = Query(None, ge=0, le=100, description="Minimum match score"),
+    max_score: int | None = Query(None, ge=0, le=100, description="Maximum match score"),
+    skills: str | None = Query(None, description="Comma-separated skills to filter"),
+    experience_min: float | None = Query(None, ge=0, description="Minimum years of experience"),
+    experience_max: float | None = Query(None, ge=0, description="Maximum years of experience"),
+    education_level: str | None = Query(None, description="Education level filter"),
+    application_status: str | None = Query(None, description="Filter by application status"),
     only_applicants: bool = Query(False, description="Export only students who applied"),
     # Export options
     export_type: str = Query("filtered", description="Export type: filtered, all, or current_page"),
@@ -1517,9 +1515,10 @@ async def export_candidate_rankings(
     - Key Strengths (brief summary)
     """
     import logging
-    from sqlalchemy import and_, or_, func
+
     import openpyxl
-    from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
+    from openpyxl.styles import Alignment, Border, Font, PatternFill, Side
+    from sqlalchemy import and_, func, or_
 
     logger = logging.getLogger(__name__)
 

@@ -4,9 +4,9 @@ Extracts required and preferred skills from job descriptions using Gemini AI
 """
 
 import json
-import re
 import logging
-from typing import Dict, List
+import re
+
 from app.utils.gemini_key_manager import get_gemini_key_manager
 
 logger = logging.getLogger(__name__)
@@ -22,7 +22,7 @@ class JobDescriptionAnalyzer:
         self.key_manager = get_gemini_key_manager()
         logger.info("✅ JobDescriptionAnalyzer initialized with GeminiKeyManager")
 
-    def extract_skills(self, job_description: str) -> Dict[str, List[str]]:
+    def extract_skills(self, job_description: str) -> dict[str, list[str]]:
         """
         Extract required and preferred skills from job description using Gemini AI
 
@@ -151,7 +151,7 @@ Return JSON only (no markdown, no explanation):
             logger.info("🔄 Using fallback keyword extraction...")
             return self._fallback_keyword_extraction(job_description)
 
-    def _fallback_keyword_extraction(self, job_description: str) -> Dict[str, List[str]]:
+    def _fallback_keyword_extraction(self, job_description: str) -> dict[str, list[str]]:
         """
         Fallback method to extract skills using keyword matching
         When AI fails, this ensures we still extract some skills
@@ -330,8 +330,8 @@ Return JSON only (no markdown, no explanation):
         return result
 
     def validate_and_enhance_skills(
-        self, required_skills: List[str], preferred_skills: List[str]
-    ) -> Dict[str, List[str]]:
+        self, required_skills: list[str], preferred_skills: list[str]
+    ) -> dict[str, list[str]]:
         """
         Validate and enhance skill lists using Gemini AI
         - Normalize skill names

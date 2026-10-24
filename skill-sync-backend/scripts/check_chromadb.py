@@ -3,8 +3,8 @@ Check ChromaDB collections status
 Run this to see what's stored in the vector database
 """
 
-import sys
 import os
+import sys
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
@@ -25,7 +25,7 @@ def check_collections():
     print(f"Total resumes: {len(resume_data['ids']) if resume_data['ids'] else 0}")
     if resume_data['ids']:
         print(f"Resume IDs: {resume_data['ids']}")
-        print(f"\nResume Metadata:")
+        print("\nResume Metadata:")
         for i, (id, metadata) in enumerate(zip(resume_data['ids'], resume_data['metadatas'])):
             print(f"  {i + 1}. {id}")
             print(f"     - Resume ID: {metadata.get('resume_id')}")
@@ -42,7 +42,7 @@ def check_collections():
     print(f"Total internships: {len(internship_data['ids']) if internship_data['ids'] else 0}")
     if internship_data['ids']:
         print(f"Internship IDs: {internship_data['ids'][:10]}...")  # Show first 10
-        print(f"\nSample Internship Metadata:")
+        print("\nSample Internship Metadata:")
         for i, (id, metadata) in enumerate(zip(internship_data['ids'][:5], internship_data['metadatas'][:5])):
             print(f"  {i + 1}. {id}")
             print(f"     - Internship ID: {metadata.get('internship_id')}")

@@ -3,22 +3,22 @@ User Profile Routes - Profile management for students, companies, and admins
 Feature 7: User Profile Pages
 """
 
-from typing import Optional
-from fastapi import APIRouter, Depends, HTTPException, status, Query
-from sqlalchemy.orm import Session
-from pydantic import BaseModel, EmailStr
+import csv
+import io
 from datetime import datetime
 
-from app.database.connection import get_db
-from app.models import User, UserRole, Internship, Application, Resume
-from app.models.student_internship_match import StudentInternshipMatch
-from app.utils.security import get_current_user
-from app.services.email_service import email_service
-import io
-import csv
+from fastapi import APIRouter, Depends, HTTPException, Query, status
 from openpyxl import Workbook
-from openpyxl.styles import Font, PatternFill, Alignment
+from openpyxl.styles import Alignment, Font, PatternFill
 from openpyxl.utils import get_column_letter
+from pydantic import BaseModel
+from sqlalchemy.orm import Session
+
+from app.database.connection import get_db
+from app.models import Application, Internship, Resume, User, UserRole
+from app.models.student_internship_match import StudentInternshipMatch
+from app.services.email_service import email_service
+from app.utils.security import get_current_user
 
 router = APIRouter(prefix="/profile", tags=["Profile"])
 
@@ -28,11 +28,11 @@ class StudentProfileResponse(BaseModel):
     id: int
     email: str
     full_name: str
-    phone: Optional[str] = None
-    linkedin_url: Optional[str] = None
-    github_url: Optional[str] = None
-    skills: Optional[list] = None
-    total_experience_years: Optional[float] = None
+    phone: str | None = None
+    linkedin_url: str | None = None
+    github_url: str | None = None
+    skills: list | None = None
+    total_experience_years: float | None = None
 
     class Config:
         from_attributes = True
@@ -42,9 +42,9 @@ class CompanyProfileResponse(BaseModel):
     id: int
     email: str
     full_name: str  # Company name
-    hr_contact_name: Optional[str] = None
-    mailing_email: Optional[str] = None
-    phone: Optional[str] = None
+    hr_contact_name: str | None = None
+    mailing_email: str | None = None
+    phone: str | None = None
     phone_visible: bool = False
 
     class Config:
@@ -52,19 +52,19 @@ class CompanyProfileResponse(BaseModel):
 
 
 class StudentProfileUpdate(BaseModel):
-    full_name: Optional[str] = None
-    phone: Optional[str] = None
-    linkedin_url: Optional[str] = None
-    github_url: Optional[str] = None
+    full_name: str | None = None
+    phone: str | None = None
+    linkedin_url: str | None = None
+    github_url: str | None = None
 
 
 class CompanyProfileUpdate(BaseModel):
-    full_name: Optional[str] = None  # Company name
-    hr_contact_name: Optional[str] = None
-    email: Optional[str] = None
-    mailing_email: Optional[str] = None
-    phone: Optional[str] = None
-    phone_visible: Optional[bool] = None
+    full_name: str | None = None  # Company name
+    hr_contact_name: str | None = None
+    email: str | None = None
+    mailing_email: str | None = None
+    phone: str | None = None
+    phone_visible: bool | None = None
 
 
 class JobEmailStats(BaseModel):

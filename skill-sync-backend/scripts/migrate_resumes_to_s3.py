@@ -10,7 +10,6 @@ from pathlib import Path
 # Add parent directory to path
 sys.path.append(str(Path(__file__).parent.parent))
 
-from sqlalchemy import text
 from app.database.connection import SessionLocal
 from app.models import Resume
 from app.services.s3_service import s3_service
@@ -72,13 +71,13 @@ def migrate_resumes_to_s3():
                 print(f"  ✅ Uploaded to S3: {s3_key}")
                 success_count += 1
             else:
-                print(f"    Failed to upload to S3")
+                print("    Failed to upload to S3")
                 error_count += 1
 
             print()
 
         print("=" * 60)
-        print(f"🎉 Migration completed!")
+        print("🎉 Migration completed!")
         print(f"  ✅ Successful uploads: {success_count}")
         print(f"    Failed uploads: {error_count}")
         print()

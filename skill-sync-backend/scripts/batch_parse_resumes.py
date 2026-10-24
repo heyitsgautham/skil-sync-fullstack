@@ -3,21 +3,22 @@ Batch Resume Parser with API Key Rotation
 Parses all unparsed resumes using multiple Gemini API keys to avoid rate limiting
 """
 
-import sys
 import os
+import sys
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
+import time
+import traceback
+from datetime import datetime
+
+from dotenv import load_dotenv
+
 from app.database.connection import get_db
 from app.models.resume import Resume
-from app.models.user import User
 from app.services.parser_service import ResumeParser
-from app.services.resume_intelligence_service import ResumeIntelligenceService
 from app.services.rag_engine import rag_engine
-import time
-from datetime import datetime
-import traceback
-from dotenv import load_dotenv
+from app.services.resume_intelligence_service import ResumeIntelligenceService
 
 # Gemini API keys to rotate through, read from the same GEMINI_KEY_* variables
 # that app/utils/gemini_key_manager.py uses. Set them in .env (see .env.example).
@@ -130,7 +131,6 @@ def main():
 
     # Find all resumes that need parsing (no parsed_data or empty or no skills or no embedding)
     print("🔍 Finding resumes that need re-parsing with Gemini...")
-    from sqlalchemy import or_, cast, Text
 
     # Get all resumes and filter in Python (to avoid PostgreSQL JSON comparison issues)
     all_resumes = db.query(Resume).all()

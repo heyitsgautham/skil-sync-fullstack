@@ -3,8 +3,8 @@
 System Status Check - Verify all components of Intelligent Filtering System
 """
 
-import sys
 import os
+import sys
 
 # Add parent directory to path for imports
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -20,8 +20,9 @@ def check_status():
     # 1. Check database connection
     print("\n📊 DATABASE:")
     try:
-        from app.database.connection import engine
         from sqlalchemy import text
+
+        from app.database.connection import engine
 
         with engine.connect() as conn:
             conn.execute(text("SELECT 1"))
@@ -62,7 +63,7 @@ def check_status():
             model = genai.GenerativeModel('gemini-2.5-flash')
             response = model.generate_content('Reply with: OK')
             if response.text:
-                print(f"  ✅ Gemini API connected (Model: gemini-2.5-flash)")
+                print("  ✅ Gemini API connected (Model: gemini-2.5-flash)")
             else:
                 print("  ⚠️  Gemini responded but with empty content")
 
@@ -79,7 +80,7 @@ def check_status():
         test_embedding = model.encode("test", convert_to_numpy=True)
 
         if len(test_embedding) == 384:
-            print(f"  ✅ Embedding model loaded (Dimension: 384)")
+            print("  ✅ Embedding model loaded (Dimension: 384)")
         else:
             print(f"  ⚠️  Unexpected embedding dimension: {len(test_embedding)}")
 
@@ -108,7 +109,7 @@ def check_status():
     # 5. Check Services
     print("\n⚙️  SERVICES:")
     try:
-        from app.services.resume_intelligence_service import ResumeIntelligenceService
+        from app.services.resume_intelligence_service import ResumeIntelligenceService  # noqa: F401
 
         print("  ✅ ResumeIntelligenceService")
     except Exception as e:
@@ -116,7 +117,7 @@ def check_status():
         all_passed = False
 
     try:
-        from app.services.matching_engine import MatchingEngine
+        from app.services.matching_engine import MatchingEngine  # noqa: F401
 
         print("  ✅ MatchingEngine")
     except Exception as e:
@@ -124,7 +125,7 @@ def check_status():
         all_passed = False
 
     try:
-        from app.services.rag_engine import RAGEngine
+        from app.services.rag_engine import RAGEngine  # noqa: F401
 
         print("  ✅ RAGEngine")
     except Exception as e:
@@ -134,7 +135,6 @@ def check_status():
     # 6. Check API Routes
     print("\n🌐 API ROUTES:")
     try:
-        from app.routes.intelligent_filtering import router
         from app.main import app
 
         filter_routes = [r for r in app.routes if hasattr(r, 'path') and '/filter' in r.path]

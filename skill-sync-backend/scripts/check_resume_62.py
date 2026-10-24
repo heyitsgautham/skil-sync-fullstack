@@ -2,8 +2,8 @@
 Check resume 62 in the database
 """
 
-import sys
 import os
+import sys
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
@@ -18,7 +18,7 @@ def check_resume():
         resume = db.query(Resume).filter(Resume.id == 62).first()
 
         if resume:
-            print(f"Resume 62 found:")
+            print("Resume 62 found:")
             print(f"  ID: {resume.id}")
             print(f"  Resume ID (UUID): {resume.resume_id}")
             print(f"  Student ID: {resume.student_id}")

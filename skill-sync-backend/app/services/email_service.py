@@ -2,14 +2,14 @@
 Email Service - Handle email notifications for SkillSync
 """
 
-import smtplib
-from email.mime.text import MIMEText
-from email.mime.multipart import MIMEMultipart
-from email.mime.base import MIMEBase
-from email import encoders
-from typing import List, Dict, Optional, Tuple
-from datetime import datetime, timedelta
 import os
+import smtplib
+from datetime import datetime
+from email import encoders
+from email.mime.base import MIMEBase
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -34,8 +34,8 @@ class EmailService:
         to_email: str,
         subject: str,
         html_content: str,
-        text_content: Optional[str] = None,
-        attachments: Optional[List[Tuple[str, bytes, str]]] = None,
+        text_content: str | None = None,
+        attachments: list[tuple[str, bytes, str]] | None = None,
     ) -> bool:
         """
         Send an email using SMTP with optional attachments
@@ -106,7 +106,7 @@ class EmailService:
             print(f"Error sending email to {to_email}: {str(e)}")
             return False
 
-    def generate_daily_summary_html(self, company_name: str, internship_summaries: List[Dict], date: datetime) -> str:
+    def generate_daily_summary_html(self, company_name: str, internship_summaries: list[dict], date: datetime) -> str:
         """
         Generate HTML content for daily applicant summary email
 
@@ -368,7 +368,7 @@ class EmailService:
 
         return html
 
-    def generate_daily_summary_text(self, company_name: str, internship_summaries: List[Dict], date: datetime) -> str:
+    def generate_daily_summary_text(self, company_name: str, internship_summaries: list[dict], date: datetime) -> str:
         """
         Generate plain text content for daily applicant summary email
 

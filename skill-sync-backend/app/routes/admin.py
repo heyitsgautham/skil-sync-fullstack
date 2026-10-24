@@ -3,15 +3,14 @@ Admin API Routes
 Endpoints for administrative operations
 """
 
-from typing import Dict
-from fastapi import APIRouter, Depends, HTTPException, status, BackgroundTasks
-from sqlalchemy.orm import Session
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, status
 from pydantic import BaseModel
+from sqlalchemy.orm import Session
 
 from app.database.connection import get_db
 from app.models import User, UserRole
-from app.utils.security import get_current_user
 from app.services.embedding_recompute_service import EmbeddingRecomputeService
+from app.utils.security import get_current_user
 
 router = APIRouter(prefix="/admin", tags=["Admin"])
 
@@ -20,9 +19,9 @@ class RecomputeResponse(BaseModel):
     """Response model for recompute embeddings endpoint"""
 
     message: str
-    resumes: Dict
-    internships: Dict
-    matches: Dict = None
+    resumes: dict
+    internships: dict
+    matches: dict = None
 
     class Config:
         from_attributes = True
@@ -167,7 +166,7 @@ def clear_chromadb_embeddings(db: Session = Depends(get_db), current_user: User 
         # Commit changes
         db.commit()
 
-        logger.info(f"✅ ChromaDB cleanup completed!")
+        logger.info("✅ ChromaDB cleanup completed!")
         logger.info(f"   - ChromaDB embeddings deleted: {chromadb_cleared_count}")
         logger.info(f"   - PostgreSQL resumes cleared: {len(resumes)}")
         logger.info(f"   - Matches cleared: {matches_deleted}")
@@ -206,9 +205,9 @@ def reindex_all_student_resumes(
 
     This is a background task that may take several minutes.
     """
+    import glob
     import logging
     import os
-    import glob
 
     logger = logging.getLogger(__name__)
 
@@ -217,10 +216,11 @@ def reindex_all_student_resumes(
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Only admins can reindex resumes")
 
     try:
+        from app.models import Resume
+        from app.models import User as UserModel
         from app.services.parser_service import ResumeParser
-        from app.services.resume_intelligence_service import ResumeIntelligenceService
         from app.services.rag_engine import rag_engine
-        from app.models import Resume, User as UserModel
+        from app.services.resume_intelligence_service import ResumeIntelligenceService
 
         logger.info(f"🔄 Admin {current_user.email} initiated full resume reindexing")
 
@@ -265,7 +265,7 @@ def reindex_all_student_resumes(
                     elif resume_file.endswith('.docx'):
                         text = parser.extract_text_from_docx(resume_file)
                     else:
-                        with open(resume_file, 'r', encoding='utf-8') as f:
+                        with open(resume_file, encoding='utf-8') as f:
                             text = f.read()
 
                     # Extract structured data using Gemini
@@ -366,7 +366,7 @@ def get_system_status(db: Session = Depends(get_db), current_user: User = Depend
 
     Returns counts of resumes, internships, and matches
     """
-    from app.models import Resume, Internship, StudentInternshipMatch
+    from app.models import Internship, Resume, StudentInternshipMatch
 
     # Verify user is admin
     if current_user.role != UserRole.admin:

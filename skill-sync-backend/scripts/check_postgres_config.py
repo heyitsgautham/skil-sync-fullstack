@@ -5,6 +5,7 @@ Helps diagnose and fix PostgreSQL connection issues
 
 import os
 import sys
+
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -29,14 +30,14 @@ def check_env_file():
         print("  DATABASE_URL not set in .env file")
         return False
 
-    print(f"✅ DATABASE_URL is set")
+    print("✅ DATABASE_URL is set")
 
     # Parse the URL
     if "YOUR_PASSWORD" in DATABASE_URL or "your-password" in DATABASE_URL.lower():
         print("\n⚠️  WARNING: DATABASE_URL contains placeholder password!")
         print("   Please update .env file with your actual PostgreSQL password.")
         print(f"\n   Current: {DATABASE_URL}")
-        print(f"   Update to: postgresql://gauthamkrishna:YOUR_ACTUAL_PASSWORD@localhost:5432/skillsync")
+        print("   Update to: postgresql://gauthamkrishna:YOUR_ACTUAL_PASSWORD@localhost:5432/skillsync")
         return False
 
     # Check URL format

@@ -3,8 +3,8 @@
 Script to delete ALL embeddings from ChromaDB (both resumes and internships)
 """
 
-import sys
 import os
+import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
@@ -19,7 +19,7 @@ def delete_all_embeddings():
     chroma_path = os.path.join(os.path.dirname(__file__), "..", "data", "chroma_db")
 
     print(f"\n{'=' * 60}")
-    print(f"Deleting ALL Embeddings from ChromaDB")
+    print("Deleting ALL Embeddings from ChromaDB")
     print(f"{'=' * 60}\n")
 
     try:
@@ -55,9 +55,9 @@ def delete_all_embeddings():
                 if new_count == 0:
                     print(f"  ✓ Successfully deleted {count} documents")
                 else:
-                    print(f"  ✗ Failed to delete all documents")
+                    print("  ✗ Failed to delete all documents")
             else:
-                print(f"  Already empty")
+                print("  Already empty")
 
             print()
 

@@ -3,9 +3,10 @@ Student-Internship Match Model - Pre-computed similarity scores
 Part of the Hybrid Matching Strategy for performance optimization
 """
 
-from sqlalchemy import Column, Integer, Float, DateTime, ForeignKey, Index
+from sqlalchemy import Column, DateTime, Float, ForeignKey, Index, Integer
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
+
 from app.database.connection import Base
 
 

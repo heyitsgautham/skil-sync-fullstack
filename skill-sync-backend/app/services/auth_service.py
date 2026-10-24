@@ -3,11 +3,11 @@ Authentication Service
 Business logic for user authentication and registration
 """
 
-from sqlalchemy.orm import Session
 from fastapi import HTTPException, status
+from sqlalchemy.orm import Session
+
 from app.models.user import User, UserRole
-from app.utils.security import get_password_hash, verify_password, create_access_token
-from datetime import timedelta
+from app.utils.security import create_access_token, get_password_hash, verify_password
 
 
 class AuthService:

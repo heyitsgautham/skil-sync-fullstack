@@ -3,7 +3,6 @@ Test if the /api/auth/users endpoint returns is_active field
 """
 
 import requests
-import json
 
 BASE_URL = "http://localhost:8000"
 
@@ -21,7 +20,7 @@ if response.status_code != 200:
     exit(1)
 
 token = response.json()["access_token"]
-print(f"✅ Logged in successfully")
+print("✅ Logged in successfully")
 
 headers = {"Authorization": f"Bearer {token}"}
 

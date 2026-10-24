@@ -4,8 +4,8 @@ Script to verify if embeddings are deleted from ChromaDB
 Checks all collections and their document counts
 """
 
-import sys
 import os
+import sys
 from pathlib import Path
 
 # Add parent directory to path
@@ -22,7 +22,7 @@ def verify_embeddings_deletion():
     chroma_path = os.path.join(os.path.dirname(__file__), "..", "data", "chroma_db")
 
     print(f"\n{'=' * 60}")
-    print(f"ChromaDB Verification Report")
+    print("ChromaDB Verification Report")
     print(f"{'=' * 60}")
     print(f"Database Path: {chroma_path}\n")
 
@@ -62,29 +62,29 @@ def verify_embeddings_deletion():
                 print()
             else:
                 print(f"Collection: {collection.name}")
-                print(f"  Document count: 0 (EMPTY)")
+                print("  Document count: 0 (EMPTY)")
                 print(f"  Metadata: {collection.metadata}")
                 print()
 
         # Summary
         print(f"\n{'=' * 60}")
-        print(f"Summary:")
+        print("Summary:")
         print(f"{'=' * 60}")
         print(f"Total collections: {len(collections)}")
         print(f"Total documents across all collections: {total_documents}")
 
         if total_documents == 0:
-            print(f"\n✓ Status: All embeddings have been DELETED")
-            print(f"  All collections exist but contain no documents")
+            print("\n✓ Status: All embeddings have been DELETED")
+            print("  All collections exist but contain no documents")
             return True
         else:
-            print(f"\n✗ Status: Embeddings still exist")
+            print("\n✗ Status: Embeddings still exist")
             print(f"  {total_documents} document(s) found across collections")
 
             # Show which collections have documents
             non_empty = [c for c in collection_details if c['count'] > 0]
             if non_empty:
-                print(f"\n  Collections with documents:")
+                print("\n  Collections with documents:")
                 for col in non_empty:
                     print(f"    - {col['name']}: {col['count']} documents")
 
@@ -114,7 +114,7 @@ def verify_specific_collection(collection_name: str):
             collection = client.get_collection(collection_name)
             count = collection.count()
 
-            print(f"Collection exists: Yes")
+            print("Collection exists: Yes")
             print(f"Document count: {count}")
             print(f"Metadata: {collection.metadata}")
 
@@ -132,7 +132,7 @@ def verify_specific_collection(collection_name: str):
                 return True
 
         except Exception as e:
-            print(f"Collection exists: No")
+            print("Collection exists: No")
             print(f"Error: {str(e)}")
             return True
 
@@ -148,7 +148,7 @@ def check_sqlite_database():
     db_path = os.path.join(os.path.dirname(__file__), "..", "data", "chroma_db", "chroma.sqlite3")
 
     print(f"\n{'=' * 60}")
-    print(f"SQLite Database Analysis")
+    print("SQLite Database Analysis")
     print(f"{'=' * 60}\n")
 
     if not os.path.exists(db_path):

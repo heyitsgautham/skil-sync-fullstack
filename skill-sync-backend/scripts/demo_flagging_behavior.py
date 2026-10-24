@@ -3,14 +3,14 @@ Quick demonstration of the updated flagging behavior
 Shows that only candidates with uploaded resumes are flagged
 """
 
-import sys
 import os
+import sys
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from app.database.connection import SessionLocal
-from app.models.user import User, UserRole
 from app.models.resume import Resume
+from app.models.user import User, UserRole
 
 
 def demonstrate_flagging_logic():
@@ -56,7 +56,7 @@ def demonstrate_flagging_logic():
 
         if students_no_resume:
             example_no_resume = students_no_resume[0]
-            print(f"\n  Student WITHOUT Resume (Will NOT be checked for duplicates):")
+            print("\n  Student WITHOUT Resume (Will NOT be checked for duplicates):")
             print(f"   ID: {example_no_resume.id}")
             print(f"   Name: {example_no_resume.full_name}")
             print(f"   Phone: {example_no_resume.phone or 'Not set'}")
@@ -65,7 +65,7 @@ def demonstrate_flagging_logic():
 
         if students_with_resume_list:
             example_with_resume = students_with_resume_list[0]
-            print(f"\n✅ Student WITH Resume (WILL be checked for duplicates):")
+            print("\n✅ Student WITH Resume (WILL be checked for duplicates):")
             print(f"   ID: {example_with_resume.id}")
             print(f"   Name: {example_with_resume.full_name}")
             print(f"   Phone: {example_with_resume.phone or 'Not set'}")

@@ -5,20 +5,20 @@ Script to reset the database and populate it with sample data:
 """
 
 import sys
-import os
 from pathlib import Path
 
 # Add parent directory to path
 sys.path.append(str(Path(__file__).parent.parent))
 
+import shutil
+
 from sqlalchemy.orm import Session
-from app.database.connection import engine, SessionLocal, Base
-from app.models.user import User, UserRole
+
+from app.database.connection import Base, SessionLocal, engine
 from app.models.internship import Internship
 from app.models.resume import Resume
-from app.models.application import Application
+from app.models.user import User, UserRole
 from app.utils.security import get_password_hash
-import shutil
 
 
 def reset_database():
@@ -512,7 +512,7 @@ def create_students(db: Session):
 
         # Create resume record
         resume_path = resume_paths[student_data["resume_key"]]
-        with open(resume_path, 'r') as f:
+        with open(resume_path) as f:
             resume_content = f.read()
 
         resume = Resume(

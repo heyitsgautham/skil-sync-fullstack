@@ -4,15 +4,16 @@ Run this script to add the resume anonymization toggle for companies
 """
 
 import sys
-import os
 from pathlib import Path
 
 # Add parent directory to path for imports
 sys.path.append(str(Path(__file__).parent.parent))
 
-from sqlalchemy import text
-from app.database.connection import engine, SessionLocal
 import logging
+
+from sqlalchemy import text
+
+from app.database.connection import SessionLocal
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -60,7 +61,7 @@ def add_anonymization_toggle():
         result = db.execute(verify_query).fetchone()
 
         if result:
-            logger.info(f"✅ Verification successful:")
+            logger.info("✅ Verification successful:")
             logger.info(f"   Column: {result[0]}")
             logger.info(f"   Type: {result[1]}")
             logger.info(f"   Default: {result[2]}")
