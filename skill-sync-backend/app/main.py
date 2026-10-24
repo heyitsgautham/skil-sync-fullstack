@@ -43,10 +43,17 @@ except Exception as e:
     print("  API will start but database-dependent endpoints will fail")
     print("  Please ensure PostgreSQL is running and DATABASE_URL is configured correctly")
 
-# Configure CORS
+
+def parse_allowed_origins(value: str | None) -> list[str]:
+    """Split a comma-separated ALLOWED_ORIGINS value. Unset or blank allows every origin."""
+    origins = [origin.strip() for origin in (value or "").split(",") if origin.strip()]
+    return origins or ["*"]
+
+
+# Configure CORS from ALLOWED_ORIGINS, for example "http://localhost:3000,https://app.example.com"
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Configure this properly in production
+    allow_origins=parse_allowed_origins(os.getenv("ALLOWED_ORIGINS")),
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
