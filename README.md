@@ -125,6 +125,7 @@ The backend reads its settings from environment variables, and `skill-sync-backe
 | `SECRET_KEY`, `ALGORITHM`, `ACCESS_TOKEN_EXPIRE_MINUTES` | JWT signing for login tokens |
 | `TEMP_TOKEN_SECRET` | Signing key for short-lived resume view links |
 | `ALLOWED_ORIGINS` | Comma-separated CORS origins, empty allows all |
+| `LOG_LEVEL`, `LOG_FORMAT` | Log level, and `json` for one JSON object per line |
 | `FRONTEND_URL`, `BACKEND_URL` | Public URLs used in emails and resume links |
 | `GEMINI_KEY_*` | Ten Gemini API keys, one per task plus three fallbacks |
 | `CHROMA_DB_PATH` | ChromaDB directory |

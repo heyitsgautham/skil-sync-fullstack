@@ -3,11 +3,13 @@ SkillSync Backend - Main Application Entry Point
 FastAPI application for intelligent internship matching platform
 """
 
+import logging
 import os
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from app.logging_config import configure_logging
 from app.routes import (
     admin,
     auth,
@@ -23,6 +25,9 @@ from app.routes import (
     students,
 )
 
+configure_logging()
+logger = logging.getLogger(__name__)
+
 # Initialize FastAPI app
 app = FastAPI(
     title="SkillSync API",
@@ -37,11 +42,13 @@ try:
     from app.database.connection import Base, engine
 
     Base.metadata.create_all(bind=engine)
-    print("✓ Database tables created successfully")
+    logger.info("Database tables created")
 except Exception as e:
-    print(f"⚠ Warning: Could not connect to database: {str(e)}")
-    print("  API will start but database-dependent endpoints will fail")
-    print("  Please ensure PostgreSQL is running and DATABASE_URL is configured correctly")
+    logger.warning(
+        "Could not connect to the database, so endpoints that need it will fail. "
+        "Check that PostgreSQL is running and DATABASE_URL is correct: %s",
+        e,
+    )
 
 
 def parse_allowed_origins(value: str | None) -> list[str]:
