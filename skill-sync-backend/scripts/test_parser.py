@@ -24,19 +24,19 @@ def test_skill_extraction():
     resume_text = """
     John Doe
     Software Developer
-    
+
     SKILLS:
     Python, Java, JavaScript, React, Node.js, Django, Flask
     PostgreSQL, MongoDB, Docker, Kubernetes, AWS
     REST API, GraphQL, Microservices
     Git, CI/CD, Agile, Scrum
-    
+
     EXPERIENCE:
     Backend Developer at Tech Corp
     - Built REST APIs using Django and Flask
     - Worked with PostgreSQL and Redis
     - Deployed applications on AWS using Docker
-    
+
     EDUCATION:
     B.S. in Computer Science
     """

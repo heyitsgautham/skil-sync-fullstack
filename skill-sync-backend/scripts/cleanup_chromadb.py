@@ -37,7 +37,7 @@ def main():
     to_delete = []
     to_keep = []
 
-    for chroma_id, metadata in zip(all_chromadb_resumes['ids'], all_chromadb_resumes['metadatas']):
+    for chroma_id, metadata in zip(all_chromadb_resumes['ids'], all_chromadb_resumes['metadatas'], strict=True):
         resume_id = metadata.get('resume_id', '')
 
         # Delete if:

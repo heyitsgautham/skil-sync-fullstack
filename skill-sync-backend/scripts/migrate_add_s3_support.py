@@ -25,7 +25,7 @@ def migrate_add_s3_key():
         print("📝 Adding s3_key column...")
         db.execute(
             text("""
-            ALTER TABLE resumes 
+            ALTER TABLE resumes
             ADD COLUMN IF NOT EXISTS s3_key VARCHAR(500)
         """)
         )
@@ -34,7 +34,7 @@ def migrate_add_s3_key():
         print("📝 Creating index on s3_key...")
         db.execute(
             text("""
-            CREATE INDEX IF NOT EXISTS idx_resumes_s3_key 
+            CREATE INDEX IF NOT EXISTS idx_resumes_s3_key
             ON resumes(s3_key)
         """)
         )

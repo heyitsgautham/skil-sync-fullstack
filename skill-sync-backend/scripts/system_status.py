@@ -32,7 +32,7 @@ def check_status():
         with engine.connect() as conn:
             result = conn.execute(
                 text("""
-                SELECT COUNT(*) FROM information_schema.columns 
+                SELECT COUNT(*) FROM information_schema.columns
                 WHERE table_name = 'users' AND column_name = 'user_id'
             """)
             )

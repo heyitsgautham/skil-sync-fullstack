@@ -465,7 +465,6 @@ def generate_csv_export_from_matches(matches, db, internship):
             .filter(Application.student_id == match.student_id, Application.internship_id == match.internship_id)
             .first()
         )
-        has_applied = 'Yes' if application else 'No'
 
         score = match.base_similarity_score or 0
 
@@ -660,7 +659,6 @@ def generate_excel_export_from_matches(matches, db, internship):
             .filter(Application.student_id == match.student_id, Application.internship_id == match.internship_id)
             .first()
         )
-        has_applied = 'Yes' if application else 'No'
 
         score = match.base_similarity_score or 0
 
@@ -755,7 +753,7 @@ def generate_excel_export_from_matches(matches, db, internship):
             try:
                 if len(str(cell.value)) > max_length:
                     max_length = len(str(cell.value))
-            except:
+            except Exception:
                 pass
         adjusted_width = min(max_length + 2, 50)  # Cap at 50
         ws.column_dimensions[column_letter].width = adjusted_width
@@ -848,9 +846,9 @@ def generate_job_email_html(company_name, internship_title, job_stats, matches, 
         <div class="content">
             <h3>Hello, {company_name}!</h3>
             <p>Here's your comprehensive report for <strong>{internship_title}</strong>.</p>
-            
+
             {filter_info}
-            
+
             <div class="stats-grid">
                 <div class="stat-card">
                     <div class="stat-number">{job_stats['total_applicants']}</div>
@@ -873,11 +871,11 @@ def generate_job_email_html(company_name, internship_title, job_stats, matches, 
                     <div class="stat-label">Tailored Resumes</div>
                 </div>
             </div>
-            
+
             <p><strong>Note:</strong> CSV and Excel exports with detailed candidate information are attached to this email.</p>
-            
+
             <hr style="margin: 30px 0; border: none; border-top: 1px solid #ddd;">
-            
+
             <p style="font-size: 12px; color: #666; text-align: center;">
                 This is an automated report from SkillSync<br>
                 Feature 7: User Profile Pages - Job Email Reports<br>

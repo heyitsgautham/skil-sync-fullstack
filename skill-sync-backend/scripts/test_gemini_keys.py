@@ -94,12 +94,12 @@ for username, key in working_keys:
 
 print()
 print(f"🔴 Rate Limited Keys: {len(rate_limited_keys)}")
-for username, key, error in rate_limited_keys:
+for username, _key, error in rate_limited_keys:
     print(f"   - {username}: {error}")
 
 print()
 print(f"  Invalid/Error Keys: {len(invalid_keys)}")
-for username, key, error in invalid_keys:
+for username, _key, error in invalid_keys:
     print(f"   - {username}: {error}")
 
 print()

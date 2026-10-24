@@ -81,7 +81,7 @@ class EmailService:
 
             # Add attachments if provided
             if attachments:
-                for filename, file_content, mime_type in attachments:
+                for filename, file_content, _mime_type in attachments:
                     # Create attachment part
                     part = MIMEBase("application", "octet-stream")
                     part.set_payload(file_content)
@@ -278,7 +278,7 @@ class EmailService:
                     <h1>📊 Daily Applicant Summary</h1>
                     <div class="date">{date.strftime("%A, %B %d, %Y")}</div>
                 </div>
-                
+
                 <div class="summary-box">
                     <h2>Hello, {company_name}!</h2>
                     <p>Here's your daily summary of new internship applications.</p>
@@ -355,7 +355,7 @@ class EmailService:
                         View All Applications in Dashboard
                     </a>
                 </div>
-                
+
                 <div class="footer">
                     <p>This is an automated daily summary from SkillSync.</p>
                     <p>You're receiving this because you have active internship postings.</p>

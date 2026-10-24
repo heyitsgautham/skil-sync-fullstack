@@ -1792,7 +1792,7 @@ async def export_candidate_rankings(
                             cell_length = len(str(cell.value))
                             if cell_length > max_length:
                                 max_length = cell_length
-                        except:
+                        except Exception:
                             pass
 
                 adjusted_width = min(max_length + 2, 50)

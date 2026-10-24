@@ -112,9 +112,6 @@ def upload_and_parse_resume(file_path: str, student_id: int, file_name: str, db)
         skills = structured_data.get('all_skills', [])
         print(f"   ✅ Extracted {len(skills)} skills")
 
-        # Combine data
-        parsed_data = {**basic_data, **structured_data, 'parsed_content': resume_text}
-
         # Deactivate old resumes for this student
         db.query(Resume).filter(Resume.student_id == student_id, Resume.is_active == 1).update({"is_active": 0})
 

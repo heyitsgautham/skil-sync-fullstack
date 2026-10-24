@@ -120,7 +120,7 @@ class EmbeddingRecomputeService:
 
                 try:
                     extracted_skills = json.loads(extracted_skills)
-                except:
+                except json.JSONDecodeError:
                     extracted_skills = []
 
             # 2. Store embedding in ChromaDB and get embedding_id
@@ -178,7 +178,7 @@ class EmbeddingRecomputeService:
 
             # Recompute embedding
             # 1. Store in vector DB (which generates embedding)
-            embedding_id = rag_engine.store_internship_embedding(
+            rag_engine.store_internship_embedding(
                 internship_id=str(internship.id),
                 title=internship.title,
                 description=internship.description,

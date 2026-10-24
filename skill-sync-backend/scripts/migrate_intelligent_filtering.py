@@ -28,7 +28,7 @@ def migrate_database():
             print("  ➜ Adding columns to users table...")
             conn.execute(
                 text("""
-                ALTER TABLE users 
+                ALTER TABLE users
                 ADD COLUMN IF NOT EXISTS user_id VARCHAR(36) UNIQUE,
                 ADD COLUMN IF NOT EXISTS skills JSON,
                 ADD COLUMN IF NOT EXISTS total_experience_years FLOAT DEFAULT 0
@@ -38,8 +38,8 @@ def migrate_database():
             # Update existing users with UUIDs if they don't have one
             conn.execute(
                 text("""
-                UPDATE users 
-                SET user_id = gen_random_uuid()::text 
+                UPDATE users
+                SET user_id = gen_random_uuid()::text
                 WHERE user_id IS NULL
             """)
             )
@@ -48,7 +48,7 @@ def migrate_database():
             print("  ➜ Adding columns to resumes table...")
             conn.execute(
                 text("""
-                ALTER TABLE resumes 
+                ALTER TABLE resumes
                 ADD COLUMN IF NOT EXISTS resume_id VARCHAR(36) UNIQUE,
                 ADD COLUMN IF NOT EXISTS parsed_data JSON,
                 ADD COLUMN IF NOT EXISTS embedding FLOAT[],
@@ -59,8 +59,8 @@ def migrate_database():
             # Update existing resumes with UUIDs
             conn.execute(
                 text("""
-                UPDATE resumes 
-                SET resume_id = gen_random_uuid()::text 
+                UPDATE resumes
+                SET resume_id = gen_random_uuid()::text
                 WHERE resume_id IS NULL
             """)
             )
@@ -69,7 +69,7 @@ def migrate_database():
             print("  ➜ Adding columns to internships table...")
             conn.execute(
                 text("""
-                ALTER TABLE internships 
+                ALTER TABLE internships
                 ADD COLUMN IF NOT EXISTS internship_id VARCHAR(36) UNIQUE,
                 ADD COLUMN IF NOT EXISTS preferred_skills JSON,
                 ADD COLUMN IF NOT EXISTS min_experience FLOAT DEFAULT 0,
@@ -81,8 +81,8 @@ def migrate_database():
             # Update existing internships with UUIDs
             conn.execute(
                 text("""
-                UPDATE internships 
-                SET internship_id = gen_random_uuid()::text 
+                UPDATE internships
+                SET internship_id = gen_random_uuid()::text
                 WHERE internship_id IS NULL
             """)
             )

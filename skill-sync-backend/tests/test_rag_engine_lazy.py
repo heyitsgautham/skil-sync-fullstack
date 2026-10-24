@@ -2,6 +2,8 @@
 
 import threading
 
+import pytest
+
 from app.services import rag_engine as rag_module
 from app.services.rag_engine import LazyRAGEngine
 
@@ -66,9 +68,5 @@ def test_concurrent_first_access_builds_one_engine():
 
 def test_missing_attribute_raises_attribute_error():
     lazy = LazyRAGEngine(factory=FakeEngine)
-    try:
-        lazy.does_not_exist
-    except AttributeError:
-        pass
-    else:
-        raise AssertionError("expected AttributeError")
+    with pytest.raises(AttributeError):
+        _ = lazy.does_not_exist

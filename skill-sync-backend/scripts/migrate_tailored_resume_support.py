@@ -54,8 +54,8 @@ def migrate_add_tailored_resume_support():
         with engine.connect() as conn:
             result = conn.execute(
                 text("""
-                SELECT column_name 
-                FROM information_schema.columns 
+                SELECT column_name
+                FROM information_schema.columns
                 WHERE table_name = 'resumes'
                 AND column_name IN ('is_tailored', 'tailored_for_internship_id', 'base_resume_id');
             """)

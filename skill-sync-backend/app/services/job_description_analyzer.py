@@ -38,7 +38,7 @@ class JobDescriptionAnalyzer:
 
 IMPORTANT LIMITS:
 - Extract MAX 7 required skills
-- Extract MAX 7 preferred skills  
+- Extract MAX 7 preferred skills
 - Total skills (required + preferred) must NOT exceed 15
 - Prioritize the MOST IMPORTANT and SPECIFIC skills
 
@@ -246,7 +246,6 @@ Return JSON only (no markdown, no explanation):
             'kafka': 'Apache Kafka',
             'rabbitmq': 'RabbitMQ',
             'elasticsearch': 'Elasticsearch',
-            'redis': 'Redis',
         }
 
         description_lower = job_description.lower()

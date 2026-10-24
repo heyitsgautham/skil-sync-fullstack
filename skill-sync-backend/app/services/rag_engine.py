@@ -216,7 +216,7 @@ class RAGEngine:
                     min_dist = distances[0] if distances else 0
                     dist_range = 0
 
-                for metadata, distance in zip(results['metadatas'][0], distances):
+                for metadata, distance in zip(results['metadatas'][0], distances, strict=True):
                     # Min-max normalization with inversion (lower distance = higher score)
                     if dist_range > 0:
                         normalized = 1 - ((distance - min_dist) / dist_range)
@@ -296,7 +296,7 @@ class RAGEngine:
                     min_dist = distances[0] if distances else 0
                     dist_range = 0
 
-                for metadata, distance in zip(results['metadatas'][0], distances):
+                for metadata, distance in zip(results['metadatas'][0], distances, strict=True):
                     # Min-max normalization with inversion (lower distance = higher score)
                     if dist_range > 0:
                         normalized = 1 - ((distance - min_dist) / dist_range)
