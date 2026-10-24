@@ -28,6 +28,7 @@ import {
     Email as EmailIcon
 } from '@mui/icons-material';
 import Layout from '../../components/Layout';
+import { API_BASE_URL } from '../../services/apiConfig';
 
 const StudentProfile = () => {
     const [profile, setProfile] = useState(null);
@@ -43,7 +44,6 @@ const StudentProfile = () => {
         github_url: ''
     });
 
-    const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000/api';
     const token = localStorage.getItem('token');
 
     const fetchProfile = useCallback(async () => {
@@ -76,7 +76,7 @@ const StudentProfile = () => {
         } finally {
             setLoading(false);
         }
-    }, [API_BASE_URL, token]);
+    }, [token]);
 
     useEffect(() => {
         fetchProfile();

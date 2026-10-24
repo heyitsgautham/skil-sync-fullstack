@@ -27,6 +27,7 @@ import PhoneIcon from '@mui/icons-material/Phone';
 import EmailIcon from '@mui/icons-material/Email';
 import axios from 'axios';
 import toast from 'react-hot-toast';
+import { API_BASE_URL } from '../services/apiConfig';
 
 const FlaggedCandidatesModal = ({ open, onClose, candidateId, flaggedWith, flagReasons }) => {
     const [loading, setLoading] = useState(false);
@@ -64,7 +65,7 @@ const FlaggedCandidatesModal = ({ open, onClose, candidateId, flaggedWith, flagR
 
             const token = localStorage.getItem('token');
             const response = await axios.get(
-                `http://localhost:8000/api/filter/flagged-candidates-details`,
+                `${API_BASE_URL}/filter/flagged-candidates-details`,
                 {
                     params: { candidate_ids: candidateIdsStr },
                     headers: { Authorization: `Bearer ${token}` }

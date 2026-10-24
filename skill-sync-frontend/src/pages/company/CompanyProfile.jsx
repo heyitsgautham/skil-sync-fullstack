@@ -45,6 +45,7 @@ import {
 } from '@mui/icons-material';
 import Layout from '../../components/Layout';
 import authService from '../../services/authService';
+import { API_BASE_URL } from '../../services/apiConfig';
 
 const CompanyProfile = () => {
   const [profile, setProfile] = useState(null);
@@ -76,7 +77,6 @@ const CompanyProfile = () => {
     phone_visible: false
   });
 
-  const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000/api';
   const token = localStorage.getItem('token');
 
   const fetchProfile = useCallback(async () => {
@@ -119,7 +119,7 @@ const CompanyProfile = () => {
     } finally {
       setLoading(false);
     }
-  }, [API_BASE_URL, token]);
+  }, [token]);
 
   const fetchJobStats = useCallback(async () => {
     try {
@@ -138,7 +138,7 @@ const CompanyProfile = () => {
     } catch (error) {
       console.error('Error fetching job stats:', error);
     }
-  }, [API_BASE_URL, token]);
+  }, [token]);
 
   useEffect(() => {
     fetchProfile();

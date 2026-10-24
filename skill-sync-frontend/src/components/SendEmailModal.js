@@ -19,6 +19,7 @@ import SendIcon from '@mui/icons-material/Send';
 import CloseIcon from '@mui/icons-material/Close';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import ErrorIcon from '@mui/icons-material/Error';
+import { API_BASE_URL } from '../services/apiConfig';
 
 const SendEmailModal = ({ open, onClose, selectedCandidates, internshipTitle, internshipId, onSendComplete }) => {
     const [subject, setSubject] = useState(`Congratulations! Next Round - ${internshipTitle}`);
@@ -34,7 +35,7 @@ const SendEmailModal = ({ open, onClose, selectedCandidates, internshipTitle, in
 
         try {
             const token = localStorage.getItem('token');
-            const response = await fetch('http://localhost:8000/api/candidate-emails/send-to-candidates', {
+            const response = await fetch(`${API_BASE_URL}/candidate-emails/send-to-candidates`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
