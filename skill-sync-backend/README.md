@@ -26,7 +26,8 @@ skillsync-backend/
 │   │   └── connection.py
 │   └── utils/               # Utility functions
 │       └── security.py
-├── requirements.txt         # Python dependencies
+├── pyproject.toml           # Python dependencies and tool config
+├── uv.lock                  # Locked dependency versions
 ├── .env                     # Environment variables (DO NOT COMMIT)
 ├── .gitignore
 └── README.md
@@ -49,15 +50,16 @@ skillsync-backend/
    cd skill-sync-backend
    ```
 
-2. **Create virtual environment**
+2. **Install dependencies**
+
+   Install [uv](https://docs.astral.sh/uv/), then create `.venv` from the lockfile:
    ```bash
-   python -m venv venv
-   source venv/bin/activate  # On Windows: venv\Scripts\activate
+   uv sync --frozen
    ```
 
-3. **Install dependencies**
+3. **Activate the environment** (or prefix commands with `uv run`)
    ```bash
-   pip install -r requirements.txt
+   source .venv/bin/activate  # On Windows: .venv\Scripts\activate
    ```
 
 4. **Configure environment variables**
