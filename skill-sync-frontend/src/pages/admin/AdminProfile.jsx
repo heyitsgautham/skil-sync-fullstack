@@ -3,7 +3,7 @@
  * Allows admins to view and edit their profile information
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
     Box,
     Card,
@@ -41,11 +41,7 @@ const AdminProfile = () => {
     const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000/api';
     const token = localStorage.getItem('token');
 
-    useEffect(() => {
-        fetchProfile();
-    }, []);
-
-    const fetchProfile = async () => {
+    const fetchProfile = useCallback(async () => {
         setLoading(true);
         try {
             const response = await fetch(`${API_BASE_URL}/profile/me`, {
@@ -72,7 +68,11 @@ const AdminProfile = () => {
         } finally {
             setLoading(false);
         }
-    };
+    }, [API_BASE_URL, token]);
+
+    useEffect(() => {
+        fetchProfile();
+    }, [fetchProfile]);
 
     const handleSave = async () => {
         setSaving(true);

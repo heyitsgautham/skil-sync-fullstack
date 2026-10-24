@@ -4,7 +4,7 @@
  * Includes "Send Email" button with job selection dropdown
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   Box,
   Card,
@@ -41,8 +41,7 @@ import {
   Person as PersonIcon,
   Phone as PhoneIcon,
   Email as EmailIcon,
-  Send as SendIcon,
-  CheckCircle as CheckCircleIcon
+  Send as SendIcon
 } from '@mui/icons-material';
 import Layout from '../../components/Layout';
 import authService from '../../services/authService';
@@ -80,12 +79,7 @@ const CompanyProfile = () => {
   const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000/api';
   const token = localStorage.getItem('token');
 
-  useEffect(() => {
-    fetchProfile();
-    fetchJobStats();
-  }, []);
-
-  const fetchProfile = async () => {
+  const fetchProfile = useCallback(async () => {
     setLoading(true);
     try {
       const response = await fetch(`${API_BASE_URL}/profile/me`, {
@@ -125,9 +119,9 @@ const CompanyProfile = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [API_BASE_URL, token]);
 
-  const fetchJobStats = async () => {
+  const fetchJobStats = useCallback(async () => {
     try {
       const response = await fetch(`${API_BASE_URL}/profile/job-email-stats`, {
         headers: {
@@ -144,7 +138,12 @@ const CompanyProfile = () => {
     } catch (error) {
       console.error('Error fetching job stats:', error);
     }
-  };
+  }, [API_BASE_URL, token]);
+
+  useEffect(() => {
+    fetchProfile();
+    fetchJobStats();
+  }, [fetchProfile, fetchJobStats]);
 
   const handleSave = async () => {
     setSaving(true);

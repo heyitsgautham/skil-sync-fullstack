@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
     Dialog,
     DialogTitle,
@@ -48,13 +48,7 @@ const FlaggedCandidatesModal = ({ open, onClose, candidateId, flaggedWith, flagR
         return `https://${url}`;
     };
 
-    useEffect(() => {
-        if (open && candidateId && flaggedWith) {
-            fetchFlaggedCandidatesDetails();
-        }
-    }, [open, candidateId, flaggedWith]);
-
-    const fetchFlaggedCandidatesDetails = async () => {
+    const fetchFlaggedCandidatesDetails = useCallback(async () => {
         setLoading(true);
         try {
             // Collect all unique candidate IDs (current + all flagged with)
@@ -84,7 +78,13 @@ const FlaggedCandidatesModal = ({ open, onClose, candidateId, flaggedWith, flagR
         } finally {
             setLoading(false);
         }
-    };
+    }, [candidateId, flaggedWith]);
+
+    useEffect(() => {
+        if (open && candidateId && flaggedWith) {
+            fetchFlaggedCandidatesDetails();
+        }
+    }, [open, candidateId, flaggedWith, fetchFlaggedCandidatesDetails]);
 
     const getReasonIcon = (reason) => {
         switch (reason) {
@@ -115,12 +115,6 @@ const FlaggedCandidatesModal = ({ open, onClose, candidateId, flaggedWith, flagR
             'same_github': '#333'
         };
         return colors[reason] || '#757575';
-    };
-
-    // Helper to check if two candidates are flagged together for a specific reason
-    const areFlaggedTogether = (candidateA, candidateB, reason) => {
-        const candidateAFlaggedWith = candidateA.flagged_with?.[reason] || [];
-        return candidateAFlaggedWith.includes(candidateB.candidate_id);
     };
 
     // Group candidates by flag reasons
