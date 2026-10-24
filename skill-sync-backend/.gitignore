@@ -72,3 +72,6 @@ app/public/resumes
 
 
 *.ps1
+# Generated exports and uploaded resumes
+test_exports/
+app/public/resumes/*.pdf
