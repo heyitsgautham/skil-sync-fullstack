@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import {
     Container,
     Box,
@@ -9,22 +8,10 @@ import {
     Alert,
     CircularProgress,
     Chip,
-    IconButton,
-    Table,
-    TableBody,
-    TableCell,
-    TableContainer,
-    TableHead,
-    TableRow,
     Card,
     CardContent,
     Grid,
     LinearProgress,
-    Dialog,
-    DialogTitle,
-    DialogContent,
-    DialogActions,
-    Collapse,
 } from '@mui/material';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -33,7 +20,6 @@ import DescriptionIcon from '@mui/icons-material/Description';
 import FileUploadIcon from '@mui/icons-material/FileUpload';
 import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
 import StarIcon from '@mui/icons-material/Star';
-import StarBorderIcon from '@mui/icons-material/StarBorder';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import toast from 'react-hot-toast';
@@ -41,7 +27,6 @@ import apiClient from '../services/api';
 import Layout from '../components/Layout';
 
 const UploadResume = () => {
-    const navigate = useNavigate();
     const [selectedFile, setSelectedFile] = useState(null);
     const [uploading, setUploading] = useState(false);
     const [loading, setLoading] = useState(false);

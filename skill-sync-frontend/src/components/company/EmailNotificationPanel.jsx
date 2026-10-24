@@ -26,7 +26,6 @@ import {
     CardContent
 } from '@mui/material';
 import {
-    Email as EmailIcon,
     Preview as PreviewIcon,
     Send as SendIcon,
     Close as CloseIcon,

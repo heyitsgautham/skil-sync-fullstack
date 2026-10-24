@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import {
     Container,
@@ -22,7 +22,6 @@ import toast from 'react-hot-toast';
 import apiClient from '../services/api';
 import Layout from '../components/Layout';
 import AnimatedMatchScore from '../components/AnimatedMatchScore';
-import SkillsCloud from '../components/SkillsCloud';
 import { InternshipListSkeleton } from '../components/SkeletonLoader';
 import FilterPanel from '../components/FilterPanel';
 import PaginationControls from '../components/PaginationControls';

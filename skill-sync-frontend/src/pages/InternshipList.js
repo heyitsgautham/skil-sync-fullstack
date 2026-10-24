@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import {
     Container,
     Box,
@@ -20,8 +19,6 @@ import {
     DialogTitle,
     DialogContent,
     DialogActions,
-    IconButton,
-    Tooltip,
 } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
@@ -35,7 +32,6 @@ import Layout from '../components/Layout';
 import InternshipApplicationDialog from '../components/InternshipApplicationDialog';
 
 const InternshipList = () => {
-    const navigate = useNavigate();
     const [internships, setInternships] = useState([]);
     const [filteredInternships, setFilteredInternships] = useState([]);
     const [loading, setLoading] = useState(true);

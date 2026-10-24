@@ -1055,19 +1055,6 @@ const Dashboard = () => {
         }
     };
 
-    const getRoleColor = () => {
-        switch (role) {
-            case 'student':
-                return 'primary';
-            case 'company':
-                return 'success';
-            case 'admin':
-                return 'error';
-            default:
-                return 'default';
-        }
-    };
-
     return (
         <Layout>
             <Container maxWidth="lg">

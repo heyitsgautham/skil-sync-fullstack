@@ -14,20 +14,14 @@ import {
     Chip,
     Grid,
     LinearProgress,
-    Divider,
     Alert,
     CircularProgress,
-    Accordion,
-    AccordionSummary,
-    AccordionDetails,
     Menu,
     ListItemIcon,
     ListItemText,
     Checkbox,
 } from '@mui/material';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import CancelIcon from '@mui/icons-material/Cancel';
 import TrendingUpIcon from '@mui/icons-material/TrendingUp';
 import PsychologyIcon from '@mui/icons-material/Psychology';
@@ -57,7 +51,7 @@ const IntelligentRanking = () => {
     const [exportMenuAnchor, setExportMenuAnchor] = useState(null);
     const [exportLoading, setExportLoading] = useState(false);
     const [expandedAccordions, setExpandedAccordions] = useState({});
-    const [onlyApplicants, setOnlyApplicants] = useState(false); // Default to showing all candidates
+    const [onlyApplicants] = useState(false); // Default to showing all candidates
 
     // Flagged candidates modal state
     const [flaggedModalOpen, setFlaggedModalOpen] = useState(false);
@@ -257,12 +251,6 @@ const IntelligentRanking = () => {
         return '#f44336'; // Red
     };
 
-    const getMatchLabel = (score) => {
-        if (score >= 80) return 'Strong Match';
-        if (score >= 60) return 'Moderate Match';
-        return 'Weak Match';
-    };
-
     const handleExportClick = (event) => {
         setExportMenuAnchor(event.currentTarget);
     };
@@ -421,14 +409,6 @@ const IntelligentRanking = () => {
             handleExpandAll();
         }
     }, [allExpanded, handleExpandAll, handleCollapseAll]);
-
-    // Optimized toggle handler
-    const handleAccordionChange = useCallback((key) => (e, isExpanded) => {
-        setExpandedAccordions(prev => ({
-            ...prev,
-            [key]: isExpanded
-        }));
-    }, []);
 
     const handleFlaggedClick = (candidate) => {
         setSelectedFlaggedCandidate(candidate);
