@@ -243,11 +243,8 @@ class RAGEngine:
 
             return matches
 
-        except Exception as e:
-            import traceback
-
-            print(f"Error in find_matching_internships: {str(e)}")
-            print(f"Traceback: {traceback.format_exc()}")
+        except Exception:
+            logger.exception("Error in find_matching_internships")
             return []
 
     def find_matching_candidates(self, internship_id: str, top_k: int = 20) -> list[dict]:
@@ -319,7 +316,7 @@ class RAGEngine:
             return matches
 
         except Exception as e:
-            print(f"Error finding matches: {str(e)}")
+            logger.error("Error finding matches: %s", e)
             return []
 
     def get_resume_embedding(self, resume_id: str) -> list[float] | None:
@@ -342,7 +339,7 @@ class RAGEngine:
             return None
 
         except Exception as e:
-            print(f"Error retrieving resume embedding: {str(e)}")
+            logger.error("Error retrieving resume embedding: %s", e)
             return None
 
     def get_internship_embedding(self, internship_id: str) -> list[float] | None:
@@ -365,7 +362,7 @@ class RAGEngine:
             return None
 
         except Exception as e:
-            print(f"Error retrieving internship embedding: {str(e)}")
+            logger.error("Error retrieving internship embedding: %s", e)
             return None
 
     def delete_resume_embedding(self, resume_id: str) -> bool:
@@ -374,7 +371,7 @@ class RAGEngine:
             self.resume_collection.delete(ids=[f"resume_{resume_id}"])
             return True
         except Exception as e:
-            print(f"Error deleting resume embedding: {str(e)}")
+            logger.error("Error deleting resume embedding: %s", e)
             return False
 
     def delete_internship_embedding(self, internship_id: str) -> bool:
@@ -383,7 +380,7 @@ class RAGEngine:
             self.internship_collection.delete(ids=[f"internship_{internship_id}"])
             return True
         except Exception as e:
-            print(f"Error deleting internship embedding: {str(e)}")
+            logger.error("Error deleting internship embedding: %s", e)
             return False
 
     def clear_all_resume_embeddings(self) -> int:

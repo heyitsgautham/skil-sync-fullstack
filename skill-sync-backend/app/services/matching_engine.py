@@ -410,24 +410,23 @@ Format as bullet points. Be specific and reference actual skills/experience.
             jd_text += f"Skills: {', '.join(internship_data.get('required_skills', []))}"
             internship_embedding = self.rag_engine.generate_embedding(jd_text)
 
-        print(f"\n🔍 RANKING {len(candidates)} CANDIDATES")
-        print("=" * 70)
+        logger.info("Ranking %d candidates", len(candidates))
 
         candidates_with_embedding = 0
         candidates_without_embedding = 0
 
         for idx, candidate in enumerate(candidates, 1):
             candidate_embedding = candidate.get('embedding')
-            candidate_name = candidate.get('personal_info', {}).get(
-                'name', f"Candidate {candidate.get('student_id', 'Unknown')}"
-            )
 
             if candidate_embedding:
                 candidates_with_embedding += 1
-                print(f"✅ Candidate {idx}: {candidate_name} - HAS embedding")
             else:
                 candidates_without_embedding += 1
-                print(f"⚠️  Candidate {idx}: {candidate_name} - NO embedding (will use fallback)")
+                logger.debug(
+                    "Candidate %d (student %s) has no embedding, using the fallback score",
+                    idx,
+                    candidate.get('student_id'),
+                )
 
             # Calculate match score
             match_result = self.calculate_match_score(
@@ -454,12 +453,12 @@ Format as bullet points. Be specific and reference actual skills/experience.
                 }
             )
 
-        print("\n📊 RANKING SUMMARY:")
-        print(f"   Total candidates: {len(candidates)}")
-        print(f"   ✅ With embeddings: {candidates_with_embedding}")
-        print(f"   ⚠️  Without embeddings: {candidates_without_embedding}")
-        print("=" * 70)
-        print()
+        logger.info(
+            "Ranked %d candidates, %d with embeddings and %d without",
+            len(candidates),
+            candidates_with_embedding,
+            candidates_without_embedding,
+        )
 
         # Sort by match score (descending)
         ranked_candidates.sort(key=lambda x: x['match_score'], reverse=True)

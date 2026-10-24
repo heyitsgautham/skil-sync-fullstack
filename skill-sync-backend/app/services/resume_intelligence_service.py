@@ -198,7 +198,7 @@ Return ONLY the JSON object, no markdown, no explanation.
                 date_ranges.append((start_date, end_date))
 
             except (ValueError, AttributeError) as e:
-                print(f"Date parsing error: {e}")
+                logger.warning("Date parsing error: %s", e)
                 continue
 
         if not date_ranges:
