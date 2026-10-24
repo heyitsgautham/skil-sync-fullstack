@@ -1,0 +1,55 @@
+# Brings up PostgreSQL, the FastAPI backend and the React frontend.
+#   docker compose up --build
+# Frontend: http://localhost:3000   API docs: http://localhost:8000/api/docs
+# AI features need Gemini keys in skill-sync-backend/.env (copy it from .env.example).
+
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: skillsync
+      POSTGRES_PASSWORD: skillsync
+      POSTGRES_DB: skillsync
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U skillsync -d skillsync"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  backend:
+    build: ./skill-sync-backend
+    env_file:
+      - path: ./skill-sync-backend/.env
+        required: false
+    environment:
+      DATABASE_URL: postgresql://skillsync:skillsync@db:5432/skillsync
+      SECRET_KEY: ${SECRET_KEY:-local-dev-only-change-me}
+      TEMP_TOKEN_SECRET: ${TEMP_TOKEN_SECRET:-local-dev-only-change-me-too}
+      ALLOWED_ORIGINS: http://localhost:3000
+      FRONTEND_URL: http://localhost:3000
+      BACKEND_URL: http://localhost:8000
+    ports:
+      - "8000:8000"
+    volumes:
+      - backend-data:/data
+      - resumes:/app/app/public/resumes
+    depends_on:
+      db:
+        condition: service_healthy
+
+  frontend:
+    build:
+      context: ./skill-sync-frontend
+      args:
+        REACT_APP_API_BASE_URL: http://localhost:8000/api
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+
+volumes:
+  pgdata:
+  backend-data:
+  resumes:
