@@ -31,6 +31,7 @@ import {
     Close as CloseIcon,
     Settings as SettingsIcon
 } from '@mui/icons-material';
+import { API_BASE_URL } from '../../services/apiConfig';
 
 const EmailNotificationPanel = ({ token }) => {
     const [previewOpen, setPreviewOpen] = useState(false);
@@ -45,7 +46,6 @@ const EmailNotificationPanel = ({ token }) => {
         weekly_report: false
     });
 
-    const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000/api';
 
     const handlePreviewEmail = async () => {
         setLoading(true);
