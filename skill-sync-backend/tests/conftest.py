@@ -2,12 +2,19 @@
 Test configuration and fixtures
 """
 
-import pytest
-from fastapi.testclient import TestClient
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
-from app.main import app
-from app.database.connection import Base, get_db
+import os
+
+# Pin the database before app.database.connection runs load_dotenv(), which
+# walks up the directory tree and would otherwise pick up an unrelated .env.
+os.environ["DATABASE_URL"] = "sqlite:///./test.db"
+
+import pytest  # noqa: E402
+from fastapi.testclient import TestClient  # noqa: E402
+from sqlalchemy import create_engine  # noqa: E402
+from sqlalchemy.orm import sessionmaker  # noqa: E402
+
+from app.database.connection import Base, get_db  # noqa: E402
+from app.main import app  # noqa: E402
 
 # Use in-memory SQLite for testing
 SQLALCHEMY_DATABASE_URL = "sqlite:///./test.db"
