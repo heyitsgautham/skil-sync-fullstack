@@ -5,10 +5,10 @@ Security utilities for password hashing and JWT token management
 import os
 from datetime import datetime, timedelta
 
+import jwt
 from dotenv import load_dotenv
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
-from jose import JWTError, jwt
 from passlib.context import CryptContext
 from sqlalchemy.orm import Session
 
@@ -75,7 +75,7 @@ def decode_access_token(token: str) -> dict | None:
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         return payload
-    except JWTError:
+    except jwt.InvalidTokenError:
         return None
 
 
@@ -110,7 +110,7 @@ async def get_current_user(token: str = Depends(oauth2_scheme), db: Session = De
         if user_email is None:
             raise credentials_exception
 
-    except JWTError:
+    except jwt.InvalidTokenError:
         raise credentials_exception
 
     user = db.query(User).filter(User.email == user_email).first()
