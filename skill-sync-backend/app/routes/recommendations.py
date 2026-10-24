@@ -375,7 +375,6 @@ def get_candidate_resume_url(
         }
     
     # If anonymization is ENABLED, generate temporary token and use API endpoint
-    import os
     TEMP_TOKEN_SECRET = os.getenv("TEMP_TOKEN_SECRET", "your-secret-key-change-in-production")
     
     token_payload = {
