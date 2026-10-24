@@ -1,13 +1,30 @@
-import { render } from '@testing-library/react';
 import React from 'react';
+import { render, screen } from '@testing-library/react';
+import App from './App';
 
-test('renders app without crashing', () => {
-  // Simple test to ensure React is working
-  const TestComponent = () => <div>Test</div>;
-  const { container } = render(<TestComponent />);
-  expect(container).toBeTruthy();
-});
+describe('App routing', () => {
+  beforeEach(() => {
+    localStorage.clear();
+  });
 
-test('basic arithmetic works', () => {
-  expect(1 + 1).toBe(2);
+  test('sends a signed-out visitor from / to the login page', async () => {
+    window.history.pushState({}, '', '/');
+    render(<App />);
+    expect(await screen.findByLabelText(/Email Address/)).toBeInTheDocument();
+    expect(window.location.pathname).toBe('/login');
+  });
+
+  test('redirects a signed-out visitor away from a protected page', async () => {
+    window.history.pushState({}, '', '/dashboard');
+    render(<App />);
+    expect(await screen.findByLabelText(/Email Address/)).toBeInTheDocument();
+    expect(window.location.pathname).toBe('/login');
+  });
+
+  test('serves the register page without a token', async () => {
+    window.history.pushState({}, '', '/register');
+    render(<App />);
+    expect(await screen.findByLabelText(/Email Address/)).toBeInTheDocument();
+    expect(window.location.pathname).toBe('/register');
+  });
 });

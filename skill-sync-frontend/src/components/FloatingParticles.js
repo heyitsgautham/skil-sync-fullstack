@@ -8,7 +8,9 @@ const FloatingParticles = () => {
         const canvas = canvasRef.current;
         if (!canvas) return;
 
+        // getContext returns null when the browser cannot create a 2D context.
         const ctx = canvas.getContext('2d');
+        if (!ctx) return;
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
 
