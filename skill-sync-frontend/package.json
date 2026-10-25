@@ -65,6 +65,11 @@
         "functions": 4,
         "lines": 6
       }
-    }
+    },
+    "collectCoverageFrom": [
+      "src/**/*.{js,jsx}",
+      "!src/testUtils/**",
+      "!src/**/__mocks__/**"
+    ]
   }
 }
