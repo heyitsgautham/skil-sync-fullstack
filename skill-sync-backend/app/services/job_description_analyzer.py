@@ -8,12 +8,7 @@ import logging
 import re
 
 from app.utils.gemini_key_manager import get_gemini_key_manager
-
-
-def _mentions(pattern: str, text: str) -> bool:
-    """True when pattern appears in text as a whole word, so "r" does not match "docker"."""
-    return re.search(rf"(?<![a-z0-9]){re.escape(pattern)}(?![a-z0-9])", text) is not None
-
+from app.utils.text import mentions_word
 
 logger = logging.getLogger(__name__)
 
@@ -259,7 +254,7 @@ Return JSON only (no markdown, no explanation):
 
         # Extract skills based on patterns
         for pattern, skill_name in skill_patterns.items():
-            if _mentions(pattern, description_lower):
+            if mentions_word(pattern, description_lower):
                 found_skills.add(skill_name)
 
         # Convert to list and categorize
@@ -287,7 +282,7 @@ Return JSON only (no markdown, no explanation):
 
             # Extract skills from this line
             for pattern, skill_name in skill_patterns.items():
-                if skill_name in all_skills and _mentions(pattern, line_lower):
+                if skill_name in all_skills and mentions_word(pattern, line_lower):
                     if current_section == 'required':
                         required_skills.append(skill_name)
                     else:
