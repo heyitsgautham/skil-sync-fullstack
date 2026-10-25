@@ -17,6 +17,23 @@ from app.services.candidate_filters import experience_years, resume_matches
 from app.utils.security import get_current_company
 
 
+def format_phone_for_export(phone, file_format):
+    """Format a resume phone number for one export cell, keeping the digits as given.
+
+    CSV wraps the number in ="..." so spreadsheet apps keep it as text instead of dropping a
+    leading + or 0. XLSX marks the cell as text in the writer, so the value stays plain.
+    """
+    if not phone or phone == 'N/A':
+        return phone
+    # A number without a country code stays as written. Prefixing "+" would turn a local
+    # number such as 98765 43210 into a different international one.
+    if phone.startswith('+91-'):
+        phone = phone.replace('+91-', '+91 ', 1)
+    if file_format.lower() == 'xlsx':
+        return phone
+    return f'="{phone}"'
+
+
 @router.get("/export-candidates/{internship_id}")
 async def export_candidate_rankings(
     internship_id: str,
@@ -213,26 +230,8 @@ async def export_candidate_rankings(
         date_str = datetime.now().strftime('%Y%m%d')
         filename = f"{internship_title}_Candidates_{date_str}"
 
-        # Format phone numbers based on export type
         for row in export_data:
-            phone = row.get('Phone', 'N/A')
-            if phone != 'N/A' and phone:
-                # Ensure phone has proper format with country code
-                if not phone.startswith('+'):
-                    phone = f"+{phone}"
-
-                # Format based on export type
-                if format.lower() == 'xlsx':
-                    # For XLSX: Format as +91 9876543210 (with space after country code)
-                    # Cell format will be set to text in the XLSX writer
-                    if phone.startswith('+91-'):
-                        phone = phone.replace('+91-', '+91 ')
-                    row['Phone'] = phone
-                else:
-                    # For CSV: Use ="..." formula to force text
-                    if phone.startswith('+91-'):
-                        phone = phone.replace('+91-', '+91 ')
-                    row['Phone'] = f'="{phone}"'
+            row['Phone'] = format_phone_for_export(row.get('Phone'), format)
 
         # Export based on format
         if format.lower() == 'xlsx':
