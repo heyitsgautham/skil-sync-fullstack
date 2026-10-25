@@ -1,0 +1,23 @@
+{
+  "name": "skillsync",
+  "version": "0.1.0",
+  "private": true,
+  "description": "SkillSync, a full-stack web application that matches students to internships: FastAPI backend and React frontend",
+  "workspaces": [
+    "skill-sync-frontend"
+  ],
+  "engines": {
+    "node": ">=22.12"
+  },
+  "scripts": {
+    "dev": "npm run start -w skill-sync-frontend",
+    "build": "npm run build -w skill-sync-frontend",
+    "test": "npm run test:js && npm run test:py",
+    "test:js": "npm run test:coverage -w skill-sync-frontend",
+    "test:py": "uv run pytest --cov",
+    "lint": "npm run lint:js && npm run lint:py",
+    "lint:js": "npm run lint -w skill-sync-frontend",
+    "lint:py": "uv run ruff check . && uv run ruff format --check .",
+    "format": "uv run ruff format ."
+  }
+}

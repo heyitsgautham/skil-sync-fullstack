@@ -10,13 +10,8 @@ Follow "Local development" in the [README](README.md) to install the backend wit
 Run the same checks CI runs.
 
 ```bash
-uv run ruff check .
-uv run ruff format --check .
-uv run pytest --cov
-
-cd skill-sync-frontend
-npm run lint
-npm run test:coverage
+npm run lint      # ESLint, ruff check and ruff format --check
+npm test          # Vitest and pytest, both with coverage floors
 npm run build
 ```
 

@@ -1,4 +1,4 @@
-# The backend image builds from the repository root.
+# Both images build from the repository root.
 .git
 .github
 **/.venv
@@ -18,4 +18,5 @@ skill-sync-backend/data/chroma_db
 skill-sync-backend/app/public/resumes
 skill-sync-backend/test_exports
 skill-sync-backend/tests
-skill-sync-frontend
+skill-sync-frontend/build
+skill-sync-frontend/coverage

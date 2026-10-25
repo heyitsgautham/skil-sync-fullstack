@@ -21,7 +21,7 @@ services:
   backend:
     build:
       context: .
-      dockerfile: skill-sync-backend/Dockerfile
+      target: backend
     env_file:
       - path: ./skill-sync-backend/.env
         required: false
@@ -43,7 +43,8 @@ services:
 
   frontend:
     build:
-      context: ./skill-sync-frontend
+      context: .
+      target: frontend
       args:
         VITE_API_BASE_URL: http://localhost:8000/api
     ports:

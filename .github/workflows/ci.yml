@@ -84,9 +84,6 @@ jobs:
   frontend:
     name: Frontend (lint, test, build, audit)
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: skill-sync-frontend
     steps:
       - uses: actions/checkout@v4
 
@@ -94,16 +91,16 @@ jobs:
         with:
           node-version: 24
           cache: npm
-          cache-dependency-path: skill-sync-frontend/package-lock.json
+          cache-dependency-path: package-lock.json
 
       - name: Install dependencies
         run: npm ci
 
       - name: Lint
-        run: npm run lint
+        run: npm run lint:js
 
       - name: Test
-        run: npm run test:coverage
+        run: npm run test:js
 
       - name: Build
         run: npm run build

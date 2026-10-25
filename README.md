@@ -67,6 +67,7 @@ docker compose up --build
 | Health check | http://localhost:8000/api/healthcheck |
 
 Compose starts PostgreSQL 16, the backend and the frontend.
+The root `Dockerfile` builds both images, as its `backend` and `frontend` targets.
 The app starts without Gemini keys, but resume parsing and AI explanations fail until you add them.
 CI builds these images and checks the health endpoint on every push.
 
@@ -89,27 +90,28 @@ The backend creates its tables on startup.
 
 ### Frontend
 
+The repository root is also an npm workspace, so `npm ci` there installs the frontend.
+
 ```bash
-cd skill-sync-frontend
 npm ci
-cp .env.example .env          # VITE_API_BASE_URL, defaults to http://localhost:8000/api
-npm start
+cp skill-sync-frontend/.env.example skill-sync-frontend/.env   # VITE_API_BASE_URL, defaults to http://localhost:8000/api
+npm run dev
 ```
 
 The dev server runs on http://localhost:3000.
 
 ## Tests and checks
 
-Run the backend checks from the repository root and the frontend checks from `skill-sync-frontend/`.
+Run every check from the repository root.
+`npm test` runs both suites, and `npm run lint` runs both linters.
 
 | Check | Command |
 |---|---|
-| Backend tests with coverage | `uv run pytest --cov` |
-| Backend lint | `uv run ruff check .` |
-| Backend format | `uv run ruff format --check .` |
+| Backend tests with coverage | `uv run pytest --cov`, or `npm run test:py` |
+| Backend lint and format | `npm run lint:py` |
 | Backend dependency audit | `uv export --frozen --no-dev -o req.txt && uv run pip-audit -r req.txt --disable-pip` |
-| Frontend tests with coverage | `npm run test:coverage` |
-| Frontend lint | `npm run lint` |
+| Frontend tests with coverage | `npm run test:js` |
+| Frontend lint | `npm run lint:js` |
 | Frontend build | `npm run build` |
 | Frontend dependency audit | `npm audit --omit=dev --audit-level=high` |
 

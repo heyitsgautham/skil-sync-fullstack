@@ -7,8 +7,10 @@ The [root README](../README.md) covers the architecture and Docker.
 
 You need Node 22.12 or newer and a running backend.
 
+This package is a workspace of the root `package.json`, so install from the repository root.
+
 ```bash
-npm ci
+cd .. && npm ci && cd skill-sync-frontend
 cp .env.example .env          # VITE_API_BASE_URL, defaults to http://localhost:8000/api
 npm start
 ```
