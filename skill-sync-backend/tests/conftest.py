@@ -230,3 +230,73 @@ def write_docx(path, *paragraphs):
         document.add_paragraph(paragraph)
     document.save(str(path))
     return path
+
+
+# ---------------------------------------------------------------------------
+# A small seeded world: one company, two internships, three students
+# ---------------------------------------------------------------------------
+
+
+@pytest.fixture
+def seeded(db_session, make_user, fake_rag, tmp_path):
+    """Students with parsed resumes and stored embeddings, and a company with two internships."""
+    from types import SimpleNamespace
+
+    from app.models.internship import Internship
+    from app.models.resume import Resume
+    from app.models.user import UserRole
+
+    company = make_user(role=UserRole.company, full_name="Acme Labs")
+    backend = Internship(
+        company_id=company.id,
+        title="Backend Intern",
+        description="Build FastAPI services in Python with PostgreSQL",
+        required_skills=["Python", "FastAPI"],
+        preferred_skills=["Docker"],
+        min_experience=0,
+        max_experience=2,
+        required_education="Bachelor",
+    )
+    frontend = Internship(
+        company_id=company.id,
+        title="Frontend Intern",
+        description="Build React pages in JavaScript",
+        required_skills=["React", "JavaScript"],
+    )
+    db_session.add_all([backend, frontend])
+    db_session.commit()
+    for internship in (backend, frontend):
+        fake_rag.store_internship_embedding(
+            str(internship.id), internship.title, internship.description, internship.required_skills
+        )
+
+    profiles = {
+        "asha": ("Python FastAPI Docker developer", ["Python", "FastAPI", "Docker"], 1.0, "Bachelor of Engineering"),
+        "ravi": ("React JavaScript frontend developer", ["React", "JavaScript"], 0.5, "Bachelor of Science"),
+        "meera": ("Python data analyst with SQL", ["Python", "SQL"], 3.0, "Master of Science"),
+    }
+    students, resumes = {}, {}
+    for name, (text, skills, years, degree) in profiles.items():
+        student = make_user(role=UserRole.student, full_name=name.title(), email=f"{name}@example.com", phone=None)
+        path = tmp_path / f"{name}.pdf"
+        write_pdf(path, name.title(), text)
+        resume = Resume(
+            student_id=student.id,
+            file_path=str(path),
+            file_name=f"{name}.pdf",
+            parsed_content=text,
+            extracted_skills=skills,
+            parsed_data={
+                "all_skills": skills,
+                "total_experience_years": years,
+                "education": [{"degree": degree}],
+                "personal_info": {"name": name.title(), "email": f"{name}@example.com"},
+            },
+        )
+        db_session.add(resume)
+        db_session.commit()
+        resume.embedding_id = fake_rag.store_resume_embedding(str(resume.id), text, skills)
+        db_session.commit()
+        students[name], resumes[name] = student, resume
+
+    return SimpleNamespace(company=company, backend=backend, frontend=frontend, students=students, resumes=resumes)
