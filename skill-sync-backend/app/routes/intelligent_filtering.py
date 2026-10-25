@@ -15,6 +15,7 @@ from app.models.application import Application
 from app.models.internship import Internship
 from app.models.resume import Resume
 from app.models.user import User, UserRole
+from app.services.candidate_filters import CandidateFilters, apply_filters, attach_flag_info
 from app.services.candidate_flagging_service import CandidateFlaggingService
 from app.services.matching_engine import MatchingEngine
 from app.services.parser_service import ResumeParser
@@ -474,110 +475,23 @@ async def rank_candidates_for_internship(
             ranked_candidates.sort(key=lambda x: x['overall_score'], reverse=True)
 
             # Apply filters before limiting results
-            filtered_candidates = ranked_candidates
+            filters = CandidateFilters(
+                min_match_score=min_match_score,
+                max_match_score=max_match_score,
+                min_experience=min_experience,
+                max_experience=max_experience,
+                skills=filter_skills,
+                education_level=education_level,
+                exclude_flagged=exclude_flagged,
+            )
+            filtered_candidates = apply_filters(ranked_candidates, filters)
 
-            # Filter by match score
-            if min_match_score is not None:
-                filtered_candidates = [c for c in filtered_candidates if c['match_score'] >= min_match_score]
-                logger.info(f"🔍 Filter: min_match_score >= {min_match_score} → {len(filtered_candidates)} candidates")
-
-            if max_match_score is not None:
-                filtered_candidates = [c for c in filtered_candidates if c['match_score'] <= max_match_score]
-                logger.info(f"🔍 Filter: max_match_score <= {max_match_score} → {len(filtered_candidates)} candidates")
-
-            # Filter by experience
-            if min_experience is not None:
-                filtered_candidates = [c for c in filtered_candidates if c['total_experience_years'] >= min_experience]
-                logger.info(
-                    f"🔍 Filter: min_experience >= {min_experience} years → {len(filtered_candidates)} candidates"
-                )
-
-            if max_experience is not None:
-                filtered_candidates = [c for c in filtered_candidates if c['total_experience_years'] <= max_experience]
-                logger.info(
-                    f"🔍 Filter: max_experience <= {max_experience} years → {len(filtered_candidates)} candidates"
-                )
-
-            # Filter by required skills
-            if filter_skills:
-                filter_skills_list = [s.strip().lower() for s in filter_skills.split(',')]
-                filtered_candidates = [
-                    c
-                    for c in filtered_candidates
-                    if all(any(req_skill in skill.lower() for skill in c['skills']) for req_skill in filter_skills_list)
-                ]
-                logger.info(
-                    f"🔍 Filter: required_skills = {filter_skills_list} → {len(filtered_candidates)} candidates"
-                )
-
-            # Filter by education level
-            if education_level:
-                education_hierarchy = {'bachelor': 1, 'master': 2, 'phd': 3, 'doctorate': 3}
-                min_level = education_hierarchy.get(education_level.lower(), 0)
-
-                def get_highest_education(candidate):
-                    """Extract highest education level from candidate data"""
-                    personal_info = candidate.get('personal_info', {})
-                    education = personal_info.get('education', [])
-                    if not education:
-                        return 0
-
-                    max_level = 0
-                    for edu in education:
-                        degree = edu.get('degree', '').lower()
-                        for level_name, level_value in education_hierarchy.items():
-                            if level_name in degree:
-                                max_level = max(max_level, level_value)
-                    return max_level
-
-                filtered_candidates = [c for c in filtered_candidates if get_highest_education(c) >= min_level]
-                logger.info(f"🔍 Filter: education_level >= {education_level} → {len(filtered_candidates)} candidates")
-
-            # ✨ ADD FLAGGING INFORMATION FIRST (before exclude_flagged filter)
-            logger.info("🚩 Detecting flagged candidates...")
+            # Add flag info before the exclude_flagged filter, which reads it
             candidate_ids = [c['candidate_id'] for c in filtered_candidates]
-            logger.info(f"🔍 Checking flag info for {len(candidate_ids)} candidates: {candidate_ids[:5]}...")
             flag_info = CandidateFlaggingService.get_flag_info_for_candidates(candidate_ids, db)
-            logger.info(f"🚩 Flag info returned for {len(flag_info)} candidates")
-
-            # Add flag info to each candidate
-            for candidate in filtered_candidates:
-                candidate_id = candidate['candidate_id']
-                if candidate_id in flag_info:
-                    candidate['is_flagged'] = True
-                    candidate['flag_reasons'] = flag_info[candidate_id]['reasons']
-                    candidate['flagged_with'] = flag_info[candidate_id]['flagged_with']
-                    candidate['flag_reason_text'] = CandidateFlaggingService.format_flag_reason(
-                        flag_info[candidate_id]['reasons']
-                    )
-                    logger.info(f"✅ Candidate {candidate_id} is FLAGGED: {candidate['flag_reason_text']}")
-                else:
-                    candidate['is_flagged'] = False
-                    candidate['flag_reasons'] = []
-                    candidate['flagged_with'] = {}
-                    candidate['flag_reason_text'] = None
-
-            total_flagged_count = sum(1 for c in filtered_candidates if c['is_flagged'])
-            logger.info(f"🚩 Found {total_flagged_count} flagged candidates out of {len(filtered_candidates)} total")
-
-            # NOW filter out flagged candidates if requested (is_flagged property exists now)
+            attach_flag_info(filtered_candidates, flag_info)
             if exclude_flagged:
-                pre_filter_count = len(filtered_candidates)
-                # Log which candidates are being filtered out
-                flagged_to_remove = [c for c in filtered_candidates if c.get('is_flagged', False)]
-                logger.info(
-                    f"🚫 About to filter out {len(flagged_to_remove)} flagged candidates: {[c['candidate_id'] for c in flagged_to_remove]}"
-                )
-
-                filtered_candidates = [c for c in filtered_candidates if not c.get('is_flagged', False)]
-                logger.info(
-                    f"🔍 Filter: exclude_flagged=True → removed {pre_filter_count - len(filtered_candidates)} flagged candidates → {len(filtered_candidates)} remaining"
-                )
-                logger.info("🚫 Excluded candidates with is_flagged=True")
-            else:
-                logger.info(
-                    f"🔍 Filter: exclude_flagged=False → keeping all candidates including {total_flagged_count} flagged"
-                )
+                filtered_candidates = [c for c in filtered_candidates if not c['is_flagged']]
 
             # Now apply limit
             filtered_candidates = filtered_candidates[:limit]
@@ -591,22 +505,7 @@ async def rank_candidates_for_internship(
                 f"🚩 Final results contain {flagged_count} flagged candidates out of {len(filtered_candidates)}"
             )
 
-            # Prepare filter summary
-            filters_applied = []
-            if min_match_score is not None:
-                filters_applied.append(f"match_score >= {min_match_score}%")
-            if max_match_score is not None:
-                filters_applied.append(f"match_score <= {max_match_score}%")
-            if min_experience is not None:
-                filters_applied.append(f"experience >= {min_experience} years")
-            if max_experience is not None:
-                filters_applied.append(f"experience <= {max_experience} years")
-            if filter_skills:
-                filters_applied.append(f"skills contain: {filter_skills}")
-            if education_level:
-                filters_applied.append(f"education >= {education_level}")
-            if exclude_flagged:
-                filters_applied.append("excluding flagged candidates")
+            filters_applied = filters.describe()
 
             return {
                 "success": True,
@@ -773,107 +672,23 @@ async def rank_candidates_for_internship(
                     candidate['scoring_breakdown']['has_tailored'] = False
 
             # Apply filters before limiting results
-            filtered_candidates = ranked_candidates
+            filters = CandidateFilters(
+                min_match_score=min_match_score,
+                max_match_score=max_match_score,
+                min_experience=min_experience,
+                max_experience=max_experience,
+                skills=filter_skills,
+                education_level=education_level,
+                exclude_flagged=exclude_flagged,
+            )
+            filtered_candidates = apply_filters(ranked_candidates, filters)
 
-            # Filter by match score
-            if min_match_score is not None:
-                filtered_candidates = [c for c in filtered_candidates if c['match_score'] >= min_match_score]
-                logger.info(f"🔍 Filter: min_match_score >= {min_match_score} → {len(filtered_candidates)} candidates")
-
-            if max_match_score is not None:
-                filtered_candidates = [c for c in filtered_candidates if c['match_score'] <= max_match_score]
-                logger.info(f"🔍 Filter: max_match_score <= {max_match_score} → {len(filtered_candidates)} candidates")
-
-            # Filter by experience
-            if min_experience is not None:
-                filtered_candidates = [c for c in filtered_candidates if c['total_experience_years'] >= min_experience]
-                logger.info(
-                    f"🔍 Filter: min_experience >= {min_experience} years → {len(filtered_candidates)} candidates"
-                )
-
-            if max_experience is not None:
-                filtered_candidates = [c for c in filtered_candidates if c['total_experience_years'] <= max_experience]
-                logger.info(
-                    f"🔍 Filter: max_experience <= {max_experience} years → {len(filtered_candidates)} candidates"
-                )
-
-            # Filter by required skills
-            if filter_skills:
-                filter_skills_list = [s.strip().lower() for s in filter_skills.split(',')]
-                filtered_candidates = [
-                    c
-                    for c in filtered_candidates
-                    if all(any(req_skill in skill.lower() for skill in c['skills']) for req_skill in filter_skills_list)
-                ]
-                logger.info(
-                    f"🔍 Filter: required_skills = {filter_skills_list} → {len(filtered_candidates)} candidates"
-                )
-
-            # Filter by education level
-            if education_level:
-                education_hierarchy = {'bachelor': 1, 'master': 2, 'phd': 3, 'doctorate': 3}
-                min_level = education_hierarchy.get(education_level.lower(), 0)
-
-                def get_highest_education(candidate):
-                    """Extract highest education level from candidate data"""
-                    personal_info = candidate.get('personal_info', {})
-                    education = personal_info.get('education', [])
-                    if not education:
-                        return 0
-
-                    max_level = 0
-                    for edu in education:
-                        degree = edu.get('degree', '').lower()
-                        for level_name, level_value in education_hierarchy.items():
-                            if level_name in degree:
-                                max_level = max(max_level, level_value)
-                    return max_level
-
-                filtered_candidates = [c for c in filtered_candidates if get_highest_education(c) >= min_level]
-                logger.info(f"🔍 Filter: education_level >= {education_level} → {len(filtered_candidates)} candidates")
-
-            # ✨ ADD FLAGGING INFORMATION FIRST (before exclude_flagged filter)
-            logger.info("🚩 Detecting flagged candidates...")
+            # Add flag info before the exclude_flagged filter, which reads it
             candidate_ids = [c['candidate_id'] for c in filtered_candidates]
             flag_info = CandidateFlaggingService.get_flag_info_for_candidates(candidate_ids, db)
-
-            # Add flag info to each candidate
-            for candidate in filtered_candidates:
-                candidate_id = candidate['candidate_id']
-                if candidate_id in flag_info:
-                    candidate['is_flagged'] = True
-                    candidate['flag_reasons'] = flag_info[candidate_id]['reasons']
-                    candidate['flagged_with'] = flag_info[candidate_id]['flagged_with']
-                    candidate['flag_reason_text'] = CandidateFlaggingService.format_flag_reason(
-                        flag_info[candidate_id]['reasons']
-                    )
-                else:
-                    candidate['is_flagged'] = False
-                    candidate['flag_reasons'] = []
-                    candidate['flagged_with'] = {}
-                    candidate['flag_reason_text'] = None
-
-            total_flagged_count = sum(1 for c in filtered_candidates if c['is_flagged'])
-            logger.info(f"🚩 Found {total_flagged_count} flagged candidates out of {len(filtered_candidates)} total")
-
-            # NOW filter out flagged candidates if requested (is_flagged property exists now)
+            attach_flag_info(filtered_candidates, flag_info)
             if exclude_flagged:
-                pre_filter_count = len(filtered_candidates)
-                # Log which candidates are being filtered out
-                flagged_to_remove = [c for c in filtered_candidates if c.get('is_flagged', False)]
-                logger.info(
-                    f"🚫 About to filter out {len(flagged_to_remove)} flagged candidates: {[c['candidate_id'] for c in flagged_to_remove]}"
-                )
-
-                filtered_candidates = [c for c in filtered_candidates if not c.get('is_flagged', False)]
-                logger.info(
-                    f"🔍 Filter: exclude_flagged=True → removed {pre_filter_count - len(filtered_candidates)} flagged candidates → {len(filtered_candidates)} remaining"
-                )
-                logger.info("🚫 Excluded candidates with is_flagged=True")
-            else:
-                logger.info(
-                    f"🔍 Filter: exclude_flagged=False → keeping all candidates including {total_flagged_count} flagged"
-                )
+                filtered_candidates = [c for c in filtered_candidates if not c['is_flagged']]
 
             # Now apply limit
             filtered_candidates = filtered_candidates[:limit]
@@ -884,22 +699,7 @@ async def rank_candidates_for_internship(
                 f"🚩 Final results contain {flagged_count} flagged candidates out of {len(filtered_candidates)}"
             )
 
-            # Prepare filter summary
-            filters_applied = []
-            if min_match_score is not None:
-                filters_applied.append(f"match_score >= {min_match_score}%")
-            if max_match_score is not None:
-                filters_applied.append(f"match_score <= {max_match_score}%")
-            if min_experience is not None:
-                filters_applied.append(f"experience >= {min_experience} years")
-            if max_experience is not None:
-                filters_applied.append(f"experience <= {max_experience} years")
-            if filter_skills:
-                filters_applied.append(f"skills contain: {filter_skills}")
-            if education_level:
-                filters_applied.append(f"education >= {education_level}")
-            if exclude_flagged:
-                filters_applied.append("excluding flagged candidates")
+            filters_applied = filters.describe()
 
             return {
                 "success": True,
