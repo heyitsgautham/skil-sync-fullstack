@@ -6,11 +6,11 @@ import CreateInternship from '../CreateInternship';
 import { company, fakeBackend, fail, signIn } from '../../testUtils/backend';
 import { renderAt } from '../../testUtils/render';
 
-jest.mock('../../services/api');
-jest.mock('react-hot-toast', () => {
-    const toast = jest.fn();
-    toast.success = jest.fn();
-    toast.error = jest.fn();
+vi.mock('../../services/api');
+vi.mock('react-hot-toast', () => {
+    const toast = vi.fn();
+    toast.success = vi.fn();
+    toast.error = vi.fn();
     return { __esModule: true, default: toast, Toaster: () => null };
 });
 
@@ -19,12 +19,12 @@ const DESCRIPTION = 'Build FastAPI services in Python, review pull requests and 
 beforeEach(() => {
     localStorage.clear();
     signIn(company);
-    jest.clearAllMocks();
-    jest.spyOn(console, 'error').mockImplementation(() => {});
-    jest.spyOn(console, 'log').mockImplementation(() => {});
+    vi.clearAllMocks();
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+    vi.spyOn(console, 'log').mockImplementation(() => {});
 });
 
-afterEach(() => jest.restoreAllMocks());
+afterEach(() => vi.restoreAllMocks());
 
 const fillBasics = () => {
     userEvent.paste(screen.getByLabelText(/Internship Title/), 'Backend Intern');

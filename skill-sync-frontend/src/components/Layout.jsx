@@ -318,9 +318,9 @@ const Layout = ({ children }) => {
                                     transform: 'scale(1.1)',
                                 }
                             }}
-                            aria-controls={Boolean(anchorEl) ? 'account-menu' : undefined}
+                            aria-controls={anchorEl ? 'account-menu' : undefined}
                             aria-haspopup="true"
-                            aria-expanded={Boolean(anchorEl) ? 'true' : undefined}
+                            aria-expanded={anchorEl ? 'true' : undefined}
                         >
                             <Avatar
                                 sx={{

@@ -5,7 +5,7 @@ import InternshipList from '../InternshipList';
 import { admin, company, fakeBackend, fail, signIn, student } from '../../testUtils/backend';
 import { renderAt } from '../../testUtils/render';
 
-jest.mock('../../services/api');
+vi.mock('../../services/api');
 
 const LISTINGS = [
     {
@@ -31,10 +31,10 @@ const LISTINGS = [
 
 beforeEach(() => {
     localStorage.clear();
-    jest.spyOn(console, 'error').mockImplementation(() => {});
+    vi.spyOn(console, 'error').mockImplementation(() => {});
 });
 
-afterEach(() => jest.restoreAllMocks());
+afterEach(() => vi.restoreAllMocks());
 
 test('students browse every listing and can search them', async () => {
     signIn(student);

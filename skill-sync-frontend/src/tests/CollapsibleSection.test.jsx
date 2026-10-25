@@ -131,6 +131,6 @@ describe('CollapsibleSection Component', () => {
         // The accordion root has no accessible role, so the test reaches it by class.
         // eslint-disable-next-line testing-library/no-container, testing-library/no-node-access
         const accordion = container.querySelector('.MuiAccordion-root');
-        expect(accordion).toHaveStyle('background-color: red');
+        expect(accordion).toHaveStyle({ backgroundColor: 'rgb(255, 0, 0)' });
     });
 });

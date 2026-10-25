@@ -5,7 +5,7 @@ import ManageUsers from '../ManageUsers';
 import { admin, fakeBackend, fail, signIn } from '../../testUtils/backend';
 import { renderAt } from '../../testUtils/render';
 
-jest.mock('../../services/api');
+vi.mock('../../services/api');
 
 const USERS = [
     { id: 1, email: 'admin@skillsync.test', full_name: 'Site Admin', role: 'admin', is_active: 1, created_at: '2026-01-01' },
@@ -16,10 +16,10 @@ const USERS = [
 beforeEach(() => {
     localStorage.clear();
     signIn(admin);
-    jest.spyOn(console, 'error').mockImplementation(() => {});
+    vi.spyOn(console, 'error').mockImplementation(() => {});
 });
 
-afterEach(() => jest.restoreAllMocks());
+afterEach(() => vi.restoreAllMocks());
 
 const rowFor = (name) => screen.getByText(name).closest('tr'); // eslint-disable-line testing-library/no-node-access
 

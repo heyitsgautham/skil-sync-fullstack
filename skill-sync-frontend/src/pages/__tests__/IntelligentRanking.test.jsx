@@ -6,13 +6,13 @@ import IntelligentRanking from '../IntelligentRanking';
 import { company, fakeBackend, fail, signIn } from '../../testUtils/backend';
 import { renderAt } from '../../testUtils/render';
 
-jest.mock('../../services/api');
-jest.mock('react-hot-toast', () => {
-    const toast = jest.fn();
-    toast.success = jest.fn();
-    toast.error = jest.fn();
-    toast.loading = jest.fn();
-    toast.dismiss = jest.fn();
+vi.mock('../../services/api');
+vi.mock('react-hot-toast', () => {
+    const toast = vi.fn();
+    toast.success = vi.fn();
+    toast.error = vi.fn();
+    toast.loading = vi.fn();
+    toast.dismiss = vi.fn();
     return { __esModule: true, default: toast, Toaster: () => null };
 });
 
@@ -51,12 +51,12 @@ const ranking = (candidates, extra = {}) => ({
 beforeEach(() => {
     localStorage.clear();
     signIn(company);
-    jest.clearAllMocks();
-    jest.spyOn(console, 'error').mockImplementation(() => {});
-    jest.spyOn(console, 'log').mockImplementation(() => {});
+    vi.clearAllMocks();
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+    vi.spyOn(console, 'log').mockImplementation(() => {});
 });
 
-afterEach(() => jest.restoreAllMocks());
+afterEach(() => vi.restoreAllMocks());
 
 async function rankFor(title) {
     const select = await screen.findByRole('combobox');
@@ -141,8 +141,8 @@ test('the rank button stays disabled until an internship is chosen', async () =>
 });
 
 test('exports the ranking as CSV', async () => {
-    window.URL.createObjectURL = jest.fn(() => 'blob:export');
-    window.URL.revokeObjectURL = jest.fn();
+    window.URL.createObjectURL = vi.fn(() => 'blob:export');
+    window.URL.revokeObjectURL = vi.fn();
     const calls = fakeBackend([
         ['get', '/internship/my-posts', POSTS],
         ['get', /^\/internship\/\w+/, POSTS[0]],
@@ -167,7 +167,7 @@ test('exports the ranking as CSV', async () => {
 });
 
 test('opens a candidate resume stored in S3', async () => {
-    const open = jest.spyOn(window, 'open').mockImplementation(() => null);
+    const open = vi.spyOn(window, 'open').mockImplementation(() => null);
     fakeBackend([
         ['get', '/internship/my-posts', POSTS],
         ['get', '/recommendations/resume/1', { storage_type: 's3', url: 'https://bucket/cv.pdf', anonymized: false }],

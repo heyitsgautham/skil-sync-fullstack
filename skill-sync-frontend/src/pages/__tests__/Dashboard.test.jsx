@@ -5,18 +5,18 @@ import Dashboard from '../Dashboard';
 import { admin, company, fakeBackend, fail, signIn, student } from '../../testUtils/backend';
 import { renderAt } from '../../testUtils/render';
 
-jest.mock('../../services/api');
+vi.mock('../../services/api');
 
 const STATUS = { resumes: { total: 12, with_embeddings: 10 }, matches: { total: 40 } };
 
 beforeEach(() => {
     localStorage.clear();
-    jest.spyOn(console, 'error').mockImplementation(() => {});
+    vi.spyOn(console, 'error').mockImplementation(() => {});
 });
 
 afterEach(() => {
-    jest.useRealTimers();
-    jest.restoreAllMocks();
+    vi.useRealTimers();
+    vi.restoreAllMocks();
 });
 
 const cardButton = (title) => {
@@ -112,7 +112,7 @@ test('clearing ChromaDB asks first, then reports what it deleted', async () => {
 });
 
 test('re-indexing starts, then refreshes the status 30 seconds later', async () => {
-    jest.useFakeTimers();
+    vi.useFakeTimers({ shouldAdvanceTime: true });
     signIn(admin);
     const calls = fakeBackend([
         ['get', '/admin/system-status', STATUS],
@@ -126,7 +126,7 @@ test('re-indexing starts, then refreshes the status 30 seconds later', async () 
 
     const before = calls.filter((c) => c.path === '/admin/system-status').length;
     await act(async () => {
-        jest.advanceTimersByTime(30000);
+        vi.advanceTimersByTime(30000);
     });
 
     expect(await screen.findByText('Reindexing completed! System status updated.')).toBeInTheDocument();

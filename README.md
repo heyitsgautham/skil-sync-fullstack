@@ -25,7 +25,7 @@ Every user has one of three roles, student, company or admin.
 ## Architecture
 
 ```
-skill-sync-frontend/  React 19 + MUI, Create React App
+skill-sync-frontend/  React 19 + MUI, built with Vite
   src/pages/          one file per screen, the largest split into a hook and section components
   src/components/     shared UI
   src/services/       API client, auth, apiConfig.js holds the backend URL
@@ -72,7 +72,7 @@ CI builds these images and checks the health endpoint on every push.
 
 ## Local development
 
-You need Python 3.11 to 3.13, [uv](https://docs.astral.sh/uv/), Node 20 and PostgreSQL.
+You need Python 3.11 to 3.13, [uv](https://docs.astral.sh/uv/), Node 22.12 or newer and PostgreSQL.
 
 ### Backend
 
@@ -92,7 +92,7 @@ The backend creates its tables on startup.
 ```bash
 cd skill-sync-frontend
 npm ci
-cp .env.example .env          # REACT_APP_API_BASE_URL, defaults to http://localhost:8000/api
+cp .env.example .env          # VITE_API_BASE_URL, defaults to http://localhost:8000/api
 npm start
 ```
 
@@ -137,7 +137,7 @@ The backend reads its settings from environment variables, and `skill-sync-backe
 | `AWS_*` | S3 resume storage, leave empty for local storage |
 | `SMTP_*`, `SENDER_EMAIL`, `SENDER_NAME` | Outgoing email |
 
-The frontend reads one variable, `REACT_APP_API_BASE_URL`, at build time.
+The frontend reads one variable, `VITE_API_BASE_URL`, at build time.
 
 ## Contributing
 

@@ -1,15 +1,15 @@
 import apiClient from '../api';
 import authService from '../authService';
 
-jest.mock('../api', () => ({
+vi.mock('../api', () => ({
     __esModule: true,
-    default: { post: jest.fn() },
+    default: { post: vi.fn() },
 }));
 
 describe('authService', () => {
     beforeEach(() => {
         localStorage.clear();
-        jest.clearAllMocks();
+        vi.clearAllMocks();
     });
 
     test('login posts the credentials and stores the token and user', async () => {

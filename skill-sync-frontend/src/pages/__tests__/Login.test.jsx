@@ -6,13 +6,13 @@ import toast from 'react-hot-toast';
 import Login from '../Login';
 import authService from '../../services/authService';
 
-jest.mock('../../services/authService', () => ({
+vi.mock('../../services/authService', () => ({
     __esModule: true,
-    default: { login: jest.fn() },
+    default: { login: vi.fn() },
 }));
-jest.mock('react-hot-toast', () => ({
+vi.mock('react-hot-toast', () => ({
     __esModule: true,
-    default: { success: jest.fn(), error: jest.fn() },
+    default: { success: vi.fn(), error: vi.fn() },
 }));
 
 const renderLogin = () =>
@@ -32,7 +32,7 @@ const fillAndSubmit = () => {
 };
 
 describe('Login page', () => {
-    beforeEach(() => jest.clearAllMocks());
+    beforeEach(() => vi.clearAllMocks());
 
     test('signs in and goes to the dashboard', async () => {
         authService.login.mockResolvedValue({ access_token: 'jwt' });

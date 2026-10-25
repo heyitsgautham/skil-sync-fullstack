@@ -92,7 +92,7 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 24
           cache: npm
           cache-dependency-path: skill-sync-frontend/package-lock.json
 
@@ -102,15 +102,11 @@ jobs:
       - name: Lint
         run: npm run lint
 
-      - name: Test with coverage
+      - name: Test
         run: npm run test:coverage
-        env:
-          CI: true
 
       - name: Build
         run: npm run build
-        env:
-          CI: true
 
       - name: Audit production dependencies
         run: npm audit --omit=dev --audit-level=high

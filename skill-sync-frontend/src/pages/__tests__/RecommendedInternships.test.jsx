@@ -6,11 +6,11 @@ import RecommendedInternships from '../RecommendedInternships';
 import { fakeBackend, fail, signIn, student } from '../../testUtils/backend';
 import { renderAt } from '../../testUtils/render';
 
-jest.mock('../../services/api');
-jest.mock('react-hot-toast', () => {
-    const toast = jest.fn();
-    toast.success = jest.fn();
-    toast.error = jest.fn();
+vi.mock('../../services/api');
+vi.mock('react-hot-toast', () => {
+    const toast = vi.fn();
+    toast.success = vi.fn();
+    toast.error = vi.fn();
     return { __esModule: true, default: toast, Toaster: () => null };
 });
 
@@ -40,12 +40,12 @@ const titles = () => screen.queryAllByText(/^Internship \d$/).map((node) => node
 beforeEach(() => {
     localStorage.clear();
     signIn(student);
-    jest.clearAllMocks();
-    jest.spyOn(console, 'error').mockImplementation(() => {});
-    jest.spyOn(console, 'log').mockImplementation(() => {});
+    vi.clearAllMocks();
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+    vi.spyOn(console, 'log').mockImplementation(() => {});
 });
 
-afterEach(() => jest.restoreAllMocks());
+afterEach(() => vi.restoreAllMocks());
 
 test('shows the five best matches first', async () => {
     const calls = fakeBackend([['get', '/internship/match', SEVEN]]);

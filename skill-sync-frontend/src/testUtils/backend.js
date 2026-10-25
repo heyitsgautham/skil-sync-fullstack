@@ -5,7 +5,7 @@
  * and window.fetch. `fakeBackend` answers all three from one route table, records every call, and
  * fails the request for any route the test did not declare.
  *
- * Each test file must mock services/api with `jest.mock('../../services/api')` (relative to the test),
+ * Each test file must mock services/api with `vi.mock('../../services/api')` (relative to the test),
  * which picks up the manual mock in services/__mocks__/api.js.
  */
 import axios from 'axios';
@@ -41,11 +41,11 @@ export function fakeBackend(routes) {
 
     METHODS.forEach((method) => {
         const handler = (url, a, b) => (method === 'get' || method === 'delete' ? respond(method, url, undefined, a) : respond(method, url, a, b));
-        jest.spyOn(axios, method).mockImplementation(handler);
+        vi.spyOn(axios, method).mockImplementation(handler);
         apiClient[method].mockImplementation(handler);
     });
 
-    global.fetch = jest.fn((url, options = {}) => {
+    global.fetch = vi.fn((url, options = {}) => {
         const method = (options.method || 'GET').toLowerCase();
         let body = options.body;
         try {

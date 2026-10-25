@@ -6,11 +6,11 @@ import ResumeIntelligence from '../ResumeIntelligence';
 import { fakeBackend, fail, signIn, student } from '../../testUtils/backend';
 import { renderAt } from '../../testUtils/render';
 
-jest.mock('../../services/api');
-jest.mock('react-hot-toast', () => {
-    const toast = jest.fn();
-    toast.success = jest.fn();
-    toast.error = jest.fn();
+vi.mock('../../services/api');
+vi.mock('react-hot-toast', () => {
+    const toast = vi.fn();
+    toast.success = vi.fn();
+    toast.error = vi.fn();
     return { __esModule: true, default: toast, Toaster: () => null };
 });
 
@@ -34,14 +34,14 @@ const PARSED = {
 beforeEach(() => {
     localStorage.clear();
     signIn(student);
-    jest.clearAllMocks();
-    jest.spyOn(console, 'error').mockImplementation(() => {});
-    jest.spyOn(console, 'log').mockImplementation(() => {});
+    vi.clearAllMocks();
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+    vi.spyOn(console, 'log').mockImplementation(() => {});
 });
 
 afterEach(() => {
-    jest.useRealTimers();
-    jest.restoreAllMocks();
+    vi.useRealTimers();
+    vi.restoreAllMocks();
 });
 
 test('lists the student resumes with their top skills', async () => {
@@ -97,7 +97,7 @@ test('a failed analysis load shows the server error', async () => {
 });
 
 test('deleting asks for confirmation first', async () => {
-    const confirm = jest.spyOn(window, 'confirm').mockReturnValueOnce(false).mockReturnValueOnce(true);
+    const confirm = vi.spyOn(window, 'confirm').mockReturnValueOnce(false).mockReturnValueOnce(true);
     const calls = fakeBackend([
         ['get', '/resume/my-resumes', RESUMES],
         ['delete', '/resume/6', null],
@@ -117,7 +117,7 @@ test('deleting asks for confirmation first', async () => {
 });
 
 test('uploading a new resume parses it with AI', async () => {
-    jest.useFakeTimers();
+    vi.useFakeTimers({ shouldAdvanceTime: true });
     const calls = fakeBackend([
         ['get', '/resume/my-resumes', []],
         ['post', '/filter/parse-resume', { structured_data: PARSED, processing_details: { skills_extracted: 3 } }],
@@ -132,9 +132,9 @@ test('uploading a new resume parses it with AI', async () => {
     userEvent.click(screen.getByRole('button', { name: /Parse Resume with AI/ }));
 
     for (let i = 0; i < 10; i += 1) {
-        // eslint-disable-next-line no-await-in-loop
+         
         await act(async () => {
-            jest.advanceTimersByTime(1500);
+            vi.advanceTimersByTime(1500);
         });
     }
 

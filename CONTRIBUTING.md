@@ -40,7 +40,7 @@ Mock Gemini, S3 and SMTP, and never call a paid API from a test.
 Frontend tests sit next to the code in `__tests__/` folders or in `src/tests/`.
 Query by role or label with Testing Library, and mock axios at the module boundary.
 
-Coverage floors in the root `pyproject.toml` and in `skill-sync-frontend/package.json` only go up.
+Coverage floors in the root `pyproject.toml` and in `skill-sync-frontend/vite.config.js` only go up.
 Raise them in the same pull request that adds the tests.
 
 ## Secrets
@@ -52,5 +52,5 @@ If you find a committed secret, tell the maintainers so they can rotate it.
 ## Style
 
 Python follows the ruff config in the root `pyproject.toml`, with 120-character lines.
-JavaScript follows the `react-app` ESLint config, and lint allows zero warnings.
+JavaScript follows `skill-sync-frontend/eslint.config.js`, and lint allows zero warnings.
 Backend code logs through `logging.getLogger(__name__)` rather than `print`.
