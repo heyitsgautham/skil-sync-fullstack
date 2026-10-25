@@ -16,14 +16,14 @@ import {
     Snackbar,
     Alert,
     CircularProgress,
-    Divider
+    Divider,
 } from '@mui/material';
 import {
     Save as SaveIcon,
     Edit as EditIcon,
     Person as PersonIcon,
     Email as EmailIcon,
-    AdminPanelSettings as AdminIcon
+    AdminPanelSettings as AdminIcon,
 } from '@mui/icons-material';
 import Layout from '../../components/Layout';
 import { API_BASE_URL } from '../../services/apiConfig';
@@ -36,7 +36,7 @@ const AdminProfile = () => {
     const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'info' });
 
     const [formData, setFormData] = useState({
-        full_name: ''
+        full_name: '',
     });
 
     const token = localStorage.getItem('token');
@@ -46,8 +46,8 @@ const AdminProfile = () => {
         try {
             const response = await fetch(`${API_BASE_URL}/profile/me`, {
                 headers: {
-                    'Authorization': `Bearer ${token}`
-                }
+                    Authorization: `Bearer ${token}`,
+                },
             });
 
             if (!response.ok) {
@@ -57,13 +57,13 @@ const AdminProfile = () => {
             const data = await response.json();
             setProfile(data);
             setFormData({
-                full_name: data.full_name || ''
+                full_name: data.full_name || '',
             });
         } catch (error) {
             setSnackbar({
                 open: true,
                 message: `Error: ${error.message}`,
-                severity: 'error'
+                severity: 'error',
             });
         } finally {
             setLoading(false);
@@ -80,10 +80,10 @@ const AdminProfile = () => {
             const response = await fetch(`${API_BASE_URL}/profile/me`, {
                 method: 'PUT',
                 headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json'
+                    Authorization: `Bearer ${token}`,
+                    'Content-Type': 'application/json',
                 },
-                body: JSON.stringify(formData)
+                body: JSON.stringify(formData),
             });
 
             if (!response.ok) {
@@ -96,13 +96,13 @@ const AdminProfile = () => {
             setSnackbar({
                 open: true,
                 message: 'Profile updated successfully!',
-                severity: 'success'
+                severity: 'success',
             });
         } catch (error) {
             setSnackbar({
                 open: true,
                 message: `Error: ${error.message}`,
-                severity: 'error'
+                severity: 'error',
             });
         } finally {
             setSaving(false);
@@ -111,7 +111,7 @@ const AdminProfile = () => {
 
     const handleCancel = () => {
         setFormData({
-            full_name: profile.full_name || ''
+            full_name: profile.full_name || '',
         });
         setEditing(false);
     };
@@ -152,11 +152,7 @@ const AdminProfile = () => {
                                 </Button>
                             ) : (
                                 <Box sx={{ display: 'flex', gap: 1 }}>
-                                    <Button
-                                        variant="outlined"
-                                        onClick={handleCancel}
-                                        disabled={saving}
-                                    >
+                                    <Button variant="outlined" onClick={handleCancel} disabled={saving}>
                                         Cancel
                                     </Button>
                                     <Button
@@ -182,7 +178,7 @@ const AdminProfile = () => {
                                     height: 100,
                                     fontSize: 40,
                                     bgcolor: 'error.main',
-                                    mr: 3
+                                    mr: 3,
                                 }}
                             >
                                 {getInitials(profile?.full_name)}
@@ -191,7 +187,11 @@ const AdminProfile = () => {
                                 <Typography variant="h5" gutterBottom sx={{ fontWeight: 600 }}>
                                     {profile?.full_name || 'Administrator'}
                                 </Typography>
-                                <Typography variant="body2" color="text.secondary" sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                <Typography
+                                    variant="body2"
+                                    color="text.secondary"
+                                    sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}
+                                >
                                     <AdminIcon fontSize="small" /> System Administrator
                                 </Typography>
                             </Box>
@@ -208,7 +208,7 @@ const AdminProfile = () => {
                                     onChange={(e) => setFormData({ ...formData, full_name: e.target.value })}
                                     disabled={!editing}
                                     InputProps={{
-                                        startAdornment: <PersonIcon sx={{ mr: 1, color: 'action.active' }} />
+                                        startAdornment: <PersonIcon sx={{ mr: 1, color: 'action.active' }} />,
                                     }}
                                 />
                             </Grid>
@@ -221,7 +221,7 @@ const AdminProfile = () => {
                                     value={profile?.email || ''}
                                     disabled
                                     InputProps={{
-                                        startAdornment: <EmailIcon sx={{ mr: 1, color: 'action.active' }} />
+                                        startAdornment: <EmailIcon sx={{ mr: 1, color: 'action.active' }} />,
                                     }}
                                     helperText="Email cannot be changed"
                                 />
@@ -230,7 +230,11 @@ const AdminProfile = () => {
                             {/* Admin Info */}
                             <Grid size={{ xs: 12 }}>
                                 <Card variant="outlined" sx={{ p: 2, bgcolor: 'error.50', borderColor: 'error.200' }}>
-                                    <Typography variant="subtitle2" gutterBottom sx={{ fontWeight: 600, color: 'error.dark' }}>
+                                    <Typography
+                                        variant="subtitle2"
+                                        gutterBottom
+                                        sx={{ fontWeight: 600, color: 'error.dark' }}
+                                    >
                                         Administrator Privileges
                                     </Typography>
                                     <Typography variant="body2" color="text.secondary">

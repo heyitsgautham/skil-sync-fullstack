@@ -1,0 +1,8 @@
+# Markdown keeps one sentence per line and hand-aligned tables.
+*.md
+package-lock.json
+uv.lock
+skill-sync-backend/
+**/build/
+**/coverage/
+.venv/

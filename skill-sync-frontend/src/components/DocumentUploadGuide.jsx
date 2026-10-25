@@ -9,7 +9,7 @@ import {
 
 /**
  * DocumentUploadGuide Component
- * 
+ *
  * Informational component explaining the document upload feature
  * for creating internships. Can be displayed as a tooltip, modal,
  * or inline help section.
@@ -66,10 +66,7 @@ const DocumentUploadGuide = () => {
                     <ListItemIcon>
                         <SpeedIcon sx={{ color: '#7c3aed' }} />
                     </ListItemIcon>
-                    <ListItemText
-                        primary="4. Post Instantly"
-                        secondary="Submit your internship posting in seconds!"
-                    />
+                    <ListItemText primary="4. Post Instantly" secondary="Submit your internship posting in seconds!" />
                 </ListItem>
             </List>
 
@@ -86,14 +83,14 @@ const DocumentUploadGuide = () => {
                 • Location, duration, and stipend
                 <br />
                 • Experience and education requirements
-                <br />
-                • Start date and application deadline
+                <br />• Start date and application deadline
             </Typography>
 
             <Divider sx={{ my: 2 }} />
 
             <Typography variant="caption" color="text.secondary">
-                💡 <strong>Tip:</strong> The more detailed your job description document, the better the AI extraction results!
+                💡 <strong>Tip:</strong> The more detailed your job description document, the better the AI extraction
+                results!
             </Typography>
         </Paper>
     );

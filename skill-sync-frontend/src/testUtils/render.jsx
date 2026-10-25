@@ -10,6 +10,6 @@ export function renderAt(element, path = '/') {
                 <Route path={path.split('?')[0]} element={element} />
                 <Route path="*" element={<div data-testid="navigated-away" />} />
             </Routes>
-        </MemoryRouter>
+        </MemoryRouter>,
     );
 }

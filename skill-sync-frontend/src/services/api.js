@@ -1,7 +1,6 @@
 import axios from 'axios';
 import { API_BASE_URL } from './apiConfig';
 
-
 // Create axios instance with default configuration
 const apiClient = axios.create({
     baseURL: API_BASE_URL,
@@ -21,7 +20,7 @@ apiClient.interceptors.request.use(
     },
     (error) => {
         return Promise.reject(error);
-    }
+    },
 );
 
 // Add a response interceptor to handle errors
@@ -35,7 +34,7 @@ apiClient.interceptors.response.use(
             window.location.href = '/login';
         }
         return Promise.reject(error);
-    }
+    },
 );
 
 export default apiClient;

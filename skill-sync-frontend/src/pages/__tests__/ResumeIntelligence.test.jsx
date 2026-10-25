@@ -15,7 +15,13 @@ vi.mock('react-hot-toast', () => {
 });
 
 const RESUMES = [
-    { id: 5, file_name: 'asha_cv.pdf', created_at: '2026-10-01T10:00:00', is_active: 1, extracted_skills: ['Python', 'SQL', 'Docker', 'AWS'] },
+    {
+        id: 5,
+        file_name: 'asha_cv.pdf',
+        created_at: '2026-10-01T10:00:00',
+        is_active: 1,
+        extracted_skills: ['Python', 'SQL', 'Docker', 'AWS'],
+    },
     { id: 6, file_name: 'asha_old.pdf', created_at: '2026-09-01T10:00:00', is_active: 0, extracted_skills: [] },
 ];
 
@@ -25,7 +31,9 @@ const PARSED = {
     skills: { technical: ['Python', 'FastAPI'], soft: ['Leadership'] },
     all_skills: ['Python', 'FastAPI', 'Leadership'],
     total_experience_years: 1.5,
-    experience: [{ role: 'Intern', company: 'Acme', start_date: '2024-01', end_date: '2024-07', description: 'Built APIs' }],
+    experience: [
+        { role: 'Intern', company: 'Acme', start_date: '2024-01', end_date: '2024-07', description: 'Built APIs' },
+    ],
     education: [{ degree: 'B.Tech', field: 'CS', institution: 'Anna University', year: '2025' }],
     projects: [{ name: 'SkillSync', description: 'Resume matching' }],
     certifications: [{ name: 'AWS Cloud Practitioner' }],
@@ -132,7 +140,6 @@ test('uploading a new resume parses it with AI', async () => {
     userEvent.click(screen.getByRole('button', { name: /Parse Resume with AI/ }));
 
     for (let i = 0; i < 10; i += 1) {
-         
         await act(async () => {
             vi.advanceTimersByTime(1500);
         });

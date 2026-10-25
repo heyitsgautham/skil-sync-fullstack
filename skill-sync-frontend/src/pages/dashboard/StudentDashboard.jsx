@@ -1,16 +1,6 @@
 import React from 'react';
-import {
-    Box,
-    Typography,
-    Grid,
-    Card,
-    CardContent,
-    Button,
-} from '@mui/material';
-import {
-    Upload as UploadIcon,
-    AutoAwesome as AIIcon,
-} from '@mui/icons-material';
+import { Box, Typography, Grid, Card, CardContent, Button } from '@mui/material';
+import { Upload as UploadIcon, AutoAwesome as AIIcon } from '@mui/icons-material';
 import { motion } from 'framer-motion';
 
 /** Student dashboard cards: resume management and AI recommendations. */
@@ -23,9 +13,9 @@ const StudentDashboard = ({ navigate }) => {
             transition: {
                 delay: i * 0.15,
                 duration: 0.5,
-                ease: "easeOut"
-            }
-        })
+                ease: 'easeOut',
+            },
+        }),
     };
 
     return (
@@ -53,7 +43,7 @@ const StudentDashboard = ({ navigate }) => {
                             '&:hover': {
                                 transform: 'translateY(-8px)',
                                 boxShadow: '0 16px 48px rgba(0,0,0,0.12)',
-                            }
+                            },
                         }}
                     >
                         <CardContent sx={{ flexGrow: 1, p: 3 }}>
@@ -61,10 +51,10 @@ const StudentDashboard = ({ navigate }) => {
                                 initial={{ scale: 0, rotate: -180 }}
                                 animate={{ scale: 1, rotate: 0 }}
                                 transition={{
-                                    type: "spring",
+                                    type: 'spring',
                                     stiffness: 260,
                                     damping: 20,
-                                    delay: 0.2
+                                    delay: 0.2,
                                 }}
                             >
                                 <Box
@@ -137,7 +127,7 @@ const StudentDashboard = ({ navigate }) => {
                             '&:hover': {
                                 transform: 'translateY(-8px)',
                                 boxShadow: '0 16px 48px rgba(0,0,0,0.12)',
-                            }
+                            },
                         }}
                     >
                         <CardContent sx={{ flexGrow: 1, p: 3 }}>

@@ -1,17 +1,6 @@
 import React from 'react';
-import {
-    Box,
-    Typography,
-    Grid,
-    Card,
-    CardContent,
-    Button,
-} from '@mui/material';
-import {
-    Work as WorkIcon,
-    PostAdd as PostAddIcon,
-    People as PeopleIcon,
-} from '@mui/icons-material';
+import { Box, Typography, Grid, Card, CardContent, Button } from '@mui/material';
+import { Work as WorkIcon, PostAdd as PostAddIcon, People as PeopleIcon } from '@mui/icons-material';
 
 /** Company dashboard cards: post, manage and rank internships. */
 const CompanyDashboard = ({ navigate }) => (
@@ -32,7 +21,7 @@ const CompanyDashboard = ({ navigate }) => (
                     '&:hover': {
                         transform: 'translateY(-8px)',
                         boxShadow: '0 16px 48px rgba(0,0,0,0.12)',
-                    }
+                    },
                 }}
             >
                 <CardContent sx={{ flexGrow: 1, p: 3 }}>
@@ -97,7 +86,7 @@ const CompanyDashboard = ({ navigate }) => (
                     '&:hover': {
                         transform: 'translateY(-8px)',
                         boxShadow: '0 16px 48px rgba(0,0,0,0.12)',
-                    }
+                    },
                 }}
             >
                 <CardContent sx={{ flexGrow: 1, p: 3 }}>
@@ -162,7 +151,7 @@ const CompanyDashboard = ({ navigate }) => (
                     '&:hover': {
                         transform: 'translateY(-8px)',
                         boxShadow: '0 16px 48px rgba(0,0,0,0.12)',
-                    }
+                    },
                 }}
             >
                 <CardContent sx={{ flexGrow: 1, p: 3 }}>

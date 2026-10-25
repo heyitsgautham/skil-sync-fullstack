@@ -6,9 +6,7 @@ const SkillsCloud = ({ skills, matchedSkills = [], variant = 'default' }) => {
     if (!skills || skills.length === 0) return null;
 
     const isMatched = (skill) => {
-        return matchedSkills.some(ms =>
-            ms.toLowerCase() === skill.toLowerCase()
-        );
+        return matchedSkills.some((ms) => ms.toLowerCase() === skill.toLowerCase());
     };
 
     const getSkillColor = (skill) => {
@@ -43,7 +41,7 @@ const SkillsCloud = ({ skills, matchedSkills = [], variant = 'default' }) => {
                         initial={{ opacity: 0, scale: 0 }}
                         animate={{ opacity: 1, scale: 1 }}
                         transition={{
-                            type: "spring",
+                            type: 'spring',
                             stiffness: 500,
                             damping: 30,
                             delay: index * 0.05,
@@ -51,7 +49,7 @@ const SkillsCloud = ({ skills, matchedSkills = [], variant = 'default' }) => {
                         whileHover={{
                             scale: 1.1,
                             rotate: [0, -5, 5, -5, 0],
-                            transition: { duration: 0.3 }
+                            transition: { duration: 0.3 },
                         }}
                         whileTap={{ scale: 0.95 }}
                     >
@@ -65,9 +63,7 @@ const SkillsCloud = ({ skills, matchedSkills = [], variant = 'default' }) => {
                                 fontSize: '0.875rem',
                                 padding: '20px 8px',
                                 cursor: 'pointer',
-                                boxShadow: isMatched(skill)
-                                    ? '0 4px 12px rgba(102, 126, 234, 0.3)'
-                                    : 'none',
+                                boxShadow: isMatched(skill) ? '0 4px 12px rgba(102, 126, 234, 0.3)' : 'none',
                                 transition: 'all 0.3s ease',
                                 '&:hover': {
                                     boxShadow: '0 6px 20px rgba(102, 126, 234, 0.4)',

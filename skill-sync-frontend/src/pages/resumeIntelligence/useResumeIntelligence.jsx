@@ -42,7 +42,7 @@ export default function useResumeIntelligence() {
         try {
             const token = localStorage.getItem('token');
             const response = await axios.get(`${API_BASE_URL}/resume/my-resumes`, {
-                headers: { Authorization: `Bearer ${token}` }
+                headers: { Authorization: `Bearer ${token}` },
             });
             setMyResumes(response.data);
         } catch (error) {
@@ -63,11 +63,11 @@ export default function useResumeIntelligence() {
             console.log('Loading resume data for ID:', resumeId);
 
             // First, update the UI immediately for instant feedback
-            setMyResumes(prevResumes =>
-                prevResumes.map(resume => ({
+            setMyResumes((prevResumes) =>
+                prevResumes.map((resume) => ({
                     ...resume,
-                    is_active: resume.id === resumeId ? 1 : 0
-                }))
+                    is_active: resume.id === resumeId ? 1 : 0,
+                })),
             );
 
             // Then, activate the resume in the database
@@ -76,8 +76,8 @@ export default function useResumeIntelligence() {
                     `${API_BASE_URL}/resume/${resumeId}/activate`,
                     {},
                     {
-                        headers: { Authorization: `Bearer ${token}` }
-                    }
+                        headers: { Authorization: `Bearer ${token}` },
+                    },
                 );
                 console.log('Resume activated successfully');
             } catch (activateError) {
@@ -88,12 +88,9 @@ export default function useResumeIntelligence() {
             }
 
             // Then, get parsed data
-            const response = await axios.get(
-                `${API_BASE_URL}/resume/${resumeId}/parsed-data`,
-                {
-                    headers: { Authorization: `Bearer ${token}` }
-                }
-            );
+            const response = await axios.get(`${API_BASE_URL}/resume/${resumeId}/parsed-data`, {
+                headers: { Authorization: `Bearer ${token}` },
+            });
             const structuredData = response.data.structured_data;
             setParsedData(structuredData);
             setProcessingDetails(response.data.processing_details);
@@ -108,8 +105,8 @@ export default function useResumeIntelligence() {
                             total_experience_years: structuredData.total_experience_years || 0,
                         },
                         {
-                            headers: { Authorization: `Bearer ${token}` }
-                        }
+                            headers: { Authorization: `Bearer ${token}` },
+                        },
                     );
                     toast.success('✅ Resume activated and profile updated!');
                 } catch (profileError) {
@@ -136,7 +133,7 @@ export default function useResumeIntelligence() {
             'application/pdf',
             'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
             'application/msword',
-            'text/plain'
+            'text/plain',
         ];
 
         if (!validTypes.includes(selectedFile.type)) {
@@ -144,7 +141,8 @@ export default function useResumeIntelligence() {
             return;
         }
 
-        if (selectedFile.size > 10 * 1024 * 1024) { // 10MB limit
+        if (selectedFile.size > 10 * 1024 * 1024) {
+            // 10MB limit
             toast.error('File size must be less than 10MB');
             return;
         }
@@ -155,16 +153,16 @@ export default function useResumeIntelligence() {
         setSelectedResumeId(null);
         // Reset processing steps
         setActiveStep(-1);
-        setProcessingSteps(prev => prev.map(step => ({ ...step, completed: false })));
+        setProcessingSteps((prev) => prev.map((step) => ({ ...step, completed: false })));
         toast.success(`Selected: ${selectedFile.name}`);
     };
 
     const handleDrag = (e) => {
         e.preventDefault();
         e.stopPropagation();
-        if (e.type === "dragenter" || e.type === "dragover") {
+        if (e.type === 'dragenter' || e.type === 'dragover') {
             setDragActive(true);
-        } else if (e.type === "dragleave") {
+        } else if (e.type === 'dragleave') {
             setDragActive(false);
         }
     };
@@ -180,7 +178,7 @@ export default function useResumeIntelligence() {
                 'application/pdf',
                 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
                 'application/msword',
-                'text/plain'
+                'text/plain',
             ];
 
             if (!validTypes.includes(droppedFile.type)) {
@@ -197,7 +195,7 @@ export default function useResumeIntelligence() {
             setParsedData(null);
             setProcessingDetails(null);
             setActiveStep(-1);
-            setProcessingSteps(prev => prev.map(step => ({ ...step, completed: false })));
+            setProcessingSteps((prev) => prev.map((step) => ({ ...step, completed: false })));
             toast.success(`Selected: ${droppedFile.name}`);
         }
     };
@@ -214,7 +212,7 @@ export default function useResumeIntelligence() {
         try {
             const token = localStorage.getItem('token');
             await axios.delete(`${API_BASE_URL}/resume/${resumeId}`, {
-                headers: { Authorization: `Bearer ${token}` }
+                headers: { Authorization: `Bearer ${token}` },
             });
 
             toast.success('Resume deleted successfully');
@@ -240,8 +238,8 @@ export default function useResumeIntelligence() {
 
         for (let i = 0; i < processingSteps.length; i++) {
             setActiveStep(i);
-            await new Promise(resolve => setTimeout(resolve, stepDurations[i]));
-            setProcessingSteps(prev => {
+            await new Promise((resolve) => setTimeout(resolve, stepDurations[i]));
+            setProcessingSteps((prev) => {
                 const updated = [...prev];
                 updated[i].completed = true;
                 return updated;
@@ -266,16 +264,12 @@ export default function useResumeIntelligence() {
             const simulationPromise = simulateProcessingSteps();
 
             const token = localStorage.getItem('token');
-            const response = await axios.post(
-                `${API_BASE_URL}/filter/parse-resume`,
-                formData,
-                {
-                    headers: {
-                        'Content-Type': 'multipart/form-data',
-                        Authorization: `Bearer ${token}`
-                    }
-                }
-            );
+            const response = await axios.post(`${API_BASE_URL}/filter/parse-resume`, formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                    Authorization: `Bearer ${token}`,
+                },
+            });
 
             // Wait for simulation to complete
             await simulationPromise;
@@ -296,8 +290,8 @@ export default function useResumeIntelligence() {
                             total_experience_years: structuredData.total_experience_years || 0,
                         },
                         {
-                            headers: { Authorization: `Bearer ${token}` }
-                        }
+                            headers: { Authorization: `Bearer ${token}` },
+                        },
                     );
                     toast.success('✨ Resume parsed and profile updated successfully!');
                 } catch (profileError) {
@@ -313,7 +307,7 @@ export default function useResumeIntelligence() {
         } catch (error) {
             console.error('Error parsing resume:', error);
             setActiveStep(-1);
-            setProcessingSteps(prev => prev.map(step => ({ ...step, completed: false })));
+            setProcessingSteps((prev) => prev.map((step) => ({ ...step, completed: false })));
             toast.error(error.response?.data?.detail || 'Failed to parse resume. Please try again.');
         } finally {
             setLoading(false);

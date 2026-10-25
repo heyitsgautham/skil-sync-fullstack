@@ -19,16 +19,34 @@ import WarningIcon from '@mui/icons-material/Warning';
 import EmailIcon from '@mui/icons-material/Email';
 
 /** One ranked candidate with scores, skills gaps, flags and links. */
-const CandidateCard = ({ candidate, index, expandedAccordions, setExpandedAccordions, setEmailModalOpen, selectedCandidates, setSelectedCandidates, selectionMode, anonymizationEnabled, page, pageSize, ensureHttpProtocol, getScoreColor, handleViewResume, handleFlaggedClick, handleToggleCandidateSelection }) => {
+const CandidateCard = ({
+    candidate,
+    index,
+    expandedAccordions,
+    setExpandedAccordions,
+    setEmailModalOpen,
+    selectedCandidates,
+    setSelectedCandidates,
+    selectionMode,
+    anonymizationEnabled,
+    page,
+    pageSize,
+    ensureHttpProtocol,
+    getScoreColor,
+    handleViewResume,
+    handleFlaggedClick,
+    handleToggleCandidateSelection,
+}) => {
     const actualIndex = (page - 1) * pageSize + index; // Calculate actual index in full list
     return (
         <Card
             key={candidate.candidate_id}
             sx={{
                 mb: 3,
-                border: selectionMode && selectedCandidates.some(c => c.candidate_id === candidate.candidate_id)
-                    ? '2px solid #667eea'
-                    : '1px solid #e0e0e0',
+                border:
+                    selectionMode && selectedCandidates.some((c) => c.candidate_id === candidate.candidate_id)
+                        ? '2px solid #667eea'
+                        : '1px solid #e0e0e0',
                 boxShadow: 1,
                 borderRadius: 3,
             }}
@@ -40,7 +58,7 @@ const CandidateCard = ({ candidate, index, expandedAccordions, setExpandedAccord
                     <Box sx={{ display: 'flex', alignItems: 'center', flex: 1 }}>
                         {selectionMode && (
                             <Checkbox
-                                checked={selectedCandidates.some(c => c.candidate_id === candidate.candidate_id)}
+                                checked={selectedCandidates.some((c) => c.candidate_id === candidate.candidate_id)}
                                 onChange={() => handleToggleCandidateSelection(candidate)}
                                 sx={{ mr: 1 }}
                             />
@@ -113,11 +131,15 @@ const CandidateCard = ({ candidate, index, expandedAccordions, setExpandedAccord
                                                 borderRadius: '50%',
                                                 backgroundColor: '#f44336',
                                                 cursor: anonymizationEnabled ? 'default' : 'pointer',
-                                                '&:hover': anonymizationEnabled ? {} : {
-                                                    backgroundColor: '#d32f2f',
-                                                }
+                                                '&:hover': anonymizationEnabled
+                                                    ? {}
+                                                    : {
+                                                          backgroundColor: '#d32f2f',
+                                                      },
                                             }}
-                                            onClick={anonymizationEnabled ? undefined : () => handleFlaggedClick(candidate)}
+                                            onClick={
+                                                anonymizationEnabled ? undefined : () => handleFlaggedClick(candidate)
+                                            }
                                         >
                                             <WarningIcon sx={{ color: 'white', fontSize: '0.9rem' }} />
                                         </Box>
@@ -128,11 +150,15 @@ const CandidateCard = ({ candidate, index, expandedAccordions, setExpandedAccord
                                                 cursor: anonymizationEnabled ? 'default' : 'pointer',
                                                 textDecoration: anonymizationEnabled ? 'none' : 'underline',
                                                 fontWeight: 'bold',
-                                                '&:hover': anonymizationEnabled ? {} : {
-                                                    color: '#d32f2f',
-                                                }
+                                                '&:hover': anonymizationEnabled
+                                                    ? {}
+                                                    : {
+                                                          color: '#d32f2f',
+                                                      },
                                             }}
-                                            onClick={anonymizationEnabled ? undefined : () => handleFlaggedClick(candidate)}
+                                            onClick={
+                                                anonymizationEnabled ? undefined : () => handleFlaggedClick(candidate)
+                                            }
                                         >
                                             {candidate.flag_reason_text}
                                         </Typography>
@@ -227,9 +253,9 @@ const CandidateCard = ({ candidate, index, expandedAccordions, setExpandedAccord
                         <Button
                             variant="outlined"
                             onClick={() => {
-                                setExpandedAccordions(prev => ({
+                                setExpandedAccordions((prev) => ({
                                     ...prev,
-                                    [`skills-${actualIndex}`]: !prev[`skills-${actualIndex}`]
+                                    [`skills-${actualIndex}`]: !prev[`skills-${actualIndex}`],
                                 }));
                             }}
                             sx={{
@@ -253,9 +279,9 @@ const CandidateCard = ({ candidate, index, expandedAccordions, setExpandedAccord
                         <Button
                             variant="outlined"
                             onClick={() => {
-                                setExpandedAccordions(prev => ({
+                                setExpandedAccordions((prev) => ({
                                     ...prev,
-                                    [`score-${actualIndex}`]: !prev[`score-${actualIndex}`]
+                                    [`score-${actualIndex}`]: !prev[`score-${actualIndex}`],
                                 }));
                             }}
                             sx={{
@@ -354,7 +380,7 @@ const CandidateCard = ({ candidate, index, expandedAccordions, setExpandedAccord
                                                         color: '#166534',
                                                         fontWeight: '600',
                                                         fontSize: '0.9rem',
-                                                        py: 2
+                                                        py: 2,
                                                     }}
                                                 />
                                             ))}
@@ -379,7 +405,7 @@ const CandidateCard = ({ candidate, index, expandedAccordions, setExpandedAccord
                                                         color: '#991b1b',
                                                         fontWeight: '600',
                                                         fontSize: '0.9rem',
-                                                        py: 2
+                                                        py: 2,
                                                     }}
                                                 />
                                             ))}
@@ -388,8 +414,10 @@ const CandidateCard = ({ candidate, index, expandedAccordions, setExpandedAccord
                                 )}
 
                                 {/* No Required Skills */}
-                                {(!candidate.match_details.matched_required_skills || candidate.match_details.matched_required_skills.length === 0) &&
-                                    (!candidate.match_details.missing_required_skills || candidate.match_details.missing_required_skills.length === 0) && (
+                                {(!candidate.match_details.matched_required_skills ||
+                                    candidate.match_details.matched_required_skills.length === 0) &&
+                                    (!candidate.match_details.missing_required_skills ||
+                                        candidate.match_details.missing_required_skills.length === 0) && (
                                         <Typography variant="body1" color="text.secondary">
                                             No required skills specified
                                         </Typography>
@@ -419,7 +447,7 @@ const CandidateCard = ({ candidate, index, expandedAccordions, setExpandedAccord
                                                         color: '#6a1b9a',
                                                         fontWeight: '600',
                                                         fontSize: '0.9rem',
-                                                        py: 2
+                                                        py: 2,
                                                     }}
                                                 />
                                             ))}
@@ -444,7 +472,7 @@ const CandidateCard = ({ candidate, index, expandedAccordions, setExpandedAccord
                                                         color: '#e65100',
                                                         fontWeight: '600',
                                                         fontSize: '0.9rem',
-                                                        py: 2
+                                                        py: 2,
                                                     }}
                                                 />
                                             ))}
@@ -453,8 +481,10 @@ const CandidateCard = ({ candidate, index, expandedAccordions, setExpandedAccord
                                 )}
 
                                 {/* No Preferred Skills */}
-                                {(!candidate.match_details.matched_preferred_skills || candidate.match_details.matched_preferred_skills.length === 0) &&
-                                    (!candidate.match_details.missing_preferred_skills || candidate.match_details.missing_preferred_skills.length === 0) && (
+                                {(!candidate.match_details.matched_preferred_skills ||
+                                    candidate.match_details.matched_preferred_skills.length === 0) &&
+                                    (!candidate.match_details.missing_preferred_skills ||
+                                        candidate.match_details.missing_preferred_skills.length === 0) && (
                                         <Typography variant="body1" color="text.secondary">
                                             No preferred skills specified
                                         </Typography>
@@ -463,7 +493,6 @@ const CandidateCard = ({ candidate, index, expandedAccordions, setExpandedAccord
                         </Grid>
                     </Paper>
                 )}
-
             </CardContent>
         </Card>
     );

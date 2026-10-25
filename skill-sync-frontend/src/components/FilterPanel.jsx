@@ -24,7 +24,7 @@ import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 
 /**
  * Reusable FilterPanel Component for Advanced Filtering
- * 
+ *
  * @param {Object} props
  * @param {Object} props.filters - Current filter values
  * @param {Function} props.onFilterChange - Callback when filters change
@@ -173,9 +173,7 @@ const FilterPanel = ({
                             Clear All
                         </Button>
                     )}
-                    <IconButton size="small">
-                        {expanded ? <ExpandLessIcon /> : <ExpandMoreIcon />}
-                    </IconButton>
+                    <IconButton size="small">{expanded ? <ExpandLessIcon /> : <ExpandMoreIcon />}</IconButton>
                 </Box>
             </Box>
 
@@ -192,7 +190,7 @@ const FilterPanel = ({
                             <Slider
                                 value={[
                                     Math.max(0, Math.min(100, Number(tempFilters.minScore ?? 0))),
-                                    Math.max(0, Math.min(100, Number(tempFilters.maxScore ?? 100)))
+                                    Math.max(0, Math.min(100, Number(tempFilters.maxScore ?? 100))),
                                 ]}
                                 onChange={handleScoreChange}
                                 valueLabelDisplay="auto"
@@ -270,7 +268,7 @@ const FilterPanel = ({
                                 <Slider
                                     value={[
                                         Math.max(0, Math.min(10, Number(tempFilters.experienceMin ?? 0))),
-                                        Math.max(0, Math.min(10, Number(tempFilters.experienceMax ?? 10)))
+                                        Math.max(0, Math.min(10, Number(tempFilters.experienceMax ?? 10))),
                                     ]}
                                     onChange={handleExperienceChange}
                                     valueLabelDisplay="auto"

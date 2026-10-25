@@ -1,15 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import {
-    Container,
-    Box,
-    Typography,
-    Paper,
-    Grid,
-    Card,
-    CardContent,
-    CircularProgress,
-    Alert,
-} from '@mui/material';
+import { Container, Box, Typography, Paper, Grid, Card, CardContent, CircularProgress, Alert } from '@mui/material';
 import {
     Analytics as AnalyticsIcon,
     Person as PersonIcon,
@@ -110,11 +100,7 @@ const Analytics = () => {
                 >
                     {value.toLocaleString()}
                 </Typography>
-                <Typography
-                    variant="body1"
-                    color="text.secondary"
-                    sx={{ fontWeight: 600 }}
-                >
+                <Typography variant="body1" color="text.secondary" sx={{ fontWeight: 600 }}>
                     {title}
                 </Typography>
             </CardContent>
@@ -316,7 +302,8 @@ const Analytics = () => {
                                             width: 120,
                                             height: 120,
                                             borderRadius: '50%',
-                                            background: 'linear-gradient(135deg, rgba(102, 126, 234, 0.15) 0%, rgba(118, 75, 162, 0.15) 100%)',
+                                            background:
+                                                'linear-gradient(135deg, rgba(102, 126, 234, 0.15) 0%, rgba(118, 75, 162, 0.15) 100%)',
                                             display: 'flex',
                                             alignItems: 'center',
                                             justifyContent: 'center',

@@ -1,6 +1,6 @@
 /**
  * Email Notification Component for Company Dashboard
- * 
+ *
  * This component provides UI for:
  * - Previewing daily summary emails
  * - Sending daily summary emails
@@ -23,13 +23,13 @@ import {
     FormControlLabel,
     Switch,
     Card,
-    CardContent
+    CardContent,
 } from '@mui/material';
 import {
     Preview as PreviewIcon,
     Send as SendIcon,
     Close as CloseIcon,
-    Settings as SettingsIcon
+    Settings as SettingsIcon,
 } from '@mui/icons-material';
 import { API_BASE_URL } from '../../services/apiConfig';
 
@@ -43,21 +43,17 @@ const EmailNotificationPanel = ({ token }) => {
     const [preferences, setPreferences] = useState({
         daily_summary: true,
         new_applications: true,
-        weekly_report: false
+        weekly_report: false,
     });
-
 
     const handlePreviewEmail = async () => {
         setLoading(true);
         try {
-            const response = await fetch(
-                `${API_BASE_URL}/notifications/preview-daily-summary?hours=24`,
-                {
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    }
-                }
-            );
+            const response = await fetch(`${API_BASE_URL}/notifications/preview-daily-summary?hours=24`, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
 
             if (!response.ok) {
                 throw new Error('Failed to generate preview');
@@ -67,14 +63,14 @@ const EmailNotificationPanel = ({ token }) => {
             setPreviewHtml(data.preview_html);
             setStats({
                 totalApplications: data.total_applications,
-                internships: data.internships_with_applications
+                internships: data.internships_with_applications,
             });
             setPreviewOpen(true);
         } catch (error) {
             setSnackbar({
                 open: true,
                 message: `Error: ${error.message}`,
-                severity: 'error'
+                severity: 'error',
             });
         } finally {
             setLoading(false);
@@ -89,9 +85,9 @@ const EmailNotificationPanel = ({ token }) => {
                 {
                     method: 'POST',
                     headers: {
-                        'Authorization': `Bearer ${token}`
-                    }
-                }
+                        Authorization: `Bearer ${token}`,
+                    },
+                },
             );
 
             if (!response.ok) {
@@ -103,7 +99,7 @@ const EmailNotificationPanel = ({ token }) => {
             setSnackbar({
                 open: true,
                 message: data.message,
-                severity: data.email_sent ? 'success' : 'warning'
+                severity: data.email_sent ? 'success' : 'warning',
             });
 
             if (data.email_sent) {
@@ -113,7 +109,7 @@ const EmailNotificationPanel = ({ token }) => {
             setSnackbar({
                 open: true,
                 message: `Error: ${error.message}`,
-                severity: 'error'
+                severity: 'error',
             });
         } finally {
             setLoading(false);
@@ -122,14 +118,11 @@ const EmailNotificationPanel = ({ token }) => {
 
     const handleLoadPreferences = async () => {
         try {
-            const response = await fetch(
-                `${API_BASE_URL}/notifications/email-settings`,
-                {
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    }
-                }
-            );
+            const response = await fetch(`${API_BASE_URL}/notifications/email-settings`, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
 
             if (!response.ok) {
                 throw new Error('Failed to load preferences');
@@ -142,7 +135,7 @@ const EmailNotificationPanel = ({ token }) => {
             setSnackbar({
                 open: true,
                 message: `Error: ${error.message}`,
-                severity: 'error'
+                severity: 'error',
             });
         }
     };
@@ -150,21 +143,18 @@ const EmailNotificationPanel = ({ token }) => {
     const handleSavePreferences = async () => {
         setLoading(true);
         try {
-            const response = await fetch(
-                `${API_BASE_URL}/notifications/email-settings`,
-                {
-                    method: 'PUT',
-                    headers: {
-                        'Authorization': `Bearer ${token}`,
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        daily_summary_enabled: preferences.daily_summary,
-                        new_applications_enabled: preferences.new_applications,
-                        weekly_report_enabled: preferences.weekly_report
-                    })
-                }
-            );
+            const response = await fetch(`${API_BASE_URL}/notifications/email-settings`, {
+                method: 'PUT',
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    daily_summary_enabled: preferences.daily_summary,
+                    new_applications_enabled: preferences.new_applications,
+                    weekly_report_enabled: preferences.weekly_report,
+                }),
+            });
 
             if (!response.ok) {
                 throw new Error('Failed to save preferences');
@@ -173,14 +163,14 @@ const EmailNotificationPanel = ({ token }) => {
             setSnackbar({
                 open: true,
                 message: 'Email preferences updated successfully',
-                severity: 'success'
+                severity: 'success',
             });
             setSettingsOpen(false);
         } catch (error) {
             setSnackbar({
                 open: true,
                 message: `Error: ${error.message}`,
-                severity: 'error'
+                severity: 'error',
             });
         } finally {
             setLoading(false);
@@ -237,12 +227,7 @@ const EmailNotificationPanel = ({ token }) => {
             </Card>
 
             {/* Email Preview Dialog */}
-            <Dialog
-                open={previewOpen}
-                onClose={() => setPreviewOpen(false)}
-                maxWidth="md"
-                fullWidth
-            >
+            <Dialog open={previewOpen} onClose={() => setPreviewOpen(false)} maxWidth="md" fullWidth>
                 <DialogTitle>
                     Daily Summary Preview
                     <IconButton
@@ -265,7 +250,7 @@ const EmailNotificationPanel = ({ token }) => {
                                 border: '1px solid #e0e0e0',
                                 borderRadius: 1,
                                 overflow: 'auto',
-                                maxHeight: '500px'
+                                maxHeight: '500px',
                             }}
                             dangerouslySetInnerHTML={{ __html: previewHtml }}
                         />
@@ -274,27 +259,15 @@ const EmailNotificationPanel = ({ token }) => {
                     )}
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={() => setPreviewOpen(false)}>
-                        Close
-                    </Button>
-                    <Button
-                        variant="contained"
-                        startIcon={<SendIcon />}
-                        onClick={handleSendEmail}
-                        disabled={loading}
-                    >
+                    <Button onClick={() => setPreviewOpen(false)}>Close</Button>
+                    <Button variant="contained" startIcon={<SendIcon />} onClick={handleSendEmail} disabled={loading}>
                         Send This Email
                     </Button>
                 </DialogActions>
             </Dialog>
 
             {/* Email Settings Dialog */}
-            <Dialog
-                open={settingsOpen}
-                onClose={() => setSettingsOpen(false)}
-                maxWidth="sm"
-                fullWidth
-            >
+            <Dialog open={settingsOpen} onClose={() => setSettingsOpen(false)} maxWidth="sm" fullWidth>
                 <DialogTitle>
                     Email Preferences
                     <IconButton
@@ -354,14 +327,8 @@ const EmailNotificationPanel = ({ token }) => {
                     </Box>
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={() => setSettingsOpen(false)}>
-                        Cancel
-                    </Button>
-                    <Button
-                        variant="contained"
-                        onClick={handleSavePreferences}
-                        disabled={loading}
-                    >
+                    <Button onClick={() => setSettingsOpen(false)}>Cancel</Button>
+                    <Button variant="contained" onClick={handleSavePreferences} disabled={loading}>
                         Save Preferences
                     </Button>
                 </DialogActions>

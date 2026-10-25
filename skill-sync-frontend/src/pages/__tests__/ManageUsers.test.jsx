@@ -8,9 +8,31 @@ import { renderAt } from '../../testUtils/render';
 vi.mock('../../services/api');
 
 const USERS = [
-    { id: 1, email: 'admin@skillsync.test', full_name: 'Site Admin', role: 'admin', is_active: 1, created_at: '2026-01-01' },
-    { id: 2, email: 'hr@acme.test', full_name: 'Acme Labs', role: 'company', is_active: 1, anonymization_enabled: false, created_at: '2026-02-01' },
-    { id: 3, email: 'asha@example.com', full_name: 'Asha Raman', role: 'student', is_active: 1, created_at: '2026-03-01' },
+    {
+        id: 1,
+        email: 'admin@skillsync.test',
+        full_name: 'Site Admin',
+        role: 'admin',
+        is_active: 1,
+        created_at: '2026-01-01',
+    },
+    {
+        id: 2,
+        email: 'hr@acme.test',
+        full_name: 'Acme Labs',
+        role: 'company',
+        is_active: 1,
+        anonymization_enabled: false,
+        created_at: '2026-02-01',
+    },
+    {
+        id: 3,
+        email: 'asha@example.com',
+        full_name: 'Asha Raman',
+        role: 'student',
+        is_active: 1,
+        created_at: '2026-03-01',
+    },
 ];
 
 beforeEach(() => {
@@ -91,5 +113,7 @@ test('explains a failed load', async () => {
     fakeBackend([['get', '/auth/users', fail(403, 'Only administrators can access user list')]]);
     renderAt(<ManageUsers />, '/admin/users');
 
-    expect(await screen.findByText('Failed to load users. Please ensure you have admin privileges.')).toBeInTheDocument();
+    expect(
+        await screen.findByText('Failed to load users. Please ensure you have admin privileges.'),
+    ).toBeInTheDocument();
 });

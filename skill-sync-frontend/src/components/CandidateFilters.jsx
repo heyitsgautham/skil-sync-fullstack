@@ -19,16 +19,12 @@ import ClearIcon from '@mui/icons-material/Clear';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 
-const CandidateFilters = ({ 
-    onApplyFilters, 
-    onReset,
-    scoringInfo
-}) => {
+const CandidateFilters = ({ onApplyFilters, onReset, scoringInfo }) => {
     const [expanded, setExpanded] = useState(false);
     const [filters, setFilters] = useState({
         matchScoreRange: [0, 100],
         experienceRange: [0, 24], // Changed to months (0-24 months = 0-2 years)
-        excludeFlagged: false
+        excludeFlagged: false,
     });
 
     const handleMatchScoreChange = (event, newValue) => {
@@ -50,7 +46,7 @@ const CandidateFilters = ({
     const handleExcludeFlaggedChange = (event) => {
         const newExcludeFlaggedValue = event.target.checked;
         setFilters({ ...filters, excludeFlagged: newExcludeFlaggedValue });
-        
+
         // Apply the filter immediately when toggled
         const apiFilters = {};
 
@@ -108,7 +104,7 @@ const CandidateFilters = ({
         setFilters({
             matchScoreRange: [0, 100],
             experienceRange: [0, 24],
-            excludeFlagged: false
+            excludeFlagged: false,
         });
         if (onReset) {
             onReset();
@@ -118,7 +114,7 @@ const CandidateFilters = ({
     const activeFiltersCount = [
         filters.matchScoreRange[0] > 0 || filters.matchScoreRange[1] < 100,
         filters.experienceRange[0] > 0 || filters.experienceRange[1] < 24,
-        filters.excludeFlagged
+        filters.excludeFlagged,
     ].filter(Boolean).length;
 
     return (
@@ -170,9 +166,7 @@ const CandidateFilters = ({
                             Clear All
                         </Button>
                     )}
-                    <IconButton size="small">
-                        {expanded ? <ExpandLessIcon /> : <ExpandMoreIcon />}
-                    </IconButton>
+                    <IconButton size="small">{expanded ? <ExpandLessIcon /> : <ExpandMoreIcon />}</IconButton>
                 </Box>
             </Box>
 
@@ -199,7 +193,7 @@ const CandidateFilters = ({
                     </Alert>
                 )}
 
-            <Grid container spacing={3}>
+                <Grid container spacing={3}>
                     {/* Match Score Filter */}
                     <Grid size={{ xs: 12, md: 4 }}>
                         <Typography gutterBottom fontWeight="600">
@@ -217,7 +211,7 @@ const CandidateFilters = ({
                                 marks={[
                                     { value: 0, label: '0%' },
                                     { value: 50, label: '50%' },
-                                    { value: 100, label: '100%' }
+                                    { value: 100, label: '100%' },
                                 ]}
                                 disableSwap
                                 sx={{
@@ -256,7 +250,7 @@ const CandidateFilters = ({
                                     { value: 6, label: '6m' },
                                     { value: 12, label: '1y' },
                                     { value: 18, label: '18m' },
-                                    { value: 24, label: '2y' }
+                                    { value: 24, label: '2y' },
                                 ]}
                                 disableSwap
                                 sx={{
@@ -281,7 +275,16 @@ const CandidateFilters = ({
                         <Typography gutterBottom fontWeight="600">
                             Candidate Filtering
                         </Typography>
-                        <Box sx={{ px: 2, py: 1, display: 'flex', alignItems: 'center', justifyContent: 'space-between', minHeight: 56 }}>
+                        <Box
+                            sx={{
+                                px: 2,
+                                py: 1,
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'space-between',
+                                minHeight: 56,
+                            }}
+                        >
                             <FormControlLabel
                                 control={
                                     <Switch

@@ -1,14 +1,5 @@
 import React from 'react';
-import {
-    Container,
-    Box,
-    Typography,
-    Paper,
-    Grid,
-    Chip,
-    Alert,
-    Snackbar,
-} from '@mui/material';
+import { Container, Box, Typography, Paper, Grid, Chip, Alert, Snackbar } from '@mui/material';
 import {
     AccountCircle as AccountCircleIcon,
     Business as BusinessIcon,
@@ -64,20 +55,22 @@ const Dashboard = () => {
                                 width: 80,
                                 height: 80,
                                 borderRadius: 3,
-                                background: role === 'admin'
-                                    ? 'linear-gradient(135deg, #d32f2f 0%, #c62828 100%)'
-                                    : 'linear-gradient(135deg, #1976d2 0%, #1976d2dd 100%)',
+                                background:
+                                    role === 'admin'
+                                        ? 'linear-gradient(135deg, #d32f2f 0%, #c62828 100%)'
+                                        : 'linear-gradient(135deg, #1976d2 0%, #1976d2dd 100%)',
                                 display: 'flex',
                                 alignItems: 'center',
                                 justifyContent: 'center',
                                 mr: 3,
-                                boxShadow: role === 'admin'
-                                    ? '0 8px 24px rgba(211, 47, 47, 0.3)'
-                                    : '0 8px 24px rgba(25, 118, 210, 0.3)',
+                                boxShadow:
+                                    role === 'admin'
+                                        ? '0 8px 24px rgba(211, 47, 47, 0.3)'
+                                        : '0 8px 24px rgba(25, 118, 210, 0.3)',
                             }}
                         >
                             {React.cloneElement(getRoleIcon(), {
-                                sx: { fontSize: 48, color: 'white', m: 0 }
+                                sx: { fontSize: 48, color: 'white', m: 0 },
                             })}
                         </Box>
                         <Box sx={{ flexGrow: 1 }}>
@@ -90,7 +83,9 @@ const Dashboard = () => {
                                     letterSpacing: '-0.5px',
                                 }}
                             >
-                                {role === 'admin' ? 'Welcome back, Admin!' : `Welcome back, ${user?.full_name || 'User'}!`}
+                                {role === 'admin'
+                                    ? 'Welcome back, Admin!'
+                                    : `Welcome back, ${user?.full_name || 'User'}!`}
                             </Typography>
                             <Typography
                                 variant="body1"
@@ -105,7 +100,8 @@ const Dashboard = () => {
                             <Chip
                                 label={user?.role || 'N/A'}
                                 sx={{
-                                    background: 'linear-gradient(135deg, rgba(102, 126, 234, 0.15) 0%, rgba(118, 75, 162, 0.15) 100%)',
+                                    background:
+                                        'linear-gradient(135deg, rgba(102, 126, 234, 0.15) 0%, rgba(118, 75, 162, 0.15) 100%)',
                                     border: '1px solid rgba(102, 126, 234, 0.3)',
                                     color: '#667eea',
                                     fontWeight: 700,

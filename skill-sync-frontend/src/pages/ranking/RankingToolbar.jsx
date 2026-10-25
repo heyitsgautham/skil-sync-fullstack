@@ -18,16 +18,29 @@ import TableViewIcon from '@mui/icons-material/TableView';
 import EmailIcon from '@mui/icons-material/Email';
 
 /** Result count, selection and email controls, expand toggle and export menu. */
-const RankingToolbar = ({ rankedCandidates, exportMenuAnchor, exportLoading, selectedCandidates, selectionMode, allExpanded, handleExportClick, handleExportClose, handleExport, handleToggleExpandAll, handleCancelSelection, handleOpenEmailModal }) => (
+const RankingToolbar = ({
+    rankedCandidates,
+    exportMenuAnchor,
+    exportLoading,
+    selectedCandidates,
+    selectionMode,
+    allExpanded,
+    handleExportClick,
+    handleExportClose,
+    handleExport,
+    handleToggleExpandAll,
+    handleCancelSelection,
+    handleOpenEmailModal,
+}) => (
     <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
             <Typography variant="h5">
                 <EmojiEventsIcon sx={{ mr: 1, verticalAlign: 'middle' }} />
                 Top Candidates ({rankedCandidates.length})
             </Typography>
-            {rankedCandidates.filter(c => c.scoring_breakdown?.has_tailored).length > 0 && (
+            {rankedCandidates.filter((c) => c.scoring_breakdown?.has_tailored).length > 0 && (
                 <Chip
-                    label={`✨ ${rankedCandidates.filter(c => c.scoring_breakdown?.has_tailored).length} with tailored resumes`}
+                    label={`✨ ${rankedCandidates.filter((c) => c.scoring_breakdown?.has_tailored).length} with tailored resumes`}
                     sx={{
                         backgroundColor: '#9c27b0',
                         color: 'white',
@@ -64,16 +77,9 @@ const RankingToolbar = ({ rankedCandidates, exportMenuAnchor, exportLoading, sel
                     },
                 }}
             >
-                {selectionMode
-                    ? `Send Email (${selectedCandidates.length} selected)`
-                    : 'Send Clustered Email'
-                }
+                {selectionMode ? `Send Email (${selectedCandidates.length} selected)` : 'Send Clustered Email'}
             </Button>
-            <Button
-                size="small"
-                variant="outlined"
-                onClick={handleToggleExpandAll}
-            >
+            <Button size="small" variant="outlined" onClick={handleToggleExpandAll}>
                 {allExpanded ? 'Collapse All' : 'Expand All'}
             </Button>
             <Button
@@ -93,11 +99,7 @@ const RankingToolbar = ({ rankedCandidates, exportMenuAnchor, exportLoading, sel
             >
                 {exportLoading ? <CircularProgress size={20} color="inherit" /> : <FileDownloadIcon />}
             </Button>
-            <Menu
-                anchorEl={exportMenuAnchor}
-                open={Boolean(exportMenuAnchor)}
-                onClose={handleExportClose}
-            >
+            <Menu anchorEl={exportMenuAnchor} open={Boolean(exportMenuAnchor)} onClose={handleExportClose}>
                 <MenuItem onClick={() => handleExport('csv')}>
                     <ListItemIcon>
                         <DescriptionIcon fontSize="small" />

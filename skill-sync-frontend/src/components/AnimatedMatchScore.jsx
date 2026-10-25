@@ -36,10 +36,10 @@ const AnimatedMatchScore = ({ score, size = 120, showLabel = true }) => {
                 initial={{ scale: 0, rotate: -180 }}
                 animate={{ scale: 1, rotate: 0 }}
                 transition={{
-                    type: "spring",
+                    type: 'spring',
                     stiffness: 260,
                     damping: 20,
-                    delay: 0.1
+                    delay: 0.1,
                 }}
                 style={{ width: size, height: size, margin: '0 auto' }}
             >
@@ -56,11 +56,7 @@ const AnimatedMatchScore = ({ score, size = 120, showLabel = true }) => {
                 />
             </motion.div>
             {showLabel && (
-                <motion.div
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.5 }}
-                >
+                <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }}>
                     <Chip
                         label={getLabel(score)}
                         sx={{

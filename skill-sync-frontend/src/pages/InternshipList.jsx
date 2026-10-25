@@ -52,7 +52,7 @@ const InternshipList = () => {
         location: '',
         duration: '',
         stipend: '',
-        required_skills: []
+        required_skills: [],
     });
 
     useEffect(() => {
@@ -74,9 +74,7 @@ const InternshipList = () => {
                     internship.description.toLowerCase().includes(query) ||
                     internship.company_name?.toLowerCase().includes(query) ||
                     internship.location?.toLowerCase().includes(query) ||
-                    internship.required_skills?.some(skill =>
-                        skill.toLowerCase().includes(query)
-                    )
+                    internship.required_skills?.some((skill) => skill.toLowerCase().includes(query)),
             );
             setFilteredInternships(filtered);
         }
@@ -129,7 +127,7 @@ const InternshipList = () => {
             location: internship.location || '',
             duration: internship.duration || '',
             stipend: internship.stipend || '',
-            required_skills: internship.required_skills || []
+            required_skills: internship.required_skills || [],
         });
         setEditDialogOpen(true);
     };
@@ -137,13 +135,17 @@ const InternshipList = () => {
     const handleEditSubmit = async () => {
         try {
             // Convert required_skills string to array if needed
-            const skills = typeof editFormData.required_skills === 'string'
-                ? editFormData.required_skills.split(',').map(s => s.trim()).filter(s => s)
-                : editFormData.required_skills;
+            const skills =
+                typeof editFormData.required_skills === 'string'
+                    ? editFormData.required_skills
+                          .split(',')
+                          .map((s) => s.trim())
+                          .filter((s) => s)
+                    : editFormData.required_skills;
 
             await apiClient.put(`/internship/${selectedInternship.id}`, {
                 ...editFormData,
-                required_skills: skills
+                required_skills: skills,
             });
 
             setSuccessMessage('Internship updated successfully');
@@ -237,7 +239,11 @@ const InternshipList = () => {
                 ) : (
                     <>
                         <Typography variant="h6" gutterBottom sx={{ fontWeight: 600, color: '#1a1a1a', mb: 3 }}>
-                            {userRole === 'company' ? 'My Posted Internships' : 'Browse Internships'} - {filteredInternships.length} {filteredInternships.length === 1 ? 'Internship' : 'Internships'} Found
+                            {userRole === 'company' ? 'My Posted Internships' : 'Browse Internships'}
+                            {' - '}
+                            {filteredInternships.length}{' '}
+                            {filteredInternships.length === 1 ? 'Internship' : 'Internships'}
+                            {' Found'}
                         </Typography>
                         <Grid container spacing={3}>
                             {filteredInternships.map((internship) => (
@@ -258,7 +264,7 @@ const InternshipList = () => {
                                             '&:hover': {
                                                 transform: 'translateY(-8px)',
                                                 boxShadow: '0 16px 48px rgba(0,0,0,0.12)',
-                                            }
+                                            },
                                         }}
                                     >
                                         <CardContent sx={{ flexGrow: 1, p: 3 }}>
@@ -268,16 +274,18 @@ const InternshipList = () => {
                                                         width: 48,
                                                         height: 48,
                                                         borderRadius: 2,
-                                                        background: userRole === 'admin' 
-                                                            ? 'linear-gradient(135deg, #f44336 0%, #d32f2f 100%)'
-                                                            : 'linear-gradient(135deg, #4caf50 0%, #45a049 100%)',
+                                                        background:
+                                                            userRole === 'admin'
+                                                                ? 'linear-gradient(135deg, #f44336 0%, #d32f2f 100%)'
+                                                                : 'linear-gradient(135deg, #4caf50 0%, #45a049 100%)',
                                                         display: 'flex',
                                                         alignItems: 'center',
                                                         justifyContent: 'center',
                                                         mr: 2,
-                                                        boxShadow: userRole === 'admin'
-                                                            ? '0 4px 12px rgba(244, 67, 54, 0.3)'
-                                                            : '0 4px 12px rgba(76, 175, 80, 0.3)',
+                                                        boxShadow:
+                                                            userRole === 'admin'
+                                                                ? '0 4px 12px rgba(244, 67, 54, 0.3)'
+                                                                : '0 4px 12px rgba(76, 175, 80, 0.3)',
                                                     }}
                                                 >
                                                     <WorkIcon sx={{ color: 'white', fontSize: 28 }} />
@@ -327,7 +335,10 @@ const InternshipList = () => {
                                             {/* Location */}
                                             {internship.location && (
                                                 <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-                                                    <LocationOnIcon fontSize="small" sx={{ mr: 0.5, color: 'text.secondary' }} />
+                                                    <LocationOnIcon
+                                                        fontSize="small"
+                                                        sx={{ mr: 0.5, color: 'text.secondary' }}
+                                                    />
                                                     <Typography variant="body2" color="text.secondary">
                                                         {internship.location}
                                                     </Typography>
@@ -337,7 +348,10 @@ const InternshipList = () => {
                                             {/* Duration */}
                                             {internship.duration && (
                                                 <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-                                                    <TimerIcon fontSize="small" sx={{ mr: 0.5, color: 'text.secondary' }} />
+                                                    <TimerIcon
+                                                        fontSize="small"
+                                                        sx={{ mr: 0.5, color: 'text.secondary' }}
+                                                    />
                                                     <Typography variant="body2" color="text.secondary">
                                                         {internship.duration}
                                                     </Typography>
@@ -347,7 +361,10 @@ const InternshipList = () => {
                                             {/* Stipend */}
                                             {internship.stipend && (
                                                 <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                                                    <MonetizationOnIcon fontSize="small" sx={{ mr: 0.5, color: 'text.secondary' }} />
+                                                    <MonetizationOnIcon
+                                                        fontSize="small"
+                                                        sx={{ mr: 0.5, color: 'text.secondary' }}
+                                                    />
                                                     <Typography variant="body2" color="text.secondary">
                                                         {internship.stipend}
                                                     </Typography>
@@ -377,13 +394,15 @@ const InternshipList = () => {
                                                                 label={skill}
                                                                 size="small"
                                                                 sx={{
-                                                                    background: 'linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%)',
+                                                                    background:
+                                                                        'linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%)',
                                                                     border: '1px solid rgba(102, 126, 234, 0.3)',
                                                                     color: '#667eea',
                                                                     fontWeight: 600,
                                                                     '&:hover': {
-                                                                        background: 'linear-gradient(135deg, rgba(102, 126, 234, 0.2) 0%, rgba(118, 75, 162, 0.2) 100%)',
-                                                                    }
+                                                                        background:
+                                                                            'linear-gradient(135deg, rgba(102, 126, 234, 0.2) 0%, rgba(118, 75, 162, 0.2) 100%)',
+                                                                    },
                                                                 }}
                                                             />
                                                         ))}
@@ -446,7 +465,11 @@ const InternshipList = () => {
                                                 <Button
                                                     variant="contained"
                                                     fullWidth
-                                                    onClick={() => userRole === 'company' ? handleViewDetails(internship) : handleApply(internship)}
+                                                    onClick={() =>
+                                                        userRole === 'company'
+                                                            ? handleViewDetails(internship)
+                                                            : handleApply(internship)
+                                                    }
                                                     sx={{
                                                         py: 1.5,
                                                         borderRadius: 2,
@@ -459,7 +482,8 @@ const InternshipList = () => {
                                                         '&:hover': {
                                                             transform: 'translateY(-2px)',
                                                             boxShadow: '0 8px 24px rgba(76, 175, 80, 0.4)',
-                                                            background: 'linear-gradient(135deg, #45a049 0%, #4caf50 100%)',
+                                                            background:
+                                                                'linear-gradient(135deg, #45a049 0%, #4caf50 100%)',
                                                         },
                                                     }}
                                                 >
@@ -483,19 +507,17 @@ const InternshipList = () => {
                 />
 
                 {/* Edit Internship Dialog */}
-                <Dialog
-                    open={editDialogOpen}
-                    onClose={() => setEditDialogOpen(false)}
-                    maxWidth="md"
-                    fullWidth
-                >
-                    <DialogTitle sx={{
-                        background: userRole === 'admin' 
-                            ? 'linear-gradient(135deg, #f44336 0%, #d32f2f 100%)'
-                            : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                        color: 'white',
-                        fontWeight: 700
-                    }}>
+                <Dialog open={editDialogOpen} onClose={() => setEditDialogOpen(false)} maxWidth="md" fullWidth>
+                    <DialogTitle
+                        sx={{
+                            background:
+                                userRole === 'admin'
+                                    ? 'linear-gradient(135deg, #f44336 0%, #d32f2f 100%)'
+                                    : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                            color: 'white',
+                            fontWeight: 700,
+                        }}
+                    >
                         Edit Internship
                     </DialogTitle>
                     <DialogContent sx={{ mt: 2 }}>
@@ -543,33 +565,34 @@ const InternshipList = () => {
                         <TextField
                             fullWidth
                             label="Required Skills (comma-separated)"
-                            value={Array.isArray(editFormData.required_skills)
-                                ? editFormData.required_skills.join(', ')
-                                : editFormData.required_skills}
+                            value={
+                                Array.isArray(editFormData.required_skills)
+                                    ? editFormData.required_skills.join(', ')
+                                    : editFormData.required_skills
+                            }
                             onChange={(e) => setEditFormData({ ...editFormData, required_skills: e.target.value })}
                             margin="normal"
                             placeholder="e.g., Python, React, SQL"
                         />
                     </DialogContent>
                     <DialogActions sx={{ p: 2 }}>
-                        <Button
-                            onClick={() => setEditDialogOpen(false)}
-                            sx={{ color: '#666' }}
-                        >
+                        <Button onClick={() => setEditDialogOpen(false)} sx={{ color: '#666' }}>
                             Cancel
                         </Button>
                         <Button
                             onClick={handleEditSubmit}
                             variant="contained"
                             sx={{
-                                background: userRole === 'admin'
-                                    ? 'linear-gradient(135deg, #f44336 0%, #d32f2f 100%)'
-                                    : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                                background:
+                                    userRole === 'admin'
+                                        ? 'linear-gradient(135deg, #f44336 0%, #d32f2f 100%)'
+                                        : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
                                 '&:hover': {
-                                    background: userRole === 'admin'
-                                        ? 'linear-gradient(135deg, #d32f2f 0%, #c62828 100%)'
-                                        : 'linear-gradient(135deg, #5568d3 0%, #6a3f8e 100%)',
-                                }
+                                    background:
+                                        userRole === 'admin'
+                                            ? 'linear-gradient(135deg, #d32f2f 0%, #c62828 100%)'
+                                            : 'linear-gradient(135deg, #5568d3 0%, #6a3f8e 100%)',
+                                },
                             }}
                         >
                             Save Changes
@@ -578,17 +601,14 @@ const InternshipList = () => {
                 </Dialog>
 
                 {/* Delete Confirmation Dialog */}
-                <Dialog
-                    open={deleteDialogOpen}
-                    onClose={() => setDeleteDialogOpen(false)}
-                    maxWidth="sm"
-                    fullWidth
-                >
-                    <DialogTitle sx={{
-                        background: 'linear-gradient(135deg, #f5576c 0%, #f093fb 100%)',
-                        color: 'white',
-                        fontWeight: 700
-                    }}>
+                <Dialog open={deleteDialogOpen} onClose={() => setDeleteDialogOpen(false)} maxWidth="sm" fullWidth>
+                    <DialogTitle
+                        sx={{
+                            background: 'linear-gradient(135deg, #f5576c 0%, #f093fb 100%)',
+                            color: 'white',
+                            fontWeight: 700,
+                        }}
+                    >
                         ⚠️ Confirm Delete Internship
                     </DialogTitle>
                     <DialogContent sx={{ mt: 2 }}>
@@ -614,16 +634,19 @@ const InternshipList = () => {
                         </Typography>
 
                         <Box component="ul" sx={{ pl: 2, mt: 1 }}>
-                            <li><Typography variant="body2">Internship posting</Typography></li>
-                            <li><Typography variant="body2">All student applications</Typography></li>
-                            <li><Typography variant="body2">All matching data</Typography></li>
+                            <li>
+                                <Typography variant="body2">Internship posting</Typography>
+                            </li>
+                            <li>
+                                <Typography variant="body2">All student applications</Typography>
+                            </li>
+                            <li>
+                                <Typography variant="body2">All matching data</Typography>
+                            </li>
                         </Box>
                     </DialogContent>
                     <DialogActions sx={{ p: 2 }}>
-                        <Button
-                            onClick={() => setDeleteDialogOpen(false)}
-                            sx={{ color: '#666' }}
-                        >
+                        <Button onClick={() => setDeleteDialogOpen(false)} sx={{ color: '#666' }}>
                             Cancel
                         </Button>
                         <Button
@@ -634,7 +657,7 @@ const InternshipList = () => {
                                 background: 'linear-gradient(135deg, #f5576c 0%, #f093fb 100%)',
                                 '&:hover': {
                                     background: 'linear-gradient(135deg, #e04558 0%, #d97fe6 100%)',
-                                }
+                                },
                             }}
                         >
                             Delete Internship
@@ -643,19 +666,17 @@ const InternshipList = () => {
                 </Dialog>
 
                 {/* Internship Details Dialog (for Company Users) */}
-                <Dialog
-                    open={detailsDialogOpen}
-                    onClose={() => setDetailsDialogOpen(false)}
-                    maxWidth="md"
-                    fullWidth
-                >
-                    <DialogTitle sx={{
-                        background: userRole === 'company'
-                            ? 'linear-gradient(135deg, #4caf50 0%, #45a049 100%)'
-                            : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                        color: 'white',
-                        fontWeight: 700
-                    }}>
+                <Dialog open={detailsDialogOpen} onClose={() => setDetailsDialogOpen(false)} maxWidth="md" fullWidth>
+                    <DialogTitle
+                        sx={{
+                            background:
+                                userRole === 'company'
+                                    ? 'linear-gradient(135deg, #4caf50 0%, #45a049 100%)'
+                                    : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                            color: 'white',
+                            fontWeight: 700,
+                        }}
+                    >
                         Internship Details
                     </DialogTitle>
                     <DialogContent sx={{ mt: 2 }}>
@@ -704,49 +725,53 @@ const InternshipList = () => {
                                     </Typography>
                                 </Box>
 
-                                {selectedInternship.required_skills && selectedInternship.required_skills.length > 0 && (
-                                    <Box sx={{ mb: 3 }}>
-                                        <Typography variant="subtitle2" fontWeight="bold" gutterBottom>
-                                            Required Skills
-                                        </Typography>
-                                        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
-                                            {selectedInternship.required_skills.map((skill, index) => (
-                                                <Chip
-                                                    key={index}
-                                                    label={skill}
-                                                    size="small"
-                                                    sx={{ backgroundColor: '#dcfce7', color: '#166534' }}
-                                                />
-                                            ))}
+                                {selectedInternship.required_skills &&
+                                    selectedInternship.required_skills.length > 0 && (
+                                        <Box sx={{ mb: 3 }}>
+                                            <Typography variant="subtitle2" fontWeight="bold" gutterBottom>
+                                                Required Skills
+                                            </Typography>
+                                            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+                                                {selectedInternship.required_skills.map((skill, index) => (
+                                                    <Chip
+                                                        key={index}
+                                                        label={skill}
+                                                        size="small"
+                                                        sx={{ backgroundColor: '#dcfce7', color: '#166534' }}
+                                                    />
+                                                ))}
+                                            </Box>
                                         </Box>
-                                    </Box>
-                                )}
+                                    )}
 
-                                {selectedInternship.preferred_skills && selectedInternship.preferred_skills.length > 0 && (
-                                    <Box sx={{ mb: 3 }}>
-                                        <Typography variant="subtitle2" fontWeight="bold" gutterBottom>
-                                            Preferred Skills
-                                        </Typography>
-                                        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
-                                            {selectedInternship.preferred_skills.map((skill, index) => (
-                                                <Chip
-                                                    key={index}
-                                                    label={skill}
-                                                    size="small"
-                                                    sx={{ backgroundColor: '#f3e5f5', color: '#6a1b9a' }}
-                                                />
-                                            ))}
+                                {selectedInternship.preferred_skills &&
+                                    selectedInternship.preferred_skills.length > 0 && (
+                                        <Box sx={{ mb: 3 }}>
+                                            <Typography variant="subtitle2" fontWeight="bold" gutterBottom>
+                                                Preferred Skills
+                                            </Typography>
+                                            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+                                                {selectedInternship.preferred_skills.map((skill, index) => (
+                                                    <Chip
+                                                        key={index}
+                                                        label={skill}
+                                                        size="small"
+                                                        sx={{ backgroundColor: '#f3e5f5', color: '#6a1b9a' }}
+                                                    />
+                                                ))}
+                                            </Box>
                                         </Box>
-                                    </Box>
-                                )}
+                                    )}
 
-                                {(selectedInternship.min_experience !== undefined || selectedInternship.max_experience !== undefined) && (
+                                {(selectedInternship.min_experience !== undefined ||
+                                    selectedInternship.max_experience !== undefined) && (
                                     <Box sx={{ mb: 2 }}>
                                         <Typography variant="subtitle2" fontWeight="bold" gutterBottom>
                                             Experience Required
                                         </Typography>
                                         <Typography variant="body2">
-                                            {selectedInternship.min_experience || 0} - {selectedInternship.max_experience || 0} years
+                                            {selectedInternship.min_experience || 0} -{' '}
+                                            {selectedInternship.max_experience || 0} years
                                         </Typography>
                                     </Box>
                                 )}
@@ -756,9 +781,7 @@ const InternshipList = () => {
                                         <Typography variant="subtitle2" fontWeight="bold" gutterBottom>
                                             Education Required
                                         </Typography>
-                                        <Typography variant="body2">
-                                            {selectedInternship.required_education}
-                                        </Typography>
+                                        <Typography variant="body2">{selectedInternship.required_education}</Typography>
                                     </Box>
                                 )}
 
@@ -780,10 +803,9 @@ const InternshipList = () => {
                                 borderColor: userRole === 'company' ? '#4caf50' : '#667eea',
                                 '&:hover': {
                                     borderColor: userRole === 'company' ? '#4caf50' : '#667eea',
-                                    backgroundColor: userRole === 'company' 
-                                        ? 'rgba(76, 175, 80, 0.1)' 
-                                        : 'rgba(102, 126, 234, 0.1)'
-                                }
+                                    backgroundColor:
+                                        userRole === 'company' ? 'rgba(76, 175, 80, 0.1)' : 'rgba(102, 126, 234, 0.1)',
+                                },
                             }}
                         >
                             Close
@@ -796,14 +818,16 @@ const InternshipList = () => {
                             variant="contained"
                             startIcon={<EditIcon />}
                             sx={{
-                                background: userRole === 'company'
-                                    ? 'linear-gradient(135deg, #4caf50 0%, #45a049 100%)'
-                                    : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                                background:
+                                    userRole === 'company'
+                                        ? 'linear-gradient(135deg, #4caf50 0%, #45a049 100%)'
+                                        : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
                                 '&:hover': {
-                                    background: userRole === 'company'
-                                        ? 'linear-gradient(135deg, #45a049 0%, #388e3c 100%)'
-                                        : 'linear-gradient(135deg, #764ba2 0%, #667eea 100%)',
-                                }
+                                    background:
+                                        userRole === 'company'
+                                            ? 'linear-gradient(135deg, #45a049 0%, #388e3c 100%)'
+                                            : 'linear-gradient(135deg, #764ba2 0%, #667eea 100%)',
+                                },
                             }}
                         >
                             Edit Internship

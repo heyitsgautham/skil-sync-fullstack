@@ -1,18 +1,23 @@
 import React from 'react';
-import {
-    Box,
-    Typography,
-    Paper,
-    Button,
-    Chip,
-} from '@mui/material';
+import { Box, Typography, Paper, Button, Chip } from '@mui/material';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import DescriptionIcon from '@mui/icons-material/Description';
 import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
 
 /** Drag-and-drop upload area with the Parse Resume with AI button. */
-const UploadPanel = ({ file, setFile, setParsedData, loading, setProcessingDetails, dragActive, handleFileUpload, handleDrag, handleDrop, handleParseResume }) => (
+const UploadPanel = ({
+    file,
+    setFile,
+    setParsedData,
+    loading,
+    setProcessingDetails,
+    dragActive,
+    handleFileUpload,
+    handleDrag,
+    handleDrop,
+    handleParseResume,
+}) => (
     <Paper
         elevation={0}
         sx={{

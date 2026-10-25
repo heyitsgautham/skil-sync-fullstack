@@ -1,19 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import {
-    Accordion,
-    AccordionSummary,
-    AccordionDetails,
-    Typography,
-    Chip,
-    Box,
-} from '@mui/material';
+import { Accordion, AccordionSummary, AccordionDetails, Typography, Chip, Box } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 
 /**
  * Reusable CollapsibleSection Component
  * Provides a consistent, animated accordion-style collapsible section
  * with optional count badge and persistence of expand/collapse state
- * 
+ *
  * @param {string} title - Section title
  * @param {number} count - Optional count badge to display next to title
  * @param {React.ReactNode} icon - Optional icon to display before title
@@ -22,15 +15,7 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
  * @param {string} sectionKey - Unique key for persisting state in localStorage
  * @param {object} sx - Additional Material-UI sx props for customization
  */
-const CollapsibleSection = ({
-    title,
-    count,
-    icon,
-    children,
-    defaultExpanded = false,
-    sectionKey,
-    sx = {},
-}) => {
+const CollapsibleSection = ({ title, count, icon, children, defaultExpanded = false, sectionKey, sx = {} }) => {
     // Load expanded state from localStorage if sectionKey is provided
     const getInitialExpandedState = () => {
         if (sectionKey) {
@@ -113,11 +98,7 @@ const CollapsibleSection = ({
                 }}
             >
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, width: '100%' }}>
-                    {icon && (
-                        <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                            {icon}
-                        </Box>
-                    )}
+                    {icon && <Box sx={{ display: 'flex', alignItems: 'center' }}>{icon}</Box>}
                     <Typography variant="h6" fontWeight="bold" sx={{ flex: 1 }}>
                         {title}
                     </Typography>

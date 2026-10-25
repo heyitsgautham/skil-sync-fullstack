@@ -1,11 +1,5 @@
 import React from 'react';
-import {
-    Box,
-    Container,
-    Typography,
-    Paper,
-    CircularProgress,
-} from '@mui/material';
+import { Box, Container, Typography, Paper, CircularProgress } from '@mui/material';
 import PsychologyIcon from '@mui/icons-material/Psychology';
 import AnalyticsIcon from '@mui/icons-material/Analytics';
 import Layout from '../components/Layout';
@@ -18,15 +12,7 @@ import ParsedResumeView from './resumeIntelligence/ParsedResumeView';
 
 const ResumeIntelligence = () => {
     const resume = useResumeIntelligence();
-    const {
-        file,
-        parsedData,
-        loading,
-        loadingResumes,
-        activeStep,
-        myResumes,
-        selectedResumeId,
-    } = resume;
+    const { file, parsedData, loading, loadingResumes, activeStep, myResumes, selectedResumeId } = resume;
 
     return (
         <Layout>
@@ -110,7 +96,8 @@ const ResumeIntelligence = () => {
                             p: 8,
                             textAlign: 'center',
                             borderRadius: 4,
-                            background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.03) 0%, rgba(29, 78, 216, 0.03) 100%)',
+                            background:
+                                'linear-gradient(135deg, rgba(59, 130, 246, 0.03) 0%, rgba(29, 78, 216, 0.03) 100%)',
                             border: '2px dashed',
                             borderColor: 'rgba(59, 130, 246, 0.2)',
                         }}
@@ -133,7 +120,8 @@ const ResumeIntelligence = () => {
                             Ready to Analyze Your Resume
                         </Typography>
                         <Typography variant="body1" color="text.secondary" sx={{ maxWidth: 500, mx: 'auto', mt: 2 }}>
-                            Upload your resume above to see our AI-powered parser extract your skills, experience, education, and more in seconds!
+                            Upload your resume above to see our AI-powered parser extract your skills, experience,
+                            education, and more in seconds!
                         </Typography>
                     </Paper>
                 )}
@@ -146,7 +134,8 @@ const ResumeIntelligence = () => {
                             p: 6,
                             textAlign: 'center',
                             borderRadius: 4,
-                            background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.03) 0%, rgba(29, 78, 216, 0.03) 100%)',
+                            background:
+                                'linear-gradient(135deg, rgba(59, 130, 246, 0.03) 0%, rgba(29, 78, 216, 0.03) 100%)',
                             border: '2px dashed',
                             borderColor: 'rgba(59, 130, 246, 0.2)',
                         }}

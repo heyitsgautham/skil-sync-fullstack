@@ -16,7 +16,7 @@ import {
     Snackbar,
     Alert,
     CircularProgress,
-    Divider
+    Divider,
 } from '@mui/material';
 import {
     Save as SaveIcon,
@@ -25,7 +25,7 @@ import {
     LinkedIn as LinkedInIcon,
     GitHub as GitHubIcon,
     Phone as PhoneIcon,
-    Email as EmailIcon
+    Email as EmailIcon,
 } from '@mui/icons-material';
 import Layout from '../../components/Layout';
 import { API_BASE_URL } from '../../services/apiConfig';
@@ -41,7 +41,7 @@ const StudentProfile = () => {
         full_name: '',
         phone: '',
         linkedin_url: '',
-        github_url: ''
+        github_url: '',
     });
 
     const token = localStorage.getItem('token');
@@ -51,8 +51,8 @@ const StudentProfile = () => {
         try {
             const response = await fetch(`${API_BASE_URL}/profile/me`, {
                 headers: {
-                    'Authorization': `Bearer ${token}`
-                }
+                    Authorization: `Bearer ${token}`,
+                },
             });
 
             if (!response.ok) {
@@ -65,13 +65,13 @@ const StudentProfile = () => {
                 full_name: data.full_name || '',
                 phone: data.phone || '',
                 linkedin_url: data.linkedin_url || '',
-                github_url: data.github_url || ''
+                github_url: data.github_url || '',
             });
         } catch (error) {
             setSnackbar({
                 open: true,
                 message: `Error: ${error.message}`,
-                severity: 'error'
+                severity: 'error',
             });
         } finally {
             setLoading(false);
@@ -88,10 +88,10 @@ const StudentProfile = () => {
             const response = await fetch(`${API_BASE_URL}/profile/me`, {
                 method: 'PUT',
                 headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json'
+                    Authorization: `Bearer ${token}`,
+                    'Content-Type': 'application/json',
                 },
-                body: JSON.stringify(formData)
+                body: JSON.stringify(formData),
             });
 
             if (!response.ok) {
@@ -104,13 +104,13 @@ const StudentProfile = () => {
             setSnackbar({
                 open: true,
                 message: 'Profile updated successfully!',
-                severity: 'success'
+                severity: 'success',
             });
         } catch (error) {
             setSnackbar({
                 open: true,
                 message: `Error: ${error.message}`,
-                severity: 'error'
+                severity: 'error',
             });
         } finally {
             setSaving(false);
@@ -122,7 +122,7 @@ const StudentProfile = () => {
             full_name: profile.full_name || '',
             phone: profile.phone || '',
             linkedin_url: profile.linkedin_url || '',
-            github_url: profile.github_url || ''
+            github_url: profile.github_url || '',
         });
         setEditing(false);
     };
@@ -153,20 +153,12 @@ const StudentProfile = () => {
                                 My Profile
                             </Typography>
                             {!editing ? (
-                                <Button
-                                    variant="contained"
-                                    startIcon={<EditIcon />}
-                                    onClick={() => setEditing(true)}
-                                >
+                                <Button variant="contained" startIcon={<EditIcon />} onClick={() => setEditing(true)}>
                                     Edit Profile
                                 </Button>
                             ) : (
                                 <Box sx={{ display: 'flex', gap: 1 }}>
-                                    <Button
-                                        variant="outlined"
-                                        onClick={handleCancel}
-                                        disabled={saving}
-                                    >
+                                    <Button variant="outlined" onClick={handleCancel} disabled={saving}>
                                         Cancel
                                     </Button>
                                     <Button
@@ -191,7 +183,7 @@ const StudentProfile = () => {
                                     height: 100,
                                     fontSize: 40,
                                     bgcolor: 'primary.main',
-                                    mr: 3
+                                    mr: 3,
                                 }}
                             >
                                 {getInitials(profile?.full_name)}
@@ -217,7 +209,7 @@ const StudentProfile = () => {
                                     onChange={(e) => setFormData({ ...formData, full_name: e.target.value })}
                                     disabled={!editing}
                                     InputProps={{
-                                        startAdornment: <PersonIcon sx={{ mr: 1, color: 'action.active' }} />
+                                        startAdornment: <PersonIcon sx={{ mr: 1, color: 'action.active' }} />,
                                     }}
                                 />
                             </Grid>
@@ -230,7 +222,7 @@ const StudentProfile = () => {
                                     value={profile?.email || ''}
                                     disabled
                                     InputProps={{
-                                        startAdornment: <EmailIcon sx={{ mr: 1, color: 'action.active' }} />
+                                        startAdornment: <EmailIcon sx={{ mr: 1, color: 'action.active' }} />,
                                     }}
                                     helperText="Email cannot be changed"
                                 />
@@ -246,7 +238,7 @@ const StudentProfile = () => {
                                     disabled={!editing}
                                     placeholder="+1-555-0123"
                                     InputProps={{
-                                        startAdornment: <PhoneIcon sx={{ mr: 1, color: 'action.active' }} />
+                                        startAdornment: <PhoneIcon sx={{ mr: 1, color: 'action.active' }} />,
                                     }}
                                 />
                             </Grid>
@@ -261,7 +253,7 @@ const StudentProfile = () => {
                                     disabled={!editing}
                                     placeholder="https://linkedin.com/in/yourprofile"
                                     InputProps={{
-                                        startAdornment: <LinkedInIcon sx={{ mr: 1, color: 'action.active' }} />
+                                        startAdornment: <LinkedInIcon sx={{ mr: 1, color: 'action.active' }} />,
                                     }}
                                 />
                             </Grid>
@@ -276,7 +268,7 @@ const StudentProfile = () => {
                                     disabled={!editing}
                                     placeholder="https://github.com/yourusername"
                                     InputProps={{
-                                        startAdornment: <GitHubIcon sx={{ mr: 1, color: 'action.active' }} />
+                                        startAdornment: <GitHubIcon sx={{ mr: 1, color: 'action.active' }} />,
                                     }}
                                 />
                             </Grid>

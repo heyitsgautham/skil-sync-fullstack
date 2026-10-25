@@ -26,7 +26,7 @@ export function fakeBackend(routes) {
         const path = pathOf(url);
         calls.push({ method, path, url, body, params: config?.params });
         const route = routes.find(
-            ([m, pattern]) => m === method && (typeof pattern === 'string' ? pattern === path : pattern.test(path))
+            ([m, pattern]) => m === method && (typeof pattern === 'string' ? pattern === path : pattern.test(path)),
         );
         if (!route) {
             return Promise.reject({ response: { status: 404, data: { detail: `No fake for ${method} ${path}` } } });
@@ -40,7 +40,8 @@ export function fakeBackend(routes) {
     };
 
     METHODS.forEach((method) => {
-        const handler = (url, a, b) => (method === 'get' || method === 'delete' ? respond(method, url, undefined, a) : respond(method, url, a, b));
+        const handler = (url, a, b) =>
+            method === 'get' || method === 'delete' ? respond(method, url, undefined, a) : respond(method, url, a, b);
         vi.spyOn(axios, method).mockImplementation(handler);
         apiClient[method].mockImplementation(handler);
     });
@@ -55,7 +56,7 @@ export function fakeBackend(routes) {
         }
         return respond(method, url, body).then(
             ({ data }) => ({ ok: true, status: 200, json: async () => data, blob: async () => new Blob([]) }),
-            ({ response }) => ({ ok: false, status: response.status, json: async () => response.data })
+            ({ response }) => ({ ok: false, status: response.status, json: async () => response.data }),
         );
     });
 

@@ -16,8 +16,11 @@
     "test:js": "npm run test:coverage -w skill-sync-frontend",
     "test:py": "uv run pytest --cov",
     "lint": "npm run lint:js && npm run lint:py",
-    "lint:js": "npm run lint -w skill-sync-frontend",
+    "lint:js": "npm run lint -w skill-sync-frontend && prettier --check .",
     "lint:py": "uv run ruff check . && uv run ruff format --check .",
-    "format": "uv run ruff format ."
+    "format": "prettier --write . && uv run ruff format ."
+  },
+  "devDependencies": {
+    "prettier": "^3.9.10"
   }
 }

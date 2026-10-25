@@ -57,20 +57,17 @@ const FlaggedCandidatesModal = ({ open, onClose, candidateId, flaggedWith, flagR
             allCandidateIds.add(candidateId);
 
             // Add all candidates flagged with this one
-            Object.values(flaggedWith).forEach(candidatesList => {
-                candidatesList.forEach(id => allCandidateIds.add(id));
+            Object.values(flaggedWith).forEach((candidatesList) => {
+                candidatesList.forEach((id) => allCandidateIds.add(id));
             });
 
             const candidateIdsStr = Array.from(allCandidateIds).join(',');
 
             const token = localStorage.getItem('token');
-            const response = await axios.get(
-                `${API_BASE_URL}/filter/flagged-candidates-details`,
-                {
-                    params: { candidate_ids: candidateIdsStr },
-                    headers: { Authorization: `Bearer ${token}` }
-                }
-            );
+            const response = await axios.get(`${API_BASE_URL}/filter/flagged-candidates-details`, {
+                params: { candidate_ids: candidateIdsStr },
+                headers: { Authorization: `Bearer ${token}` },
+            });
 
             setcandidatesData(response.data.candidates || []);
         } catch (error) {
@@ -102,18 +99,18 @@ const FlaggedCandidatesModal = ({ open, onClose, candidateId, flaggedWith, flagR
 
     const getReasonLabel = (reason) => {
         const labels = {
-            'same_mobile': 'Same Mobile Number',
-            'same_linkedin': 'Same LinkedIn',
-            'same_github': 'Same GitHub'
+            same_mobile: 'Same Mobile Number',
+            same_linkedin: 'Same LinkedIn',
+            same_github: 'Same GitHub',
         };
         return labels[reason] || reason;
     };
 
     const getReasonColor = (reason) => {
         const colors = {
-            'same_mobile': '#f44336',
-            'same_linkedin': '#0077B5',
-            'same_github': '#333'
+            same_mobile: '#f44336',
+            same_linkedin: '#0077B5',
+            same_github: '#333',
         };
         return colors[reason] || '#757575';
     };
@@ -122,21 +119,21 @@ const FlaggedCandidatesModal = ({ open, onClose, candidateId, flaggedWith, flagR
     const groupCandidatesByReason = () => {
         const groups = {};
 
-        flagReasons.forEach(reason => {
+        flagReasons.forEach((reason) => {
             if (!groups[reason]) {
                 groups[reason] = [];
             }
 
             // Find the current candidate data
-            const currentCandidate = candidatesData.find(c => c.candidate_id === candidateId);
+            const currentCandidate = candidatesData.find((c) => c.candidate_id === candidateId);
             if (currentCandidate) {
                 groups[reason].push(currentCandidate);
 
                 // Add candidates flagged with this one for this reason
                 const flaggedWithIds = flaggedWith[reason] || [];
-                flaggedWithIds.forEach(flaggedId => {
-                    const flaggedCandidate = candidatesData.find(c => c.candidate_id === flaggedId);
-                    if (flaggedCandidate && !groups[reason].some(c => c.candidate_id === flaggedId)) {
+                flaggedWithIds.forEach((flaggedId) => {
+                    const flaggedCandidate = candidatesData.find((c) => c.candidate_id === flaggedId);
+                    if (flaggedCandidate && !groups[reason].some((c) => c.candidate_id === flaggedId)) {
                         groups[reason].push(flaggedCandidate);
                     }
                 });
@@ -157,8 +154,8 @@ const FlaggedCandidatesModal = ({ open, onClose, candidateId, flaggedWith, flagR
             PaperProps={{
                 sx: {
                     borderRadius: 2,
-                    maxHeight: '90vh'
-                }
+                    maxHeight: '90vh',
+                },
             }}
         >
             <DialogTitle>
@@ -182,7 +179,8 @@ const FlaggedCandidatesModal = ({ open, onClose, candidateId, flaggedWith, flagR
                                 ⚠️ Duplicate Information Detected
                             </Typography>
                             <Typography variant="body2">
-                                The following candidates share identical contact information, which may indicate duplicate profiles or fraudulent applications.
+                                The following candidates share identical contact information, which may indicate
+                                duplicate profiles or fraudulent applications.
                             </Typography>
                         </Alert>
 
@@ -199,7 +197,7 @@ const FlaggedCandidatesModal = ({ open, onClose, candidateId, flaggedWith, flagR
                                         sx={{
                                             backgroundColor: getReasonColor(reason),
                                             color: 'white',
-                                            fontWeight: 'bold'
+                                            fontWeight: 'bold',
                                         }}
                                     />
                                 </Box>
@@ -208,11 +206,21 @@ const FlaggedCandidatesModal = ({ open, onClose, candidateId, flaggedWith, flagR
                                     <Table>
                                         <TableHead>
                                             <TableRow sx={{ backgroundColor: '#f5f5f5' }}>
-                                                <TableCell><strong>Name</strong></TableCell>
-                                                <TableCell><strong>Email</strong></TableCell>
-                                                <TableCell><strong>Phone</strong></TableCell>
-                                                <TableCell><strong>LinkedIn</strong></TableCell>
-                                                <TableCell><strong>GitHub</strong></TableCell>
+                                                <TableCell>
+                                                    <strong>Name</strong>
+                                                </TableCell>
+                                                <TableCell>
+                                                    <strong>Email</strong>
+                                                </TableCell>
+                                                <TableCell>
+                                                    <strong>Phone</strong>
+                                                </TableCell>
+                                                <TableCell>
+                                                    <strong>LinkedIn</strong>
+                                                </TableCell>
+                                                <TableCell>
+                                                    <strong>GitHub</strong>
+                                                </TableCell>
                                             </TableRow>
                                         </TableHead>
                                         <TableBody>
@@ -220,8 +228,11 @@ const FlaggedCandidatesModal = ({ open, onClose, candidateId, flaggedWith, flagR
                                                 <TableRow
                                                     key={candidate.candidate_id}
                                                     sx={{
-                                                        backgroundColor: candidate.candidate_id === candidateId ? '#fff3e0' : 'transparent',
-                                                        '&:hover': { backgroundColor: '#f5f5f5' }
+                                                        backgroundColor:
+                                                            candidate.candidate_id === candidateId
+                                                                ? '#fff3e0'
+                                                                : 'transparent',
+                                                        '&:hover': { backgroundColor: '#f5f5f5' },
                                                     }}
                                                 >
                                                     <TableCell>
@@ -243,14 +254,19 @@ const FlaggedCandidatesModal = ({ open, onClose, candidateId, flaggedWith, flagR
                                                             <PhoneIcon
                                                                 sx={{
                                                                     fontSize: 16,
-                                                                    color: reason === 'same_mobile' ? '#f44336' : '#666'
+                                                                    color:
+                                                                        reason === 'same_mobile' ? '#f44336' : '#666',
                                                                 }}
                                                             />
                                                             <Typography
                                                                 variant="body2"
                                                                 sx={{
-                                                                    fontWeight: reason === 'same_mobile' ? 'bold' : 'normal',
-                                                                    color: reason === 'same_mobile' ? '#f44336' : 'inherit'
+                                                                    fontWeight:
+                                                                        reason === 'same_mobile' ? 'bold' : 'normal',
+                                                                    color:
+                                                                        reason === 'same_mobile'
+                                                                            ? '#f44336'
+                                                                            : 'inherit',
                                                                 }}
                                                             >
                                                                 {candidate.phone || 'N/A'}
@@ -267,17 +283,23 @@ const FlaggedCandidatesModal = ({ open, onClose, candidateId, flaggedWith, flagR
                                                                     display: 'flex',
                                                                     alignItems: 'center',
                                                                     gap: 0.5,
-                                                                    color: reason === 'same_linkedin' ? '#f44336' : '#0077B5',
-                                                                    fontWeight: reason === 'same_linkedin' ? 'bold' : 'normal',
+                                                                    color:
+                                                                        reason === 'same_linkedin'
+                                                                            ? '#f44336'
+                                                                            : '#0077B5',
+                                                                    fontWeight:
+                                                                        reason === 'same_linkedin' ? 'bold' : 'normal',
                                                                     textDecoration: 'none',
-                                                                    '&:hover': { textDecoration: 'underline' }
+                                                                    '&:hover': { textDecoration: 'underline' },
                                                                 }}
                                                             >
                                                                 <LinkedInIcon sx={{ fontSize: 16 }} />
                                                                 View Profile
                                                             </Link>
                                                         ) : (
-                                                            <Typography variant="body2" color="text.secondary">N/A</Typography>
+                                                            <Typography variant="body2" color="text.secondary">
+                                                                N/A
+                                                            </Typography>
                                                         )}
                                                     </TableCell>
                                                     <TableCell>
@@ -290,17 +312,21 @@ const FlaggedCandidatesModal = ({ open, onClose, candidateId, flaggedWith, flagR
                                                                     display: 'flex',
                                                                     alignItems: 'center',
                                                                     gap: 0.5,
-                                                                    color: reason === 'same_github' ? '#f44336' : '#333',
-                                                                    fontWeight: reason === 'same_github' ? 'bold' : 'normal',
+                                                                    color:
+                                                                        reason === 'same_github' ? '#f44336' : '#333',
+                                                                    fontWeight:
+                                                                        reason === 'same_github' ? 'bold' : 'normal',
                                                                     textDecoration: 'none',
-                                                                    '&:hover': { textDecoration: 'underline' }
+                                                                    '&:hover': { textDecoration: 'underline' },
                                                                 }}
                                                             >
                                                                 <GitHubIcon sx={{ fontSize: 16 }} />
                                                                 View Profile
                                                             </Link>
                                                         ) : (
-                                                            <Typography variant="body2" color="text.secondary">N/A</Typography>
+                                                            <Typography variant="body2" color="text.secondary">
+                                                                N/A
+                                                            </Typography>
                                                         )}
                                                     </TableCell>
                                                 </TableRow>
@@ -309,9 +335,7 @@ const FlaggedCandidatesModal = ({ open, onClose, candidateId, flaggedWith, flagR
                                     </Table>
                                 </TableContainer>
 
-                                {groupIndex < Object.keys(groupedCandidates).length - 1 && (
-                                    <Divider sx={{ my: 3 }} />
-                                )}
+                                {groupIndex < Object.keys(groupedCandidates).length - 1 && <Divider sx={{ my: 3 }} />}
                             </Box>
                         ))}
                     </>

@@ -1,20 +1,11 @@
 import React from 'react';
-import {
-    Box,
-    FormControl,
-    Select,
-    MenuItem,
-    ToggleButtonGroup,
-    ToggleButton,
-    Paper,
-    Typography,
-} from '@mui/material';
+import { Box, FormControl, Select, MenuItem, ToggleButtonGroup, ToggleButton, Paper, Typography } from '@mui/material';
 import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 
 /**
  * Reusable Sort Controls Component
- * 
+ *
  * @param {Object} props
  * @param {String} props.sortBy - Current sort field
  * @param {String} props.sortOrder - Current sort order (asc/desc)

@@ -24,7 +24,7 @@ import { API_BASE_URL } from '../services/apiConfig';
 const SendEmailModal = ({ open, onClose, selectedCandidates, internshipTitle, internshipId, onSendComplete }) => {
     const [subject, setSubject] = useState(`Congratulations! Next Round - ${internshipTitle}`);
     const [message, setMessage] = useState(
-        `We are pleased to inform you that you have been selected for the next round of our recruitment process.\n\nWe were impressed with your profile and believe you would be a great fit for this position. We will reach out to you shortly with further details about the next steps.\n\nLooking forward to meeting you!\n\nBest regards`
+        `We are pleased to inform you that you have been selected for the next round of our recruitment process.\n\nWe were impressed with your profile and believe you would be a great fit for this position. We will reach out to you shortly with further details about the next steps.\n\nLooking forward to meeting you!\n\nBest regards`,
     );
     const [sending, setSending] = useState(false);
     const [sendResult, setSendResult] = useState(null);
@@ -39,14 +39,14 @@ const SendEmailModal = ({ open, onClose, selectedCandidates, internshipTitle, in
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
+                    Authorization: `Bearer ${token}`,
                 },
                 body: JSON.stringify({
                     internship_id: internshipId,
-                    candidate_ids: selectedCandidates.map(c => c.student_id),
+                    candidate_ids: selectedCandidates.map((c) => c.student_id),
                     subject: subject,
-                    message: message
-                })
+                    message: message,
+                }),
             });
 
             const data = await response.json();
@@ -54,7 +54,7 @@ const SendEmailModal = ({ open, onClose, selectedCandidates, internshipTitle, in
             if (response.ok) {
                 setSendResult({
                     success: true,
-                    data: data
+                    data: data,
                 });
 
                 // Call the callback after successful send
@@ -66,14 +66,14 @@ const SendEmailModal = ({ open, onClose, selectedCandidates, internshipTitle, in
             } else {
                 setSendResult({
                     success: false,
-                    error: data.detail || 'Failed to send emails'
+                    error: data.detail || 'Failed to send emails',
                 });
             }
         } catch (error) {
             console.error('Error sending emails:', error);
             setSendResult({
                 success: false,
-                error: 'Network error: Failed to send emails'
+                error: 'Network error: Failed to send emails',
             });
         } finally {
             setSending(false);
@@ -83,7 +83,9 @@ const SendEmailModal = ({ open, onClose, selectedCandidates, internshipTitle, in
     const handleClose = () => {
         if (!sending) {
             setSubject(`Congratulations! Next Round - ${internshipTitle}`);
-            setMessage(`We are pleased to inform you that you have been selected for the next round of our recruitment process.\n\nWe were impressed with your profile and believe you would be a great fit for this position. We will reach out to you shortly with further details about the next steps.\n\nLooking forward to meeting you!\n\nBest regards`);
+            setMessage(
+                `We are pleased to inform you that you have been selected for the next round of our recruitment process.\n\nWe were impressed with your profile and believe you would be a great fit for this position. We will reach out to you shortly with further details about the next steps.\n\nLooking forward to meeting you!\n\nBest regards`,
+            );
             setSendResult(null);
             onClose();
         }
@@ -98,17 +100,19 @@ const SendEmailModal = ({ open, onClose, selectedCandidates, internshipTitle, in
             PaperProps={{
                 sx: {
                     borderRadius: 2,
-                    maxHeight: '90vh'
-                }
+                    maxHeight: '90vh',
+                },
             }}
         >
-            <DialogTitle sx={{
-                background: 'linear-gradient(135deg, #4caf50 0%, #45a049 100%)',
-                color: 'white',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between'
-            }}>
+            <DialogTitle
+                sx={{
+                    background: 'linear-gradient(135deg, #4caf50 0%, #45a049 100%)',
+                    color: 'white',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                }}
+            >
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                     <SendIcon />
                     <Typography variant="h6" fontWeight="bold">
@@ -120,7 +124,7 @@ const SendEmailModal = ({ open, onClose, selectedCandidates, internshipTitle, in
                     sx={{
                         backgroundColor: 'white',
                         color: '#4caf50',
-                        fontWeight: 'bold'
+                        fontWeight: 'bold',
                     }}
                 />
             </DialogTitle>
@@ -131,13 +135,16 @@ const SendEmailModal = ({ open, onClose, selectedCandidates, internshipTitle, in
                     <Typography variant="subtitle2" fontWeight="bold" gutterBottom>
                         Recipients:
                     </Typography>
-                    <List dense sx={{
-                        maxHeight: 150,
-                        overflow: 'auto',
-                        bgcolor: '#f5f5f5',
-                        borderRadius: 1,
-                        p: 1
-                    }}>
+                    <List
+                        dense
+                        sx={{
+                            maxHeight: 150,
+                            overflow: 'auto',
+                            bgcolor: '#f5f5f5',
+                            borderRadius: 1,
+                            p: 1,
+                        }}
+                    >
                         {selectedCandidates.map((candidate) => (
                             <ListItem key={candidate.candidate_id}>
                                 <ListItemText
@@ -177,7 +184,7 @@ const SendEmailModal = ({ open, onClose, selectedCandidates, internshipTitle, in
                 {/* Send Result */}
                 {sendResult && (
                     <Alert
-                        severity={sendResult.success ? "success" : "error"}
+                        severity={sendResult.success ? 'success' : 'error'}
                         icon={sendResult.success ? <CheckCircleIcon /> : <ErrorIcon />}
                         sx={{ mt: 2 }}
                     >
@@ -193,20 +200,14 @@ const SendEmailModal = ({ open, onClose, selectedCandidates, internshipTitle, in
                                 )}
                             </Box>
                         ) : (
-                            <Typography variant="body2">
-                                {sendResult.error}
-                            </Typography>
+                            <Typography variant="body2">{sendResult.error}</Typography>
                         )}
                     </Alert>
                 )}
             </DialogContent>
 
             <DialogActions sx={{ p: 2, pt: 0 }}>
-                <Button
-                    onClick={handleClose}
-                    disabled={sending}
-                    startIcon={<CloseIcon />}
-                >
+                <Button onClick={handleClose} disabled={sending} startIcon={<CloseIcon />}>
                     {sendResult?.success ? 'Close' : 'Cancel'}
                 </Button>
                 {!sendResult?.success && (
@@ -219,10 +220,12 @@ const SendEmailModal = ({ open, onClose, selectedCandidates, internshipTitle, in
                             background: 'linear-gradient(135deg, #4caf50 0%, #45a049 100%)',
                             '&:hover': {
                                 background: 'linear-gradient(135deg, #45a049 0%, #388e3c 100%)',
-                            }
+                            },
                         }}
                     >
-                        {sending ? 'Sending...' : `Send to ${selectedCandidates.length} Candidate${selectedCandidates.length > 1 ? 's' : ''}`}
+                        {sending
+                            ? 'Sending...'
+                            : `Send to ${selectedCandidates.length} Candidate${selectedCandidates.length > 1 ? 's' : ''}`}
                     </Button>
                 )}
             </DialogActions>

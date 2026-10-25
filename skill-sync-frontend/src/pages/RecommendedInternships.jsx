@@ -1,17 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import {
-    Container,
-    Box,
-    Typography,
-    Paper,
-    Card,
-    CardContent,
-    Button,
-    Alert,
-    Grid,
-    Divider,
-} from '@mui/material';
+import { Container, Box, Typography, Paper, Card, CardContent, Button, Alert, Grid, Divider } from '@mui/material';
 import WorkIcon from '@mui/icons-material/Work';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
@@ -80,82 +69,86 @@ const RecommendedInternships = () => {
     }, [page, pageSize, filters, sortBy, sortOrder, setSearchParams]);
 
     // Client-side filtering function
-    const applyFilters = useCallback((items) => {
-        if (!items || items.length === 0) return [];
+    const applyFilters = useCallback(
+        (items) => {
+            if (!items || items.length === 0) return [];
 
-        return items.filter(item => {
-            // Match score filter
-            const score = item.match_score || 0;
-            if (score < filters.minScore || score > filters.maxScore) {
-                return false;
-            }
+            return items.filter((item) => {
+                // Match score filter
+                const score = item.match_score || 0;
+                if (score < filters.minScore || score > filters.maxScore) {
+                    return false;
+                }
 
-            // Skills filter (at least one required skill matches)
-            if (filters.skills.length > 0) {
-                const hasMatchingSkill = item.required_skills?.some(skill =>
-                    filters.skills.includes(skill)
-                );
-                if (!hasMatchingSkill) return false;
-            }
+                // Skills filter (at least one required skill matches)
+                if (filters.skills.length > 0) {
+                    const hasMatchingSkill = item.required_skills?.some((skill) => filters.skills.includes(skill));
+                    if (!hasMatchingSkill) return false;
+                }
 
-            // Location filter (case-insensitive partial match)
-            if (filters.location) {
-                const locationMatch = item.location?.toLowerCase().includes(filters.location.toLowerCase());
-                if (!locationMatch) return false;
-            }
+                // Location filter (case-insensitive partial match)
+                if (filters.location) {
+                    const locationMatch = item.location?.toLowerCase().includes(filters.location.toLowerCase());
+                    if (!locationMatch) return false;
+                }
 
-            // Experience level filter
-            if (filters.experienceLevel) {
-                if (item.experience_level !== filters.experienceLevel) return false;
-            }
+                // Experience level filter
+                if (filters.experienceLevel) {
+                    if (item.experience_level !== filters.experienceLevel) return false;
+                }
 
-            // Days posted filter
-            if (filters.daysPosted) {
-                const postedDate = new Date(item.posted_date);
-                const daysAgo = Math.floor((new Date() - postedDate) / (1000 * 60 * 60 * 24));
-                const maxDays = parseInt(filters.daysPosted);
-                if (daysAgo > maxDays) return false;
-            }
+                // Days posted filter
+                if (filters.daysPosted) {
+                    const postedDate = new Date(item.posted_date);
+                    const daysAgo = Math.floor((new Date() - postedDate) / (1000 * 60 * 60 * 24));
+                    const maxDays = parseInt(filters.daysPosted);
+                    if (daysAgo > maxDays) return false;
+                }
 
-            return true;
-        });
-    }, [filters]);
+                return true;
+            });
+        },
+        [filters],
+    );
 
     // Client-side sorting function
-    const applySorting = useCallback((items) => {
-        if (!items || items.length === 0) return [];
+    const applySorting = useCallback(
+        (items) => {
+            if (!items || items.length === 0) return [];
 
-        const sorted = [...items].sort((a, b) => {
-            let aValue, bValue;
+            const sorted = [...items].sort((a, b) => {
+                let aValue, bValue;
 
-            switch (sortBy) {
-                case 'score':
-                    aValue = a.match_score || 0;
-                    bValue = b.match_score || 0;
-                    break;
-                case 'date':
-                    aValue = new Date(a.posted_date);
-                    bValue = new Date(b.posted_date);
-                    break;
-                case 'title':
-                    aValue = a.title?.toLowerCase() || '';
-                    bValue = b.title?.toLowerCase() || '';
-                    break;
-                default:
-                    aValue = a.match_score || 0;
-                    bValue = b.match_score || 0;
-            }
+                switch (sortBy) {
+                    case 'score':
+                        aValue = a.match_score || 0;
+                        bValue = b.match_score || 0;
+                        break;
+                    case 'date':
+                        aValue = new Date(a.posted_date);
+                        bValue = new Date(b.posted_date);
+                        break;
+                    case 'title':
+                        aValue = a.title?.toLowerCase() || '';
+                        bValue = b.title?.toLowerCase() || '';
+                        break;
+                    default:
+                        aValue = a.match_score || 0;
+                        bValue = b.match_score || 0;
+                }
 
-            // Apply sort order
-            if (sortOrder === 'asc') {
-                return aValue > bValue ? 1 : aValue < bValue ? -1 : 0;
-            } else {
-                return aValue < bValue ? 1 : aValue > bValue ? -1 : 0;
-            }
-        });
+                // Apply sort order
+                if (sortOrder === 'asc') {
+                    return aValue > bValue ? 1 : aValue < bValue ? -1 : 0;
+                } else {
+                    return aValue < bValue ? 1 : aValue > bValue ? -1 : 0;
+                }
+            });
 
-        return sorted;
-    }, [sortBy, sortOrder]);
+            return sorted;
+        },
+        [sortBy, sortOrder],
+    );
 
     const fetchRecommendations = async () => {
         try {
@@ -167,7 +160,7 @@ const RecommendedInternships = () => {
             // Call the internship match endpoint (old working endpoint)
             // Fetch max allowed recommendations, then filter/sort client-side
             const response = await apiClient.get('/internship/match', {
-                params: { top_k: 50 } // Max allowed by endpoint
+                params: { top_k: 50 }, // Max allowed by endpoint
             });
 
             console.log('Recommendations response:', response.data);
@@ -191,13 +184,15 @@ const RecommendedInternships = () => {
 
             // Extract unique skills for filter options
             const skills = new Set();
-            allItems.forEach(item => {
-                item.required_skills?.forEach(skill => skills.add(skill));
+            allItems.forEach((item) => {
+                item.required_skills?.forEach((skill) => skills.add(skill));
             });
             setAvailableSkills(Array.from(skills).sort());
 
             if (allItems.length === 0) {
-                console.log('No recommendations found. Student may need to upload resume or matches need to be computed.');
+                console.log(
+                    'No recommendations found. Student may need to upload resume or matches need to be computed.',
+                );
             } else if (paginatedItems.length === 0 && sortedItems.length > 0) {
                 console.log('No results on this page. Adjusting to page 1.');
                 setPage(1); // Reset to first page if current page is empty
@@ -217,7 +212,7 @@ const RecommendedInternships = () => {
                 // If detail is an array (validation errors), format it
                 if (Array.isArray(err.response.data.detail)) {
                     errorMessage = err.response.data.detail
-                        .map(e => e.msg || e.message || JSON.stringify(e))
+                        .map((e) => e.msg || e.message || JSON.stringify(e))
                         .join(', ');
                 } else if (typeof err.response.data.detail === 'string') {
                     errorMessage = err.response.data.detail;
@@ -257,7 +252,6 @@ const RecommendedInternships = () => {
         setRecommendations(paginatedItems);
         setTotal(sortedItems.length);
         setTotalPages(Math.ceil(sortedItems.length / pageSize));
-
     }, [allRecommendations, applyFilters, applySorting, page, pageSize]);
 
     const handleFilterChange = (newFilters) => {
@@ -380,11 +374,7 @@ const RecommendedInternships = () => {
                             showDaysPosted={true}
                         />
 
-                        <SortControls
-                            sortBy={sortBy}
-                            sortOrder={sortOrder}
-                            onSortChange={handleSortChange}
-                        />
+                        <SortControls sortBy={sortBy} sortOrder={sortOrder} onSortChange={handleSortChange} />
                     </>
                 )}
 
@@ -405,7 +395,8 @@ const RecommendedInternships = () => {
                                 width: 120,
                                 height: 120,
                                 borderRadius: '50%',
-                                background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(29, 78, 216, 0.1) 100%)',
+                                background:
+                                    'linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(29, 78, 216, 0.1) 100%)',
                                 display: 'flex',
                                 alignItems: 'center',
                                 justifyContent: 'center',
@@ -420,13 +411,16 @@ const RecommendedInternships = () => {
                         <Typography variant="body1" color="text.secondary" sx={{ mb: 2, maxWidth: 600, mx: 'auto' }}>
                             {allRecommendations.length === 0
                                 ? "We're still processing internship matches for your profile. This usually takes a few moments."
-                                : "No internships match your current filter criteria. Try adjusting your filters to see more results."
-                            }
+                                : 'No internships match your current filter criteria. Try adjusting your filters to see more results.'}
                         </Typography>
                         {allRecommendations.length === 0 && (
-                            <Typography variant="body2" color="text.secondary" sx={{ mb: 4, maxWidth: 600, mx: 'auto', fontStyle: 'italic' }}>
-                                If you haven't uploaded your resume yet, click the button below to get started.
-                                If you've already uploaded it, matches should appear shortly!
+                            <Typography
+                                variant="body2"
+                                color="text.secondary"
+                                sx={{ mb: 4, maxWidth: 600, mx: 'auto', fontStyle: 'italic' }}
+                            >
+                                If you haven't uploaded your resume yet, click the button below to get started. If
+                                you've already uploaded it, matches should appear shortly!
                             </Typography>
                         )}
                         <Box sx={{ display: 'flex', gap: 2, justifyContent: 'center', flexWrap: 'wrap' }}>
@@ -514,7 +508,7 @@ const RecommendedInternships = () => {
                                         transition={{
                                             duration: 0.5,
                                             delay: index * 0.1,
-                                            ease: "easeOut"
+                                            ease: 'easeOut',
                                         }}
                                         style={{ width: '100%' }}
                                     >
@@ -531,18 +525,27 @@ const RecommendedInternships = () => {
                                                 '&:hover': {
                                                     transform: 'translateY(-8px)',
                                                     boxShadow: '0 16px 48px rgba(0,0,0,0.12)',
-                                                }
+                                                },
                                             }}
                                         >
                                             <CardContent sx={{ p: 4 }}>
-                                                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 3, gap: 3 }}>
+                                                <Box
+                                                    sx={{
+                                                        display: 'flex',
+                                                        justifyContent: 'space-between',
+                                                        alignItems: 'flex-start',
+                                                        mb: 3,
+                                                        gap: 3,
+                                                    }}
+                                                >
                                                     <Box sx={{ display: 'flex', alignItems: 'center', flex: 1 }}>
                                                         <Box
                                                             sx={{
                                                                 width: 56,
                                                                 height: 56,
                                                                 borderRadius: 2,
-                                                                background: 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)',
+                                                                background:
+                                                                    'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)',
                                                                 display: 'flex',
                                                                 alignItems: 'center',
                                                                 justifyContent: 'center',
@@ -603,7 +606,9 @@ const RecommendedInternships = () => {
                                                     {internship.location && (
                                                         <Grid size={{ xs: 12, sm: 6, md: 3 }}>
                                                             <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                                                                <LocationOnIcon sx={{ mr: 1, color: 'action.active' }} />
+                                                                <LocationOnIcon
+                                                                    sx={{ mr: 1, color: 'action.active' }}
+                                                                />
                                                                 <Typography variant="body2">
                                                                     {internship.location}
                                                                 </Typography>
@@ -613,7 +618,9 @@ const RecommendedInternships = () => {
                                                     {internship.duration && (
                                                         <Grid size={{ xs: 12, sm: 6, md: 3 }}>
                                                             <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                                                                <AccessTimeIcon sx={{ mr: 1, color: 'action.active' }} />
+                                                                <AccessTimeIcon
+                                                                    sx={{ mr: 1, color: 'action.active' }}
+                                                                />
                                                                 <Typography variant="body2">
                                                                     {internship.duration}
                                                                 </Typography>
@@ -623,7 +630,9 @@ const RecommendedInternships = () => {
                                                     {internship.stipend && (
                                                         <Grid size={{ xs: 12, sm: 6, md: 3 }}>
                                                             <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                                                                <AttachMoneyIcon sx={{ mr: 1, color: 'action.active' }} />
+                                                                <AttachMoneyIcon
+                                                                    sx={{ mr: 1, color: 'action.active' }}
+                                                                />
                                                                 <Typography variant="body2">
                                                                     {internship.stipend}
                                                                 </Typography>
@@ -657,7 +666,8 @@ const RecommendedInternships = () => {
                             p: 3,
                             mt: 4,
                             borderRadius: 4,
-                            background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(29, 78, 216, 0.1) 100%)',
+                            background:
+                                'linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(29, 78, 216, 0.1) 100%)',
                             border: '1px solid rgba(59, 130, 246, 0.2)',
                         }}
                     >
@@ -675,11 +685,13 @@ const RecommendedInternships = () => {
                                     flexShrink: 0,
                                 }}
                             >
-                                <Typography variant="h5" sx={{ color: 'white' }}>💡</Typography>
+                                <Typography variant="h5" sx={{ color: 'white' }}>
+                                    💡
+                                </Typography>
                             </Box>
                             <Typography variant="body1" sx={{ color: '#1a1a1a', fontWeight: 500 }}>
-                                <strong>Pro Tip:</strong> Keep your resume updated to get better recommendations.
-                                The more detailed your skills and experience, the better we can match you!
+                                <strong>Pro Tip:</strong> Keep your resume updated to get better recommendations. The
+                                more detailed your skills and experience, the better we can match you!
                             </Typography>
                         </Box>
                     </Paper>

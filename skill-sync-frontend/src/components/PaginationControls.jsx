@@ -1,17 +1,9 @@
 import React from 'react';
-import {
-    Box,
-    Pagination,
-    FormControl,
-    Select,
-    MenuItem,
-    Typography,
-    Paper,
-} from '@mui/material';
+import { Box, Pagination, FormControl, Select, MenuItem, Typography, Paper } from '@mui/material';
 
 /**
  * Reusable Pagination Controls Component
- * 
+ *
  * @param {Object} props
  * @param {Number} props.page - Current page number
  * @param {Number} props.totalPages - Total number of pages
@@ -51,8 +43,8 @@ const PaginationControls = ({
             {/* Items count */}
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                 <Typography variant="body2" color="text.secondary">
-                    Showing <strong>{startItem}</strong> to <strong>{endItem}</strong> of{' '}
-                    <strong>{total}</strong> results
+                    Showing <strong>{startItem}</strong> to <strong>{endItem}</strong> of <strong>{total}</strong>{' '}
+                    results
                 </Typography>
 
                 {/* Page size selector */}

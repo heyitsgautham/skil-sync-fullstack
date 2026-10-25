@@ -51,7 +51,6 @@ export default function useIntelligentRanking() {
     // Track if all are expanded
     const [allExpanded, setAllExpanded] = useState(false);
 
-
     useEffect(() => {
         fetchInternships();
     }, []);
@@ -74,13 +73,13 @@ export default function useIntelligentRanking() {
         try {
             const token = localStorage.getItem('token');
             const response = await axios.get(`${API_BASE_URL}/internship/my-posts`, {
-                headers: { Authorization: `Bearer ${token}` }
+                headers: { Authorization: `Bearer ${token}` },
             });
 
             // Ensure internship_id exists, otherwise use id as fallback
-            const processedInternships = (response.data || []).map(internship => ({
+            const processedInternships = (response.data || []).map((internship) => ({
                 ...internship,
-                internship_id: internship.internship_id || internship.id
+                internship_id: internship.internship_id || internship.id,
             }));
             setInternships(processedInternships);
         } catch (error) {
@@ -95,7 +94,7 @@ export default function useIntelligentRanking() {
         try {
             const token = localStorage.getItem('token');
             const response = await axios.get(`${API_BASE_URL}/internship/${internshipId}`, {
-                headers: { Authorization: `Bearer ${token}` }
+                headers: { Authorization: `Bearer ${token}` },
             });
 
             if (response.data) {
@@ -130,11 +129,11 @@ export default function useIntelligentRanking() {
             // Build query parameters
             const params = new URLSearchParams({
                 limit: '50',
-                only_applicants: onlyApplicants.toString()
+                only_applicants: onlyApplicants.toString(),
             });
 
             // Add filter parameters
-            Object.keys(filters).forEach(key => {
+            Object.keys(filters).forEach((key) => {
                 const value = filters[key];
                 // Handle boolean values explicitly
                 if (typeof value === 'boolean') {
@@ -147,7 +146,7 @@ export default function useIntelligentRanking() {
             const response = await axios.post(
                 `${API_BASE_URL}/filter/rank-candidates/${selectedInternship}?${params.toString()}`,
                 {},
-                { headers: { Authorization: `Bearer ${token}` } }
+                { headers: { Authorization: `Bearer ${token}` } },
             );
 
             setRankedCandidates(response.data.ranked_candidates || []);
@@ -170,14 +169,18 @@ export default function useIntelligentRanking() {
             setExpandedAccordions(initialState);
 
             if (response.data.ranked_candidates?.length > 0) {
-                const filterInfo = response.data.filters_applied?.length > 0
-                    ? ` (${response.data.filters_applied.length} filters applied)`
-                    : '';
-                toast.success(`✨ Ranked ${response.data.ranked_candidates.length} candidates successfully!${filterInfo}`);
+                const filterInfo =
+                    response.data.filters_applied?.length > 0
+                        ? ` (${response.data.filters_applied.length} filters applied)`
+                        : '';
+                toast.success(
+                    `✨ Ranked ${response.data.ranked_candidates.length} candidates successfully!${filterInfo}`,
+                );
             } else {
-                const message = response.data.total_candidates === 0
-                    ? 'No candidates found with uploaded resumes'
-                    : 'No matching candidates found for this internship';
+                const message =
+                    response.data.total_candidates === 0
+                        ? 'No candidates found with uploaded resumes'
+                        : 'No matching candidates found for this internship';
                 toast(message, { icon: 'ℹ️' });
             }
         } catch (error) {
@@ -209,13 +212,10 @@ export default function useIntelligentRanking() {
             const token = localStorage.getItem('token');
 
             // First, get resume metadata
-            const metadataResponse = await axios.get(
-                `${API_BASE_URL}/recommendations/resume/${studentId}`,
-                {
-                    headers: { Authorization: `Bearer ${token}` },
-                    params: { internship_id: selectedInternship }
-                }
-            );
+            const metadataResponse = await axios.get(`${API_BASE_URL}/recommendations/resume/${studentId}`, {
+                headers: { Authorization: `Bearer ${token}` },
+                params: { internship_id: selectedInternship },
+            });
 
             const { anonymized, storage_type, url } = metadataResponse.data;
             const isAnonymized = anonymized === true;
@@ -234,7 +234,7 @@ export default function useIntelligentRanking() {
 
             const pdfResponse = await axios.get(url, {
                 headers: { Authorization: `Bearer ${token}` },
-                responseType: 'blob' // Important: get binary data
+                responseType: 'blob', // Important: get binary data
             });
 
             // Create blob URL and open in new tab
@@ -284,20 +284,17 @@ export default function useIntelligentRanking() {
             const token = localStorage.getItem('token');
             const exportType = 'filtered'; // Export all filtered results
 
-            const response = await axios.get(
-                `${API_BASE_URL}/filter/export-candidates/${selectedInternship}`,
-                {
-                    params: {
-                        format: format,
-                        export_type: exportType,
-                        only_applicants: false
-                    },
-                    headers: {
-                        Authorization: `Bearer ${token}`
-                    },
-                    responseType: 'blob'
-                }
-            );
+            const response = await axios.get(`${API_BASE_URL}/filter/export-candidates/${selectedInternship}`, {
+                params: {
+                    format: format,
+                    export_type: exportType,
+                    only_applicants: false,
+                },
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+                responseType: 'blob',
+            });
 
             // Create download link
             const url = window.URL.createObjectURL(new Blob([response.data]));
@@ -365,10 +362,10 @@ export default function useIntelligentRanking() {
 
     // Email sending handlers
     const handleToggleCandidateSelection = (candidate) => {
-        setSelectedCandidates(prev => {
-            const isSelected = prev.some(c => c.candidate_id === candidate.candidate_id);
+        setSelectedCandidates((prev) => {
+            const isSelected = prev.some((c) => c.candidate_id === candidate.candidate_id);
             if (isSelected) {
-                return prev.filter(c => c.candidate_id !== candidate.candidate_id);
+                return prev.filter((c) => c.candidate_id !== candidate.candidate_id);
             } else {
                 return [...prev, candidate];
             }

@@ -14,7 +14,17 @@ import {
 import TrendingUpIcon from '@mui/icons-material/TrendingUp';
 
 /** Internship picker and the Rank Candidates button. */
-const InternshipSelector = ({ internships, selectedInternship, setSelectedInternship, setSelectedInternshipData, loading, loadingInternships, activeFilters, fetchInternshipSkills, handleRankCandidates }) => (
+const InternshipSelector = ({
+    internships,
+    selectedInternship,
+    setSelectedInternship,
+    setSelectedInternshipData,
+    loading,
+    loadingInternships,
+    activeFilters,
+    fetchInternshipSkills,
+    handleRankCandidates,
+}) => (
     <Paper sx={{ p: 2.5, mb: 3, borderRadius: 2 }}>
         <Grid container spacing={2} alignItems="center">
             <Grid size={{ xs: 12, md: 9 }}>
@@ -26,7 +36,7 @@ const InternshipSelector = ({ internships, selectedInternship, setSelectedIntern
                         onChange={(e) => {
                             const value = e.target.value || '';
                             setSelectedInternship(value);
-                            const internshipData = internships.find(i => i.internship_id === value);
+                            const internshipData = internships.find((i) => i.internship_id === value);
                             setSelectedInternshipData(internshipData);
                             if (value) {
                                 fetchInternshipSkills(value);
@@ -50,7 +60,7 @@ const InternshipSelector = ({ internships, selectedInternship, setSelectedIntern
                                     py: 1.5,
                                     '&:hover': {
                                         backgroundColor: 'rgba(25, 118, 210, 0.08)',
-                                    }
+                                    },
                                 }}
                             >
                                 <Box>

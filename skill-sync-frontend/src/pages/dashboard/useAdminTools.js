@@ -28,7 +28,7 @@ export default function useAdminTools(role) {
             const response = await fetch(`${API_BASE_URL}/admin/recompute-embeddings`, {
                 method: 'POST',
                 headers: {
-                    'Authorization': `Bearer ${authService.getToken()}`,
+                    Authorization: `Bearer ${authService.getToken()}`,
                     'Content-Type': 'application/json',
                 },
             });
@@ -65,7 +65,7 @@ export default function useAdminTools(role) {
             const response = await fetch(`${API_BASE_URL}/admin/clear-chromadb`, {
                 method: 'POST',
                 headers: {
-                    'Authorization': `Bearer ${authService.getToken()}`,
+                    Authorization: `Bearer ${authService.getToken()}`,
                     'Content-Type': 'application/json',
                 },
             });
@@ -104,7 +104,7 @@ export default function useAdminTools(role) {
             const response = await fetch(`${API_BASE_URL}/admin/reindex-all-students`, {
                 method: 'POST',
                 headers: {
-                    'Authorization': `Bearer ${authService.getToken()}`,
+                    Authorization: `Bearer ${authService.getToken()}`,
                     'Content-Type': 'application/json',
                 },
             });
@@ -147,7 +147,7 @@ export default function useAdminTools(role) {
             const response = await fetch(`${API_BASE_URL}/admin/system-status`, {
                 method: 'GET',
                 headers: {
-                    'Authorization': `Bearer ${authService.getToken()}`,
+                    Authorization: `Bearer ${authService.getToken()}`,
                     'Content-Type': 'application/json',
                 },
             });

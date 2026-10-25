@@ -10,7 +10,7 @@ const AnimatedCounter = ({ value, duration = 2, prefix = '', suffix = '', ...pro
     useEffect(() => {
         const controls = animate(count, value, {
             duration: duration,
-            ease: "easeOut",
+            ease: 'easeOut',
         });
 
         const unsubscribe = rounded.onChange((latest) => {
@@ -25,7 +25,9 @@ const AnimatedCounter = ({ value, duration = 2, prefix = '', suffix = '', ...pro
 
     return (
         <Typography {...props}>
-            {prefix}{displayValue}{suffix}
+            {prefix}
+            {displayValue}
+            {suffix}
         </Typography>
     );
 };

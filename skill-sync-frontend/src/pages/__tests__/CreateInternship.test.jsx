@@ -33,7 +33,11 @@ const fillBasics = () => {
 
 test('extracts skills, lets the company edit them, and posts the internship', async () => {
     const calls = fakeBackend([
-        ['post', '/internship/extract-skills', { required_skills: ['Python', 'FastAPI'], preferred_skills: ['Docker'] }],
+        [
+            'post',
+            '/internship/extract-skills',
+            { required_skills: ['Python', 'FastAPI'], preferred_skills: ['Docker'] },
+        ],
         ['post', '/internship/post', { id: 9 }],
     ]);
     renderAt(<CreateInternship />, '/internships/create');
@@ -75,7 +79,13 @@ test('a document upload fills the title and description', async () => {
         [
             'post',
             '/internship/parse-document',
-            { title: 'Data Intern', description: 'Clean data with SQL', location: 'Pune', required_skills: ['SQL'], preferred_skills: [] },
+            {
+                title: 'Data Intern',
+                description: 'Clean data with SQL',
+                location: 'Pune',
+                required_skills: ['SQL'],
+                preferred_skills: [],
+            },
         ],
     ]);
     const { container } = renderAt(<CreateInternship />, '/internships/create');

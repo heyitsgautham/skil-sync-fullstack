@@ -1,6 +1,6 @@
 /**
  * InternshipApplicationDialog Component
- * 
+ *
  * Provides a dialog for students to apply to internships with:
  * - Cover letter input
  * - Option to upload tailored resume
@@ -83,15 +83,11 @@ const InternshipApplicationDialog = ({ open, onClose, internship, onSuccess }) =
                 formData.append('tailored_resume', tailoredResumeFile);
             }
 
-            const response = await apiClient.post(
-                `/internship/${internship.id}/apply`,
-                formData,
-                {
-                    headers: {
-                        'Content-Type': 'multipart/form-data',
-                    },
-                }
-            );
+            const response = await apiClient.post(`/internship/${internship.id}/apply`, formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            });
 
             // Show success message with match score
             const matchScore = response.data.application_similarity_score || response.data.match_score;
@@ -134,15 +130,17 @@ const InternshipApplicationDialog = ({ open, onClose, internship, onSuccess }) =
                 sx: {
                     borderRadius: 4,
                     boxShadow: '0 24px 48px rgba(0,0,0,0.2)',
-                }
+                },
             }}
         >
-            <DialogTitle sx={{
-                pb: 1,
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-            }}>
+            <DialogTitle
+                sx={{
+                    pb: 1,
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                }}
+            >
                 <Box>
                     <Typography variant="h5" sx={{ fontWeight: 700, color: '#667eea' }}>
                         Apply to Internship
@@ -183,7 +181,7 @@ const InternshipApplicationDialog = ({ open, onClose, internship, onSuccess }) =
                                     color: '#667eea',
                                     '&.Mui-checked': {
                                         color: '#667eea',
-                                    }
+                                    },
                                 }}
                             />
                         }
@@ -217,7 +215,7 @@ const InternshipApplicationDialog = ({ open, onClose, internship, onSuccess }) =
                                         '&:hover': {
                                             borderColor: '#764ba2',
                                             backgroundColor: 'rgba(102, 126, 234, 0.05)',
-                                        }
+                                        },
                                     }}
                                 >
                                     Choose File
@@ -238,7 +236,7 @@ const InternshipApplicationDialog = ({ open, onClose, internship, onSuccess }) =
                                         maxWidth: '100%',
                                         '& .MuiChip-label': {
                                             maxWidth: 'calc(100% - 64px)',
-                                        }
+                                        },
                                     }}
                                 />
                             )}
@@ -265,8 +263,7 @@ const InternshipApplicationDialog = ({ open, onClose, internship, onSuccess }) =
                         • Your application will be reviewed by the company
                         <br />
                         • You'll receive an AI-generated match score
-                        <br />
-                        • Check "My Applications" to track status
+                        <br />• Check "My Applications" to track status
                     </Typography>
                 </Alert>
             </DialogContent>
@@ -301,8 +298,9 @@ const InternshipApplicationDialog = ({ open, onClose, internship, onSuccess }) =
                             boxShadow: '0 6px 20px rgba(102, 126, 234, 0.4)',
                         },
                         '&:disabled': {
-                            background: 'linear-gradient(135deg, rgba(102, 126, 234, 0.5) 0%, rgba(118, 75, 162, 0.5) 100%)',
-                        }
+                            background:
+                                'linear-gradient(135deg, rgba(102, 126, 234, 0.5) 0%, rgba(118, 75, 162, 0.5) 100%)',
+                        },
                     }}
                 >
                     {loading ? 'Submitting...' : 'Submit Application'}

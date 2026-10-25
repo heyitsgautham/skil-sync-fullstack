@@ -70,7 +70,11 @@ test('ranks the chosen internship and shows each candidate', async () => {
     const calls = fakeBackend([
         ['get', '/internship/my-posts', POSTS],
         ['get', /^\/internship\/\w+/, POSTS[0]],
-        ['post', '/filter/rank-candidates/uuid-backend', ranking([candidate(1), candidate(2, { is_flagged: true, flag_reason_text: 'Same Mobile number' })])],
+        [
+            'post',
+            '/filter/rank-candidates/uuid-backend',
+            ranking([candidate(1), candidate(2, { is_flagged: true, flag_reason_text: 'Same Mobile number' })]),
+        ],
     ]);
     renderAt(<IntelligentRanking />, '/intelligent-ranking');
 
@@ -201,7 +205,9 @@ test('email selection mode needs at least one candidate', async () => {
     expect(toast.error).toHaveBeenCalledWith('Please select at least one candidate');
 
     // Selection mode adds a select-all box, then one box per candidate.
-    const [selectAll, ...candidateBoxes] = screen.getAllByRole('checkbox').filter((box) => !filterCheckboxes.includes(box));
+    const [selectAll, ...candidateBoxes] = screen
+        .getAllByRole('checkbox')
+        .filter((box) => !filterCheckboxes.includes(box));
     expect(candidateBoxes).toHaveLength(2);
     userEvent.click(candidateBoxes[0]);
     expect(screen.getByRole('button', { name: 'Send Email (1 selected)' })).toBeInTheDocument();

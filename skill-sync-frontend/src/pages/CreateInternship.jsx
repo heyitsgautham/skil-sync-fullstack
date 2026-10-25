@@ -93,7 +93,7 @@ const CreateInternship = () => {
             });
 
             const extractedData = response.data;
-            
+
             // Log extracted data for debugging
             console.log('📄 Extracted data from document:', {
                 title: extractedData.title,
@@ -106,17 +106,18 @@ const CreateInternship = () => {
             setFormData({
                 title: extractedData.title || '',
                 description: extractedData.description || '',
-                required_skills: [],  // Don't populate yet - wait for Extract button
-                preferred_skills: [],  // Don't populate yet - wait for Extract button
+                required_skills: [], // Don't populate yet - wait for Extract button
+                preferred_skills: [], // Don't populate yet - wait for Extract button
                 location: extractedData.location || '',
                 duration: extractedData.duration || '',
                 stipend: extractedData.stipend || '',
             });
 
-            const totalSkills = (extractedData.required_skills?.length || 0) + (extractedData.preferred_skills?.length || 0);
-            
+            const totalSkills =
+                (extractedData.required_skills?.length || 0) + (extractedData.preferred_skills?.length || 0);
+
             setExtractionSuccess(
-                `✨ Successfully extracted internship details from "${file.name}"! Found ${totalSkills} skills in the document. Click "Extract Skills from Description" button below to populate skill fields (max 7 required + 7 preferred).`
+                `✨ Successfully extracted internship details from "${file.name}"! Found ${totalSkills} skills in the document. Click "Extract Skills from Description" button below to populate skill fields (max 7 required + 7 preferred).`,
             );
             toast.success('Document parsed successfully! Click "Extract Skills from Description" to add skills.');
         } catch (err) {
@@ -151,7 +152,7 @@ const CreateInternship = () => {
             });
 
             const { required_skills, preferred_skills } = response.data;
-            
+
             console.log('✅ Skills extracted successfully:', {
                 required: required_skills.length,
                 preferred: preferred_skills.length,
@@ -169,7 +170,7 @@ const CreateInternship = () => {
 
             const totalExtracted = required_skills.length + preferred_skills.length;
             setExtractionSuccess(
-                `✨ Extracted ${totalExtracted} skills! (${required_skills.length} required, ${preferred_skills.length} preferred). Limit: max 7+7, total max 15.`
+                `✨ Extracted ${totalExtracted} skills! (${required_skills.length} required, ${preferred_skills.length} preferred). Limit: max 7+7, total max 15.`,
             );
             toast.success(`Skills extracted successfully! Total: ${totalExtracted}/15`);
         } catch (err) {
@@ -314,14 +315,16 @@ const CreateInternship = () => {
                             mb: 4,
                             p: 4,
                             borderRadius: 3,
-                            background: 'linear-gradient(135deg, rgba(124, 58, 237, 0.05) 0%, rgba(139, 92, 246, 0.05) 100%)',
+                            background:
+                                'linear-gradient(135deg, rgba(124, 58, 237, 0.05) 0%, rgba(139, 92, 246, 0.05) 100%)',
                             border: '2px dashed rgba(124, 58, 237, 0.3)',
                             textAlign: 'center',
                             cursor: uploading ? 'not-allowed' : 'pointer',
                             transition: 'all 0.3s ease',
                             '&:hover': {
                                 borderColor: 'rgba(124, 58, 237, 0.6)',
-                                background: 'linear-gradient(135deg, rgba(124, 58, 237, 0.08) 0%, rgba(139, 92, 246, 0.08) 100%)',
+                                background:
+                                    'linear-gradient(135deg, rgba(124, 58, 237, 0.08) 0%, rgba(139, 92, 246, 0.08) 100%)',
                             },
                         }}
                         onClick={() => !uploading && fileInputRef.current?.click()}
@@ -334,7 +337,7 @@ const CreateInternship = () => {
                             disabled={uploading}
                             style={{ display: 'none' }}
                         />
-                        
+
                         <Box
                             sx={{
                                 width: 64,
@@ -358,7 +361,7 @@ const CreateInternship = () => {
                         <Typography variant="h6" sx={{ fontWeight: 700, color: '#7c3aed', mb: 1 }}>
                             {uploading ? 'Uploading & Parsing Document...' : 'Upload Job Description Document'}
                         </Typography>
-                        
+
                         <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
                             {uploading
                                 ? 'AI is extracting all internship details...'
@@ -375,10 +378,26 @@ const CreateInternship = () => {
                         )}
 
                         <Box sx={{ mt: 2, display: 'flex', justifyContent: 'center', gap: 2, flexWrap: 'wrap' }}>
-                            <Chip label="PDF" size="small" sx={{ bgcolor: 'rgba(239, 68, 68, 0.1)', color: '#dc2626' }} />
-                            <Chip label="DOCX" size="small" sx={{ bgcolor: 'rgba(59, 130, 246, 0.1)', color: '#2563eb' }} />
-                            <Chip label="DOC" size="small" sx={{ bgcolor: 'rgba(16, 185, 129, 0.1)', color: '#059669' }} />
-                            <Chip label="TXT" size="small" sx={{ bgcolor: 'rgba(245, 158, 11, 0.1)', color: '#d97706' }} />
+                            <Chip
+                                label="PDF"
+                                size="small"
+                                sx={{ bgcolor: 'rgba(239, 68, 68, 0.1)', color: '#dc2626' }}
+                            />
+                            <Chip
+                                label="DOCX"
+                                size="small"
+                                sx={{ bgcolor: 'rgba(59, 130, 246, 0.1)', color: '#2563eb' }}
+                            />
+                            <Chip
+                                label="DOC"
+                                size="small"
+                                sx={{ bgcolor: 'rgba(16, 185, 129, 0.1)', color: '#059669' }}
+                            />
+                            <Chip
+                                label="TXT"
+                                size="small"
+                                sx={{ bgcolor: 'rgba(245, 158, 11, 0.1)', color: '#d97706' }}
+                            />
                         </Box>
                     </Paper>
 
@@ -444,10 +463,12 @@ const CreateInternship = () => {
                                     fontWeight: 700,
                                     textTransform: 'none',
                                     fontSize: '1rem',
-                                    background: 'linear-gradient(135deg, rgba(124, 58, 237, 0.05) 0%, rgba(139, 92, 246, 0.05) 100%)',
+                                    background:
+                                        'linear-gradient(135deg, rgba(124, 58, 237, 0.05) 0%, rgba(139, 92, 246, 0.05) 100%)',
                                     '&:hover': {
                                         borderColor: '#7c3aed',
-                                        background: 'linear-gradient(135deg, rgba(124, 58, 237, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%)',
+                                        background:
+                                            'linear-gradient(135deg, rgba(124, 58, 237, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%)',
                                         transform: 'translateY(-2px)',
                                         boxShadow: '0 8px 24px rgba(124, 58, 237, 0.2)',
                                     },
@@ -459,7 +480,11 @@ const CreateInternship = () => {
                             >
                                 {extracting ? 'Extracting Skills...' : '✨ Extract Skills from Description'}
                             </Button>
-                            <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 1, textAlign: 'center' }}>
+                            <Typography
+                                variant="caption"
+                                color="text.secondary"
+                                sx={{ display: 'block', mt: 1, textAlign: 'center' }}
+                            >
                                 AI will analyze the job description and categorize skills
                             </Typography>
                         </Box>
@@ -515,7 +540,8 @@ const CreateInternship = () => {
                                                 </Tooltip>
                                             }
                                             sx={{
-                                                background: 'linear-gradient(135deg, rgba(239, 68, 68, 0.15) 0%, rgba(220, 38, 38, 0.15) 100%)',
+                                                background:
+                                                    'linear-gradient(135deg, rgba(239, 68, 68, 0.15) 0%, rgba(220, 38, 38, 0.15) 100%)',
                                                 border: '2px solid rgba(239, 68, 68, 0.3)',
                                                 color: '#dc2626',
                                                 fontWeight: 600,
@@ -617,7 +643,8 @@ const CreateInternship = () => {
                                                 </Tooltip>
                                             }
                                             sx={{
-                                                background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.15) 0%, rgba(37, 99, 235, 0.15) 100%)',
+                                                background:
+                                                    'linear-gradient(135deg, rgba(59, 130, 246, 0.15) 0%, rgba(37, 99, 235, 0.15) 100%)',
                                                 border: '2px solid rgba(59, 130, 246, 0.3)',
                                                 color: '#2563eb',
                                                 fontWeight: 600,

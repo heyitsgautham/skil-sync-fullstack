@@ -22,7 +22,7 @@ const renderLogin = () =>
                 <Route path="/login" element={<Login />} />
                 <Route path="/dashboard" element={<div>Dashboard page</div>} />
             </Routes>
-        </MemoryRouter>
+        </MemoryRouter>,
     );
 
 const fillAndSubmit = () => {

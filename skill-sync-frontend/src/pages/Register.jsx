@@ -111,7 +111,7 @@ const Register = () => {
                     animate={{ opacity: 1, scale: 1, y: 0 }}
                     transition={{
                         duration: 0.6,
-                        ease: "easeOut"
+                        ease: 'easeOut',
                     }}
                     style={{ position: 'relative', zIndex: 1 }}
                 >
@@ -158,11 +158,7 @@ const Register = () => {
                             >
                                 SkillSync
                             </Typography>
-                            <Typography
-                                component="h2"
-                                variant="h6"
-                                sx={{ color: '#666', fontWeight: 600 }}
-                            >
+                            <Typography component="h2" variant="h6" sx={{ color: '#666', fontWeight: 600 }}>
                                 Create Account
                             </Typography>
                         </Box>

@@ -1,11 +1,5 @@
 import React from 'react';
-import {
-    Box,
-    Container,
-    Typography,
-    Paper,
-    Checkbox,
-} from '@mui/material';
+import { Box, Container, Typography, Paper, Checkbox } from '@mui/material';
 import PsychologyIcon from '@mui/icons-material/Psychology';
 import Layout from '../components/Layout';
 import FlaggedCandidatesModal from '../components/FlaggedCandidatesModal';
@@ -73,21 +67,31 @@ const IntelligentRanking = () => {
                         {selectionMode && (
                             <Box sx={{ mb: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
                                 <Checkbox
-                                    checked={selectedCandidates.length === rankedCandidates.length && rankedCandidates.length > 0}
-                                    indeterminate={selectedCandidates.length > 0 && selectedCandidates.length < rankedCandidates.length}
+                                    checked={
+                                        selectedCandidates.length === rankedCandidates.length &&
+                                        rankedCandidates.length > 0
+                                    }
+                                    indeterminate={
+                                        selectedCandidates.length > 0 &&
+                                        selectedCandidates.length < rankedCandidates.length
+                                    }
                                     onChange={handleSelectAll}
                                 />
                                 <Typography variant="body2" color="text.secondary">
                                     {selectedCandidates.length === 0
                                         ? 'Select candidates to send emails'
-                                        : `${selectedCandidates.length} candidate${selectedCandidates.length > 1 ? 's' : ''} selected`
-                                    }
+                                        : `${selectedCandidates.length} candidate${selectedCandidates.length > 1 ? 's' : ''} selected`}
                                 </Typography>
                             </Box>
                         )}
 
                         {paginatedCandidates.map((candidate, index) => (
-                            <CandidateCard key={candidate.candidate_id} {...ranking} candidate={candidate} index={index} />
+                            <CandidateCard
+                                key={candidate.candidate_id}
+                                {...ranking}
+                                candidate={candidate}
+                                index={index}
+                            />
                         ))}
 
                         <RankingPagination {...ranking} />

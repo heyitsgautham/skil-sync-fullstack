@@ -52,19 +52,19 @@ const Layout = ({ children }) => {
     // Role-based color schemes
     const roleColors = {
         student: {
-            primary: '#1976d2',      // Blue
+            primary: '#1976d2', // Blue
             light: 'rgba(25, 118, 210, 0.08)',
             lighter: 'rgba(25, 118, 210, 0.12)',
             badge: 'rgba(25, 118, 210, 0.2)',
         },
         company: {
-            primary: '#2e7d32',      // Green
+            primary: '#2e7d32', // Green
             light: 'rgba(46, 125, 50, 0.08)',
             lighter: 'rgba(46, 125, 50, 0.12)',
             badge: 'rgba(46, 125, 50, 0.2)',
         },
         admin: {
-            primary: '#d32f2f',      // Red
+            primary: '#d32f2f', // Red
             light: 'rgba(211, 47, 47, 0.08)',
             lighter: 'rgba(211, 47, 47, 0.12)',
             badge: 'rgba(211, 47, 47, 0.2)',
@@ -99,7 +99,7 @@ const Layout = ({ children }) => {
         ];
 
         const allItems = [...baseItems, ...studentItems, ...companyItems, ...adminItems];
-        return allItems.filter(item => item.roles.includes(userRole));
+        return allItems.filter((item) => item.roles.includes(userRole));
     };
 
     const menuItems = getMenuItems();
@@ -115,7 +115,7 @@ const Layout = ({ children }) => {
             navigate('/dashboard');
             return;
         }
-        setCollapsed(prev => {
+        setCollapsed((prev) => {
             const newValue = !prev;
             localStorage.setItem('sidebarCollapsed', newValue.toString());
             return newValue;
@@ -206,13 +206,15 @@ const Layout = ({ children }) => {
                                 },
                             }}
                         >
-                            <ListItemIcon sx={{
-                                color: location.pathname === item.path ? currentColors.primary : '#666',
-                                minWidth: collapsed ? 0 : 45,
-                                justifyContent: 'center',
-                                transition: 'all 0.3s ease',
-                                mr: collapsed ? 0 : 1,
-                            }}>
+                            <ListItemIcon
+                                sx={{
+                                    color: location.pathname === item.path ? currentColors.primary : '#666',
+                                    minWidth: collapsed ? 0 : 45,
+                                    justifyContent: 'center',
+                                    transition: 'all 0.3s ease',
+                                    mr: collapsed ? 0 : 1,
+                                }}
+                            >
                                 {item.icon}
                             </ListItemIcon>
                             <ListItemText
@@ -272,7 +274,7 @@ const Layout = ({ children }) => {
                             letterSpacing: '-0.5px',
                         }}
                     >
-                        {menuItems.find(item => item.path === location.pathname)?.text || 'SkillSync'}
+                        {menuItems.find((item) => item.path === location.pathname)?.text || 'SkillSync'}
                     </Typography>
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                         <Typography
@@ -316,7 +318,7 @@ const Layout = ({ children }) => {
                                 transition: 'all 0.3s ease',
                                 '&:hover': {
                                     transform: 'scale(1.1)',
-                                }
+                                },
                             }}
                             aria-controls={anchorEl ? 'account-menu' : undefined}
                             aria-haspopup="true"
@@ -332,7 +334,9 @@ const Layout = ({ children }) => {
                                     boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
                                 }}
                             >
-                                {currentUser?.full_name?.[0]?.toUpperCase() || currentUser?.email?.[0]?.toUpperCase() || 'U'}
+                                {currentUser?.full_name?.[0]?.toUpperCase() ||
+                                    currentUser?.email?.[0]?.toUpperCase() ||
+                                    'U'}
                             </Avatar>
                         </IconButton>
                     </Box>
@@ -350,7 +354,7 @@ const Layout = ({ children }) => {
                                 borderRadius: 3,
                                 boxShadow: '0 8px 32px rgba(0,0,0,0.12)',
                                 mt: 1,
-                            }
+                            },
                         }}
                     >
                         <Box sx={{ px: 3, py: 2 }}>
@@ -397,7 +401,7 @@ const Layout = ({ children }) => {
                                 '&:hover': {
                                     backgroundColor: 'rgba(211, 47, 47, 0.08)',
                                     color: '#d32f2f',
-                                }
+                                },
                             }}
                         >
                             <ListItemIcon sx={{ color: 'inherit' }}>
@@ -410,10 +414,7 @@ const Layout = ({ children }) => {
             </AppBar>
 
             {/* Sidebar Drawer */}
-            <Box
-                component="nav"
-                sx={{ width: { sm: currentDrawerWidth }, flexShrink: { sm: 0 } }}
-            >
+            <Box component="nav" sx={{ width: { sm: currentDrawerWidth }, flexShrink: { sm: 0 } }}>
                 {/* Mobile drawer */}
                 <Drawer
                     variant="temporary"
@@ -464,16 +465,15 @@ const Layout = ({ children }) => {
                         left: 0,
                         right: 0,
                         bottom: 0,
-                        background: 'url("data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%239C92AC" fill-opacity="0.05"%3E%3Cpath d="M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")',
+                        background:
+                            'url("data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%239C92AC" fill-opacity="0.05"%3E%3Cpath d="M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")',
                         opacity: 0.4,
                         pointerEvents: 'none',
-                    }
+                    },
                 }}
             >
                 <Toolbar /> {/* Spacer for AppBar */}
-                <Box sx={{ position: 'relative', zIndex: 1 }}>
-                    {children}
-                </Box>
+                <Box sx={{ position: 'relative', zIndex: 1 }}>{children}</Box>
             </Box>
         </Box>
     );

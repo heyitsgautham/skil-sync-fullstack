@@ -56,12 +56,12 @@ const ManageUsers = () => {
     const [editFormData, setEditFormData] = useState({
         full_name: '',
         is_active: 1,
-        anonymization_enabled: false
+        anonymization_enabled: false,
     });
     const [snackbar, setSnackbar] = useState({
         open: false,
         message: '',
-        severity: 'success'
+        severity: 'success',
     });
 
     useEffect(() => {
@@ -74,7 +74,7 @@ const ManageUsers = () => {
                 (user) =>
                     user.full_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                     user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                    user.role.toLowerCase().includes(searchTerm.toLowerCase())
+                    user.role.toLowerCase().includes(searchTerm.toLowerCase()),
             );
             setFilteredUsers(filtered);
         } else {
@@ -102,7 +102,7 @@ const ManageUsers = () => {
         setEditFormData({
             full_name: user.full_name,
             is_active: user.is_active !== undefined ? user.is_active : 1,
-            anonymization_enabled: user.anonymization_enabled || false
+            anonymization_enabled: user.anonymization_enabled || false,
         });
         setEditDialogOpen(true);
     };
@@ -120,7 +120,7 @@ const ManageUsers = () => {
             setSnackbar({
                 open: true,
                 message: 'User updated successfully',
-                severity: 'success'
+                severity: 'success',
             });
             setEditDialogOpen(false);
             fetchUsers();
@@ -129,7 +129,7 @@ const ManageUsers = () => {
             setSnackbar({
                 open: true,
                 message: err.response?.data?.detail || 'Failed to update user',
-                severity: 'error'
+                severity: 'error',
             });
         }
     };
@@ -140,7 +140,7 @@ const ManageUsers = () => {
             setSnackbar({
                 open: true,
                 message: 'User deleted successfully',
-                severity: 'success'
+                severity: 'success',
             });
             setDeleteDialogOpen(false);
             fetchUsers();
@@ -149,7 +149,7 @@ const ManageUsers = () => {
             setSnackbar({
                 open: true,
                 message: err.response?.data?.detail || 'Failed to delete user',
-                severity: 'error'
+                severity: 'error',
             });
         }
     };
@@ -165,7 +165,7 @@ const ManageUsers = () => {
     };
 
     const getAdminCount = () => {
-        return users.filter(u => u.role === 'admin').length;
+        return users.filter((u) => u.role === 'admin').length;
     };
 
     const canDeleteUser = (user) => {
@@ -296,7 +296,8 @@ const ManageUsers = () => {
                         <Chip
                             label={`${filteredUsers.length} Users`}
                             sx={{
-                                background: 'linear-gradient(135deg, rgba(102, 126, 234, 0.15) 0%, rgba(118, 75, 162, 0.15) 100%)',
+                                background:
+                                    'linear-gradient(135deg, rgba(102, 126, 234, 0.15) 0%, rgba(118, 75, 162, 0.15) 100%)',
                                 border: '1px solid rgba(102, 126, 234, 0.3)',
                                 color: '#667eea',
                                 fontWeight: 700,
@@ -384,11 +385,12 @@ const ManageUsers = () => {
                                                         width: 40,
                                                         height: 40,
                                                         borderRadius: 2,
-                                                        background: user.role.toLowerCase() === 'student'
-                                                            ? '#1976d2'
-                                                            : user.role.toLowerCase() === 'company'
-                                                                ? '#2e7d32'
-                                                                : '#d32f2f',
+                                                        background:
+                                                            user.role.toLowerCase() === 'student'
+                                                                ? '#1976d2'
+                                                                : user.role.toLowerCase() === 'company'
+                                                                  ? '#2e7d32'
+                                                                  : '#d32f2f',
                                                         display: 'flex',
                                                         alignItems: 'center',
                                                         justifyContent: 'center',
@@ -405,9 +407,7 @@ const ManageUsers = () => {
                                                         <AdminIcon sx={{ color: 'white', fontSize: 22 }} />
                                                     )}
                                                 </Box>
-                                                <Typography sx={{ fontWeight: 600 }}>
-                                                    {user.full_name}
-                                                </Typography>
+                                                <Typography sx={{ fontWeight: 600 }}>{user.full_name}</Typography>
                                             </Box>
                                         </TableCell>
                                         <TableCell>
@@ -429,10 +429,22 @@ const ManageUsers = () => {
                                         </TableCell>
                                         <TableCell>
                                             {user.role.toLowerCase() === 'company' ? (
-                                                <Tooltip title={user.anonymization_enabled ? "Anonymization Enabled - Company views anonymized resumes" : "Anonymization Disabled - Company views original resumes"}>
+                                                <Tooltip
+                                                    title={
+                                                        user.anonymization_enabled
+                                                            ? 'Anonymization Enabled - Company views anonymized resumes'
+                                                            : 'Anonymization Disabled - Company views original resumes'
+                                                    }
+                                                >
                                                     <Chip
-                                                        icon={user.anonymization_enabled ? <VisibilityOffIcon /> : <VisibilityIcon />}
-                                                        label={user.anonymization_enabled ? "Anonymized" : "Original"}
+                                                        icon={
+                                                            user.anonymization_enabled ? (
+                                                                <VisibilityOffIcon />
+                                                            ) : (
+                                                                <VisibilityIcon />
+                                                            )
+                                                        }
+                                                        label={user.anonymization_enabled ? 'Anonymized' : 'Original'}
                                                         size="small"
                                                         sx={{
                                                             background: user.anonymization_enabled
@@ -447,34 +459,44 @@ const ManageUsers = () => {
                                                     />
                                                 </Tooltip>
                                             ) : user.role.toLowerCase() === 'student' ? (
-                                                <Tooltip title={user.is_active === 1 ? "Active - Visible in candidate rankings" : "Inactive - Hidden from candidate rankings"}>
+                                                <Tooltip
+                                                    title={
+                                                        user.is_active === 1
+                                                            ? 'Active - Visible in candidate rankings'
+                                                            : 'Inactive - Hidden from candidate rankings'
+                                                    }
+                                                >
                                                     <Chip
-                                                        label={user.is_active === 1 ? "Active" : "Inactive"}
+                                                        label={user.is_active === 1 ? 'Active' : 'Inactive'}
                                                         size="small"
                                                         sx={{
-                                                            background: user.is_active === 1
-                                                                ? 'linear-gradient(135deg, rgba(46, 125, 50, 0.15) 0%, rgba(56, 142, 60, 0.15) 100%)'
-                                                                : 'linear-gradient(135deg, rgba(211, 47, 47, 0.15) 0%, rgba(198, 40, 40, 0.15) 100%)',
-                                                            border: user.is_active === 1
-                                                                ? '1px solid rgba(46, 125, 50, 0.3)'
-                                                                : '1px solid rgba(211, 47, 47, 0.3)',
+                                                            background:
+                                                                user.is_active === 1
+                                                                    ? 'linear-gradient(135deg, rgba(46, 125, 50, 0.15) 0%, rgba(56, 142, 60, 0.15) 100%)'
+                                                                    : 'linear-gradient(135deg, rgba(211, 47, 47, 0.15) 0%, rgba(198, 40, 40, 0.15) 100%)',
+                                                            border:
+                                                                user.is_active === 1
+                                                                    ? '1px solid rgba(46, 125, 50, 0.3)'
+                                                                    : '1px solid rgba(211, 47, 47, 0.3)',
                                                             color: user.is_active === 1 ? '#2e7d32' : '#d32f2f',
                                                             fontWeight: 600,
                                                         }}
                                                     />
                                                 </Tooltip>
                                             ) : (
-                                                <Tooltip title={user.is_active === 1 ? "Active" : "Inactive"}>
+                                                <Tooltip title={user.is_active === 1 ? 'Active' : 'Inactive'}>
                                                     <Chip
-                                                        label={user.is_active === 1 ? "Active" : "Inactive"}
+                                                        label={user.is_active === 1 ? 'Active' : 'Inactive'}
                                                         size="small"
                                                         sx={{
-                                                            background: user.is_active === 1
-                                                                ? 'linear-gradient(135deg, rgba(46, 125, 50, 0.15) 0%, rgba(56, 142, 60, 0.15) 100%)'
-                                                                : 'linear-gradient(135deg, rgba(211, 47, 47, 0.15) 0%, rgba(198, 40, 40, 0.15) 100%)',
-                                                            border: user.is_active === 1
-                                                                ? '1px solid rgba(46, 125, 50, 0.3)'
-                                                                : '1px solid rgba(211, 47, 47, 0.3)',
+                                                            background:
+                                                                user.is_active === 1
+                                                                    ? 'linear-gradient(135deg, rgba(46, 125, 50, 0.15) 0%, rgba(56, 142, 60, 0.15) 100%)'
+                                                                    : 'linear-gradient(135deg, rgba(211, 47, 47, 0.15) 0%, rgba(198, 40, 40, 0.15) 100%)',
+                                                            border:
+                                                                user.is_active === 1
+                                                                    ? '1px solid rgba(46, 125, 50, 0.3)'
+                                                                    : '1px solid rgba(211, 47, 47, 0.3)',
                                                             color: user.is_active === 1 ? '#2e7d32' : '#d32f2f',
                                                             fontWeight: 600,
                                                         }}
@@ -503,11 +525,13 @@ const ManageUsers = () => {
                                                     <EditIcon />
                                                 </IconButton>
                                             </Tooltip>
-                                            <Tooltip title={
-                                                !canDeleteUser(user).allowed
-                                                    ? canDeleteUser(user).reason
-                                                    : "Delete User"
-                                            }>
+                                            <Tooltip
+                                                title={
+                                                    !canDeleteUser(user).allowed
+                                                        ? canDeleteUser(user).reason
+                                                        : 'Delete User'
+                                                }
+                                            >
                                                 <span>
                                                     <IconButton
                                                         size="small"
@@ -522,7 +546,7 @@ const ManageUsers = () => {
                                                             },
                                                             '&.Mui-disabled': {
                                                                 color: '#ccc',
-                                                            }
+                                                            },
                                                         }}
                                                     >
                                                         <DeleteIcon />
@@ -538,17 +562,14 @@ const ManageUsers = () => {
                 </TableContainer>
 
                 {/* Edit User Dialog */}
-                <Dialog
-                    open={editDialogOpen}
-                    onClose={() => setEditDialogOpen(false)}
-                    maxWidth="sm"
-                    fullWidth
-                >
-                    <DialogTitle sx={{
-                        background: 'linear-gradient(135deg, #d32f2f 0%, #c62828 100%)',
-                        color: 'white',
-                        fontWeight: 700
-                    }}>
+                <Dialog open={editDialogOpen} onClose={() => setEditDialogOpen(false)} maxWidth="sm" fullWidth>
+                    <DialogTitle
+                        sx={{
+                            background: 'linear-gradient(135deg, #d32f2f 0%, #c62828 100%)',
+                            color: 'white',
+                            fontWeight: 700,
+                        }}
+                    >
                         Edit User
                     </DialogTitle>
                     <DialogContent sx={{ mt: 2 }}>
@@ -560,13 +581,15 @@ const ManageUsers = () => {
                             margin="normal"
                             sx={{ mb: 2 }}
                         />
-                        <Box sx={{
-                            p: 2,
-                            mb: 2,
-                            bgcolor: 'rgba(102, 126, 234, 0.1)',
-                            borderRadius: 2,
-                            border: '1px solid rgba(102, 126, 234, 0.3)'
-                        }}>
+                        <Box
+                            sx={{
+                                p: 2,
+                                mb: 2,
+                                bgcolor: 'rgba(102, 126, 234, 0.1)',
+                                borderRadius: 2,
+                                border: '1px solid rgba(102, 126, 234, 0.3)',
+                            }}
+                        >
                             <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>
                                 Current Role
                             </Typography>
@@ -575,7 +598,7 @@ const ManageUsers = () => {
                                 size="small"
                                 sx={{
                                     textTransform: 'capitalize',
-                                    fontWeight: 600
+                                    fontWeight: 600,
                                 }}
                             />
                             <Typography variant="caption" display="block" sx={{ mt: 1, color: 'text.secondary' }}>
@@ -585,21 +608,25 @@ const ManageUsers = () => {
 
                         {/* Student Status - Active/Inactive */}
                         {selectedUser?.role.toLowerCase() === 'student' && (
-                            <Box sx={{
-                                p: 2,
-                                mt: 2,
-                                bgcolor: 'rgba(25, 118, 210, 0.05)',
-                                borderRadius: 2,
-                                border: '1px solid rgba(25, 118, 210, 0.2)'
-                            }}>
+                            <Box
+                                sx={{
+                                    p: 2,
+                                    mt: 2,
+                                    bgcolor: 'rgba(25, 118, 210, 0.05)',
+                                    borderRadius: 2,
+                                    border: '1px solid rgba(25, 118, 210, 0.2)',
+                                }}
+                            >
                                 <FormControlLabel
                                     control={
                                         <Switch
                                             checked={editFormData.is_active === 1}
-                                            onChange={(e) => setEditFormData({
-                                                ...editFormData,
-                                                is_active: e.target.checked ? 1 : 0
-                                            })}
+                                            onChange={(e) =>
+                                                setEditFormData({
+                                                    ...editFormData,
+                                                    is_active: e.target.checked ? 1 : 0,
+                                                })
+                                            }
                                             sx={{
                                                 '& .MuiSwitch-switchBase.Mui-checked': {
                                                     color: '#2e7d32',
@@ -618,22 +645,28 @@ const ManageUsers = () => {
                                             <Typography variant="caption" color="text.secondary" display="block">
                                                 {editFormData.is_active === 1
                                                     ? '✅ Active - Candidate appears in all internship rankings'
-                                                    : '🚫 Inactive - Candidate hidden from all internship rankings'
-                                                }
+                                                    : '🚫 Inactive - Candidate hidden from all internship rankings'}
                                             </Typography>
                                         </Box>
                                     }
                                     sx={{ m: 0, width: '100%', alignItems: 'flex-start' }}
                                 />
-                                <Box sx={{
-                                    mt: 2,
-                                    p: 1.5,
-                                    bgcolor: 'rgba(211, 47, 47, 0.05)',
-                                    borderRadius: 1,
-                                    border: '1px solid rgba(211, 47, 47, 0.2)'
-                                }}>
-                                    <Typography variant="caption" sx={{ display: 'flex', alignItems: 'flex-start', color: '#d32f2f' }}>
-                                        <strong>⚠️ Note:</strong>&nbsp;When inactive, this candidate will NOT appear in the Candidate Ranking page for any internship. Use this to temporarily hide candidates from company views.
+                                <Box
+                                    sx={{
+                                        mt: 2,
+                                        p: 1.5,
+                                        bgcolor: 'rgba(211, 47, 47, 0.05)',
+                                        borderRadius: 1,
+                                        border: '1px solid rgba(211, 47, 47, 0.2)',
+                                    }}
+                                >
+                                    <Typography
+                                        variant="caption"
+                                        sx={{ display: 'flex', alignItems: 'flex-start', color: '#d32f2f' }}
+                                    >
+                                        <strong>⚠️ Note:</strong>&nbsp;When inactive, this candidate will NOT appear in
+                                        the Candidate Ranking page for any internship. Use this to temporarily hide
+                                        candidates from company views.
                                     </Typography>
                                 </Box>
                             </Box>
@@ -641,21 +674,25 @@ const ManageUsers = () => {
 
                         {/* Company Anonymization Toggle */}
                         {selectedUser?.role.toLowerCase() === 'company' && (
-                            <Box sx={{
-                                p: 2,
-                                mt: 2,
-                                bgcolor: 'rgba(46, 125, 50, 0.05)',
-                                borderRadius: 2,
-                                border: '1px solid rgba(46, 125, 50, 0.2)'
-                            }}>
+                            <Box
+                                sx={{
+                                    p: 2,
+                                    mt: 2,
+                                    bgcolor: 'rgba(46, 125, 50, 0.05)',
+                                    borderRadius: 2,
+                                    border: '1px solid rgba(46, 125, 50, 0.2)',
+                                }}
+                            >
                                 <FormControlLabel
                                     control={
                                         <Switch
                                             checked={editFormData.anonymization_enabled}
-                                            onChange={(e) => setEditFormData({
-                                                ...editFormData,
-                                                anonymization_enabled: e.target.checked
-                                            })}
+                                            onChange={(e) =>
+                                                setEditFormData({
+                                                    ...editFormData,
+                                                    anonymization_enabled: e.target.checked,
+                                                })
+                                            }
                                             sx={{
                                                 '& .MuiSwitch-switchBase.Mui-checked': {
                                                     color: '#2e7d32',
@@ -674,22 +711,29 @@ const ManageUsers = () => {
                                             <Typography variant="caption" color="text.secondary" display="block">
                                                 {editFormData.anonymization_enabled
                                                     ? '🔒 Company views anonymized resumes (PII removed)'
-                                                    : '👁️ Company views original resumes with full information'
-                                                }
+                                                    : '👁️ Company views original resumes with full information'}
                                             </Typography>
                                         </Box>
                                     }
                                     sx={{ m: 0, width: '100%', alignItems: 'flex-start' }}
                                 />
-                                <Box sx={{
-                                    mt: 2,
-                                    p: 1.5,
-                                    bgcolor: 'rgba(25, 118, 210, 0.05)',
-                                    borderRadius: 1,
-                                    border: '1px solid rgba(25, 118, 210, 0.2)'
-                                }}>
-                                    <Typography variant="caption" color="primary" sx={{ display: 'flex', alignItems: 'flex-start' }}>
-                                        <strong>ℹ️ Info:</strong>&nbsp;When enabled, the company will see anonymized versions of student resumes with personal information (name, email, phone, address) automatically redacted to prevent bias in the screening process.
+                                <Box
+                                    sx={{
+                                        mt: 2,
+                                        p: 1.5,
+                                        bgcolor: 'rgba(25, 118, 210, 0.05)',
+                                        borderRadius: 1,
+                                        border: '1px solid rgba(25, 118, 210, 0.2)',
+                                    }}
+                                >
+                                    <Typography
+                                        variant="caption"
+                                        color="primary"
+                                        sx={{ display: 'flex', alignItems: 'flex-start' }}
+                                    >
+                                        <strong>ℹ️ Info:</strong>&nbsp;When enabled, the company will see anonymized
+                                        versions of student resumes with personal information (name, email, phone,
+                                        address) automatically redacted to prevent bias in the screening process.
                                     </Typography>
                                 </Box>
                             </Box>
@@ -711,10 +755,7 @@ const ManageUsers = () => {
                         )}
                     </DialogContent>
                     <DialogActions sx={{ p: 2 }}>
-                        <Button
-                            onClick={() => setEditDialogOpen(false)}
-                            sx={{ color: '#666' }}
-                        >
+                        <Button onClick={() => setEditDialogOpen(false)} sx={{ color: '#666' }}>
                             Cancel
                         </Button>
                         <Button
@@ -724,7 +765,7 @@ const ManageUsers = () => {
                                 background: 'linear-gradient(135deg, #d32f2f 0%, #c62828 100%)',
                                 '&:hover': {
                                     background: 'linear-gradient(135deg, #c62828 0%, #b71c1c 100%)',
-                                }
+                                },
                             }}
                         >
                             Save Changes
@@ -733,17 +774,14 @@ const ManageUsers = () => {
                 </Dialog>
 
                 {/* Delete Confirmation Dialog */}
-                <Dialog
-                    open={deleteDialogOpen}
-                    onClose={() => setDeleteDialogOpen(false)}
-                    maxWidth="sm"
-                    fullWidth
-                >
-                    <DialogTitle sx={{
-                        background: 'linear-gradient(135deg, #f5576c 0%, #f093fb 100%)',
-                        color: 'white',
-                        fontWeight: 700
-                    }}>
+                <Dialog open={deleteDialogOpen} onClose={() => setDeleteDialogOpen(false)} maxWidth="sm" fullWidth>
+                    <DialogTitle
+                        sx={{
+                            background: 'linear-gradient(135deg, #f5576c 0%, #f093fb 100%)',
+                            color: 'white',
+                            fontWeight: 700,
+                        }}
+                    >
                         ⚠️ Confirm Delete User
                     </DialogTitle>
                     <DialogContent sx={{ mt: 2 }}>
@@ -764,7 +802,7 @@ const ManageUsers = () => {
                                 sx={{
                                     mt: 1,
                                     textTransform: 'capitalize',
-                                    fontWeight: 600
+                                    fontWeight: 600,
                                 }}
                             />
                         </Paper>
@@ -780,34 +818,51 @@ const ManageUsers = () => {
                         <Box component="ul" sx={{ pl: 2, mt: 1 }}>
                             {selectedUser?.role === 'student' && (
                                 <>
-                                    <li><Typography variant="body2">All student resumes</Typography></li>
-                                    <li><Typography variant="body2">All internship applications</Typography></li>
-                                    <li><Typography variant="body2">All matching data</Typography></li>
-                                    <li><Typography variant="body2">ChromaDB embeddings</Typography></li>
+                                    <li>
+                                        <Typography variant="body2">All student resumes</Typography>
+                                    </li>
+                                    <li>
+                                        <Typography variant="body2">All internship applications</Typography>
+                                    </li>
+                                    <li>
+                                        <Typography variant="body2">All matching data</Typography>
+                                    </li>
+                                    <li>
+                                        <Typography variant="body2">ChromaDB embeddings</Typography>
+                                    </li>
                                 </>
                             )}
                             {selectedUser?.role === 'company' && (
                                 <>
-                                    <li><Typography variant="body2">All posted internships</Typography></li>
-                                    <li><Typography variant="body2">All student applications to their internships</Typography></li>
-                                    <li><Typography variant="body2">All matching data</Typography></li>
+                                    <li>
+                                        <Typography variant="body2">All posted internships</Typography>
+                                    </li>
+                                    <li>
+                                        <Typography variant="body2">
+                                            All student applications to their internships
+                                        </Typography>
+                                    </li>
+                                    <li>
+                                        <Typography variant="body2">All matching data</Typography>
+                                    </li>
                                 </>
                             )}
                             {selectedUser?.role === 'admin' && (
                                 <>
-                                    <li><Typography variant="body2">Admin user account</Typography></li>
-                                    <li><Typography variant="body2" color="warning.main">
-                                        Note: At least one admin must remain in the system
-                                    </Typography></li>
+                                    <li>
+                                        <Typography variant="body2">Admin user account</Typography>
+                                    </li>
+                                    <li>
+                                        <Typography variant="body2" color="warning.main">
+                                            Note: At least one admin must remain in the system
+                                        </Typography>
+                                    </li>
                                 </>
                             )}
                         </Box>
                     </DialogContent>
                     <DialogActions sx={{ p: 2 }}>
-                        <Button
-                            onClick={() => setDeleteDialogOpen(false)}
-                            sx={{ color: '#666' }}
-                        >
+                        <Button onClick={() => setDeleteDialogOpen(false)} sx={{ color: '#666' }}>
                             Cancel
                         </Button>
                         <Button
@@ -818,7 +873,7 @@ const ManageUsers = () => {
                                 background: 'linear-gradient(135deg, #f5576c 0%, #f093fb 100%)',
                                 '&:hover': {
                                     background: 'linear-gradient(135deg, #e04558 0%, #d97fe6 100%)',
-                                }
+                                },
                             }}
                         >
                             Delete User
@@ -833,11 +888,7 @@ const ManageUsers = () => {
                     onClose={handleCloseSnackbar}
                     anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
                 >
-                    <Alert
-                        onClose={handleCloseSnackbar}
-                        severity={snackbar.severity}
-                        sx={{ width: '100%' }}
-                    >
+                    <Alert onClose={handleCloseSnackbar} severity={snackbar.severity} sx={{ width: '100%' }}>
                         {snackbar.message}
                     </Alert>
                 </Snackbar>
