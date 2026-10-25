@@ -349,6 +349,8 @@ def reindex_all_student_resumes(
             "status": "processing",
         }
 
+    except HTTPException:
+        raise
     except Exception as e:
         logger.error(f"  Error starting reindexing: {str(e)}")
         import traceback

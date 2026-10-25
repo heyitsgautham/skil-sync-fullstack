@@ -99,3 +99,13 @@ def test_flagged_students_can_be_excluded(client, auth_headers, ranked_setup, db
     assert [c["candidate_id"] for c in body["ranked_candidates"]] == [ids["Senior"]]
     assert "excluding flagged candidates" in body["filters_applied"]
 
+
+def test_other_companies_cannot_rank_the_internship(client, auth_headers, make_user, ranked_setup):
+    _, internship_id, _ = ranked_setup
+    other = make_user(role=UserRole.company)
+    assert rank(client, auth_headers, other, internship_id).status_code == 403
+
+
+def test_unknown_internship_returns_404(client, auth_headers, ranked_setup):
+    company, _, _ = ranked_setup
+    assert rank(client, auth_headers, company, "999999").status_code == 404

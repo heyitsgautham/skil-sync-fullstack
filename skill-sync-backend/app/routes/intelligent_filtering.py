@@ -716,11 +716,10 @@ async def rank_candidates_for_internship(
                 "flagged_candidates_count": flagged_count,
             }
 
+    except HTTPException:
+        raise
     except Exception as e:
-        import traceback
-
-        logger.error(f"  Error ranking candidates: {str(e)}")
-        logger.error(traceback.format_exc())
+        logger.exception("Error ranking candidates")
         raise HTTPException(status_code=500, detail=f"Error ranking candidates: {str(e)}")
 
 
@@ -830,6 +829,8 @@ async def get_detailed_candidate_profile(
             },
         }
 
+    except HTTPException:
+        raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error retrieving profile: {str(e)}")
 
@@ -913,6 +914,8 @@ async def calculate_match_score(
             "explanation": explanation,
         }
 
+    except HTTPException:
+        raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error calculating match: {str(e)}")
 
@@ -1267,6 +1270,8 @@ async def get_filtered_ranked_candidates(
             },
         }
 
+    except HTTPException:
+        raise
     except Exception as e:
         import traceback
 
