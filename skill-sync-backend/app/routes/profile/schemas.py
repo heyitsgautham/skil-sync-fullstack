@@ -1,57 +1,37 @@
-"""Request and response models for /api/profile."""
+"""Request models for /api/profile."""
 
-from pydantic import BaseModel
+from typing import Annotated
 
-
-# Pydantic schemas
-class StudentProfileResponse(BaseModel):
-    id: int
-    email: str
-    full_name: str
-    phone: str | None = None
-    linkedin_url: str | None = None
-    github_url: str | None = None
-    skills: list | None = None
-    total_experience_years: float | None = None
-
-    class Config:
-        from_attributes = True
+from pydantic import BaseModel, BeforeValidator, ConfigDict, EmailStr, Field
 
 
-class CompanyProfileResponse(BaseModel):
-    id: int
-    email: str
-    full_name: str  # Company name
-    hr_contact_name: str | None = None
-    mailing_email: str | None = None
-    phone: str | None = None
-    phone_visible: bool = False
-
-    class Config:
-        from_attributes = True
+def _blank_to_none(value):
+    """The profile forms send "" for an empty field, which means "no value" rather than an invalid email."""
+    if isinstance(value, str) and not value.strip():
+        return None
+    return value
 
 
-class StudentProfileUpdate(BaseModel):
-    full_name: str | None = None
-    phone: str | None = None
-    linkedin_url: str | None = None
-    github_url: str | None = None
+# email-validator caps addresses at 254 characters, inside the 255-character column.
+OptionalEmail = Annotated[EmailStr | None, BeforeValidator(_blank_to_none)]
 
 
-class CompanyProfileUpdate(BaseModel):
-    full_name: str | None = None  # Company name
-    hr_contact_name: str | None = None
-    email: str | None = None
-    mailing_email: str | None = None
-    phone: str | None = None
+class ProfileUpdate(BaseModel):
+    """Body of PUT /api/profile/me.
+
+    Every field is optional and only the fields sent are applied. Students may change full_name,
+    phone, linkedin_url and github_url. Companies may change full_name, hr_contact_name, email,
+    mailing_email, phone and phone_visible. Fields outside the caller's role are ignored.
+    Lengths match the database columns.
+    """
+
+    model_config = ConfigDict(extra="ignore")
+
+    full_name: str | None = Field(default=None, max_length=255)
+    phone: str | None = Field(default=None, max_length=50)
+    linkedin_url: str | None = Field(default=None, max_length=500)
+    github_url: str | None = Field(default=None, max_length=500)
+    hr_contact_name: str | None = Field(default=None, max_length=255)
+    email: OptionalEmail = None
+    mailing_email: OptionalEmail = None
     phone_visible: bool | None = None
-
-
-class JobEmailStats(BaseModel):
-    internship_id: int
-    internship_title: str
-    total_applicants: int  # Actually total candidates (all matches)
-    great_matches: int  # 80%+
-    good_matches: int  # 60-79%
-    bad_matches: int  # <60%
-    tailored_resume_count: int
