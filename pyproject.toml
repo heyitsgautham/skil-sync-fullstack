@@ -62,7 +62,7 @@ ignore = [
 ]
 
 [tool.ruff.lint.isort]
-known-first-party = ["app"]
+known-first-party = ["app", "scripts"]
 
 [tool.ruff.lint.per-file-ignores]
 "skill-sync-backend/scripts/*" = ["E402"]  # scripts add the backend root to sys.path before importing app

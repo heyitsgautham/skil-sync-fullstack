@@ -17,6 +17,15 @@ uv run uvicorn app.main:app --reload --port 8000
 ```
 
 The app creates its tables on startup.
+
+To fill an empty database with demo data, run the seed script.
+It creates an admin, 3 companies with 3 internships each and 53 students with text resumes.
+
+```bash
+SEED_PASSWORD='choose-one' uv run python scripts/seed_demo_data.py   # add --reset to drop every table first
+```
+
+Every seeded account gets `SEED_PASSWORD`, or a random password the script prints once.
 Interactive API docs live at http://localhost:8000/api/docs, and the health check at http://localhost:8000/api/healthcheck.
 
 On Linux, `uv sync` installs the CPU-only torch wheel from the PyTorch index instead of the CUDA build.
