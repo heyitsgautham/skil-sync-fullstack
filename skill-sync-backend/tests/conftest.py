@@ -60,10 +60,9 @@ def client(db_session):
     """Create a test client with database override"""
 
     def override_get_db():
-        try:
-            yield db_session
-        finally:
-            db_session.close()
+        # Share the test's session and leave it open, so objects a test created stay usable
+        # after a request. The db_session fixture closes it at the end of the test.
+        yield db_session
 
     app.dependency_overrides[get_db] = override_get_db
     with TestClient(app) as test_client:
