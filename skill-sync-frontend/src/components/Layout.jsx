@@ -190,12 +190,14 @@ const Layout = ({ children }) => {
                             sx={{
                                 borderRadius: 2,
                                 py: 1.25,
-                                pr: collapsed ? 1 : 2,
+                                pr: collapsed ? 1 : 1,
                                 pl: collapsed ? 1 : 1.5,
                                 transition: 'all 0.3s ease',
                                 '&.Mui-selected': {
                                     background: `linear-gradient(135deg, ${currentColors.primary}15 0%, ${currentColors.primary}25 100%)`,
-                                    borderLeft: `4px solid ${currentColors.primary}`,
+                                    // An inset shadow draws the accent bar without narrowing the label,
+                                    // so the selected item keeps its icon in place and its full text.
+                                    boxShadow: `inset 4px 0 0 ${currentColors.primary}`,
                                     '&:hover': {
                                         background: `linear-gradient(135deg, ${currentColors.primary}20 0%, ${currentColors.primary}30 100%)`,
                                     },
