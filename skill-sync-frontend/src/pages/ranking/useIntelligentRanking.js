@@ -126,9 +126,6 @@ export default function useIntelligentRanking() {
         setLoading(true);
         try {
             const token = localStorage.getItem('token');
-            console.log('🚀 Calling rank-candidates API with internship ID:', selectedInternship);
-            console.log('👥 Only applicants mode:', onlyApplicants);
-            console.log('🔍 Filters:', filters);
 
             // Build query parameters
             const params = new URLSearchParams({
@@ -139,37 +136,19 @@ export default function useIntelligentRanking() {
             // Add filter parameters
             Object.keys(filters).forEach(key => {
                 const value = filters[key];
-                console.log(`🔍 Filter param: ${key} = ${value} (type: ${typeof value})`);
                 // Handle boolean values explicitly
                 if (typeof value === 'boolean') {
                     params.append(key, value.toString());
-                    console.log(`✅ Added boolean filter: ${key}=${value.toString()}`);
                 } else if (value !== undefined && value !== null && value !== '') {
                     params.append(key, value.toString());
-                    console.log(`✅ Added filter: ${key}=${value.toString()}`);
                 }
             });
-
-            console.log(`🌐 Full API URL: ${API_BASE_URL}/filter/rank-candidates/${selectedInternship}?${params.toString()}`);
 
             const response = await axios.post(
                 `${API_BASE_URL}/filter/rank-candidates/${selectedInternship}?${params.toString()}`,
                 {},
                 { headers: { Authorization: `Bearer ${token}` } }
             );
-
-            console.log('📊 Rank candidates response:', response.data);
-            console.log('👥 Total candidates:', response.data.total_candidates);
-            console.log('📊 Total before filter:', response.data.total_before_filter);
-            console.log('🏆 Ranked candidates count:', response.data.ranked_candidates?.length);
-            console.log('🔒 Anonymization enabled:', response.data.anonymization_enabled);
-
-            // Log flagged candidates in results
-            const flaggedInResults = response.data.ranked_candidates?.filter(c => c.is_flagged) || [];
-            console.log(`🚩 Flagged candidates in results: ${flaggedInResults.length}`);
-            if (flaggedInResults.length > 0) {
-                console.log('🚩 Flagged candidate IDs:', flaggedInResults.map(c => c.candidate_id));
-            }
 
             setRankedCandidates(response.data.ranked_candidates || []);
             setScoringInfo(response.data.scoring_info || null);
