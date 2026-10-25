@@ -13,6 +13,7 @@ import fitz  # PyMuPDF
 from docx import Document
 
 from app.utils.gemini_key_manager import get_gemini_key_manager
+from app.utils.text import mentions_word
 
 logger = logging.getLogger(__name__)
 
@@ -352,7 +353,7 @@ Return ONLY the JSON object, no markdown, no explanation.
         """
         Basic skill extraction using keyword matching (fallback method)
         """
-        skill_patterns = {
+        skill_patterns = [
             'Python',
             'Java',
             'JavaScript',
@@ -391,13 +392,13 @@ Return ONLY the JSON object, no markdown, no explanation.
             'CSS',
             'Tailwind',
             'Bootstrap',
-        }
+        ]
 
         text_lower = text.lower()
         found_skills = []
 
         for skill in skill_patterns:
-            if skill.lower() in text_lower:
+            if mentions_word(skill.lower(), text_lower):
                 found_skills.append(skill)
 
         return found_skills[:20]  # Limit to 20 skills

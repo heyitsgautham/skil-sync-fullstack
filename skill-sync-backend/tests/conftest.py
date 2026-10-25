@@ -202,3 +202,31 @@ def fake_rag(monkeypatch, tmp_path, fake_gemini):
     engine = rag_module.RAGEngine()
     monkeypatch.setattr(rag_module.rag_engine, "_engine", engine)
     return engine
+
+
+# ---------------------------------------------------------------------------
+# Real document files for the parsers
+# ---------------------------------------------------------------------------
+
+
+def write_pdf(path, *lines):
+    """Write a one-page PDF holding each line of text."""
+    import fitz
+
+    doc = fitz.open()
+    page = doc.new_page()
+    for index, line in enumerate(lines):
+        page.insert_text((72, 72 + 18 * index), line)
+    doc.save(str(path))
+    doc.close()
+    return path
+
+
+def write_docx(path, *paragraphs):
+    from docx import Document
+
+    document = Document()
+    for paragraph in paragraphs:
+        document.add_paragraph(paragraph)
+    document.save(str(path))
+    return path
