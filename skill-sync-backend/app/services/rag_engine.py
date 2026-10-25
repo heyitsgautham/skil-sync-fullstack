@@ -91,8 +91,8 @@ class RAGEngine:
             }
         )
 
-        # Store in ChromaDB
-        self.resume_collection.add(
+        # Upsert so storing a resume again replaces its old vector instead of being ignored
+        self.resume_collection.upsert(
             embeddings=[embedding], documents=[combined_text], metadatas=[meta], ids=[f"resume_{resume_id}"]
         )
 
@@ -136,8 +136,8 @@ class RAGEngine:
             }
         )
 
-        # Store in ChromaDB
-        self.internship_collection.add(
+        # Upsert so an edited internship replaces its old vector instead of being ignored
+        self.internship_collection.upsert(
             embeddings=[embedding], documents=[combined_text], metadatas=[meta], ids=[f"internship_{internship_id}"]
         )
 

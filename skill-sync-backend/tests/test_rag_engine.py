@@ -79,3 +79,24 @@ def test_delete_and_clear(fake_rag):
 
     assert fake_rag.clear_all_resume_embeddings() == 1
     assert fake_rag.clear_all_resume_embeddings() == 0
+
+
+def test_storing_again_replaces_the_resume_vector_and_metadata(fake_rag):
+    fake_rag.store_resume_embedding("1", "python fastapi", ["Python"])
+    before = fake_rag.get_resume_embedding("1")
+
+    fake_rag.store_resume_embedding("1", "react javascript css", ["React"])
+
+    assert list(fake_rag.get_resume_embedding("1")) != list(before)
+    assert fake_rag.resume_collection.get(ids=["resume_1"])["metadatas"][0]["skills"] == "React"
+    assert fake_rag.resume_collection.count() == 1
+
+
+def test_storing_again_replaces_the_internship_vector(fake_rag):
+    fake_rag.store_internship_embedding("5", "Backend", "python services", ["Python"])
+    before = fake_rag.get_internship_embedding("5")
+
+    fake_rag.store_internship_embedding("5", "Frontend", "react pages", ["React"])
+
+    assert list(fake_rag.get_internship_embedding("5")) != list(before)
+    assert fake_rag.internship_collection.get(ids=["internship_5"])["metadatas"][0]["title"] == "Frontend"
