@@ -740,22 +740,26 @@ async def apply_to_internship(
             'required_education': internship.required_education or '',
         }
 
-        # Get embeddings from the resume being used (base or tailored)
-        candidate_embedding = resume_to_use.embedding or []
-        try:
-            internship_embedding = rag_engine.get_internship_embedding(str(internship.id))
-        except Exception:
-            internship_embedding = []
-
-        # Calculate match score
-        match_result = matching_engine.calculate_match_score(
-            candidate_data=candidate_data,
-            internship_data=internship_data,
-            candidate_embedding=candidate_embedding,
-            internship_embedding=internship_embedding,
+        # Embeddings live in ChromaDB under the resume and internship ids
+        resume_chroma_id = (
+            resume_to_use.embedding_id.replace('resume_', '') if resume_to_use.embedding_id else str(resume_to_use.id)
         )
+        candidate_embedding = rag_engine.get_resume_embedding(resume_chroma_id)
+        internship_embedding = rag_engine.get_internship_embedding(str(internship.id))
 
-        application_similarity = int(match_result['overall_score'])
+        # Without both embeddings the engine refuses to score, so the application
+        # falls back to the pre-computed base similarity below.
+        try:
+            match_result = matching_engine.calculate_match_score(
+                candidate_data=candidate_data,
+                internship_data=internship_data,
+                candidate_embedding=candidate_embedding,
+                internship_embedding=internship_embedding,
+            )
+            application_similarity = int(match_result['overall_score'])
+        except ValueError:
+            logger.warning(f"No embeddings for resume {resume_to_use.id} or internship {internship.id}")
+            application_similarity = 0
         logger.info(
             f"Calculated application similarity: {application_similarity}% (using {'tailored' if used_tailored else 'active'} resume)"
         )
