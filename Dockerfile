@@ -39,7 +39,7 @@ HEALTHCHECK --interval=30s --timeout=5s --start-period=60s --retries=3 \
 CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
 
 # ---- frontend: Vite build served by nginx -----------------------------------------------
-FROM node:24-alpine AS frontend-build
+FROM node:26-alpine AS frontend-build
 
 WORKDIR /repo
 COPY package.json package-lock.json ./
