@@ -55,7 +55,7 @@ ARG VITE_API_BASE_URL=http://localhost:8000/api
 ENV VITE_API_BASE_URL=$VITE_API_BASE_URL
 RUN npm run build -w skill-sync-frontend
 
-FROM nginx:1.27-alpine AS frontend
+FROM nginx:1.31-alpine AS frontend
 
 COPY skill-sync-frontend/nginx.conf /etc/nginx/conf.d/default.conf
 COPY --from=frontend-build /repo/skill-sync-frontend/build /usr/share/nginx/html
