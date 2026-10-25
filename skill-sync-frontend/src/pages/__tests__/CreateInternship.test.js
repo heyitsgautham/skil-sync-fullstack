@@ -27,7 +27,7 @@ beforeEach(() => {
 afterEach(() => jest.restoreAllMocks());
 
 const fillBasics = () => {
-    userEvent.type(screen.getByLabelText(/Internship Title/), 'Backend Intern');
+    userEvent.paste(screen.getByLabelText(/Internship Title/), 'Backend Intern');
     userEvent.paste(screen.getByLabelText(/Job Description/), DESCRIPTION);
 };
 
@@ -42,9 +42,11 @@ test('extracts skills, lets the company edit them, and posts the internship', as
     userEvent.click(screen.getByRole('button', { name: /Extract Skills from Description/ }));
     expect(await screen.findByText(/Extracted 3 skills!/)).toBeInTheDocument();
 
-    userEvent.type(screen.getByPlaceholderText('Type a required skill...'), 'SQL{enter}');
-    userEvent.type(screen.getByPlaceholderText('Type a preferred skill...'), 'Redis{enter}');
-    userEvent.type(screen.getByLabelText(/Location/), 'Remote');
+    userEvent.paste(screen.getByPlaceholderText('Type a required skill...'), 'SQL');
+    userEvent.type(screen.getByPlaceholderText('Type a required skill...'), '{enter}');
+    userEvent.paste(screen.getByPlaceholderText('Type a preferred skill...'), 'Redis');
+    userEvent.type(screen.getByPlaceholderText('Type a preferred skill...'), '{enter}');
+    userEvent.paste(screen.getByLabelText(/Location/), 'Remote');
     userEvent.click(screen.getByRole('button', { name: /Post Internship/ }));
 
     expect(await screen.findByTestId('navigated-away')).toBeInTheDocument();

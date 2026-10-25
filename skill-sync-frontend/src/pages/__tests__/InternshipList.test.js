@@ -45,7 +45,7 @@ test('students browse every listing and can search them', async () => {
     expect(screen.getByText('Design Intern')).toBeInTheDocument();
     expect(calls[0].path).toBe('/internship/list');
 
-    userEvent.type(screen.getByPlaceholderText(/Search by title/), 'figma');
+    userEvent.paste(screen.getByPlaceholderText(/Search by title/), 'figma');
 
     expect(screen.queryByText('Backend Intern')).not.toBeInTheDocument();
     expect(screen.getByText('Design Intern')).toBeInTheDocument();
@@ -97,10 +97,10 @@ test('a company edits its post from the details dialog', async () => {
     const dialog = await screen.findByRole('dialog', { name: /Edit Internship/ });
     const title = within(dialog).getByLabelText(/Title/);
     userEvent.clear(title);
-    userEvent.type(title, 'Backend Engineering Intern');
+    userEvent.paste(title, 'Backend Engineering Intern');
     const skills = within(dialog).getByLabelText(/Required Skills/);
     userEvent.clear(skills);
-    userEvent.type(skills, 'Python, Go');
+    userEvent.paste(skills, 'Python, Go');
     userEvent.click(within(dialog).getByRole('button', { name: 'Save Changes' }));
 
     expect(await screen.findByText('Internship updated successfully')).toBeInTheDocument();

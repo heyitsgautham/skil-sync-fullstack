@@ -30,7 +30,7 @@ test('lists every user and filters them by search', async () => {
     expect(await screen.findByText('Asha Raman')).toBeInTheDocument();
     expect(screen.getByText('3 Users')).toBeInTheDocument();
 
-    userEvent.type(screen.getByPlaceholderText(/Search by name/), 'company');
+    userEvent.paste(screen.getByPlaceholderText(/Search by name/), 'company');
 
     expect(screen.getByText('1 Users')).toBeInTheDocument();
     expect(screen.queryByText('Asha Raman')).not.toBeInTheDocument();
@@ -48,7 +48,7 @@ test('renames a user', async () => {
     const dialog = await screen.findByRole('dialog');
     const name = within(dialog).getByLabelText(/Full Name/);
     userEvent.clear(name);
-    userEvent.type(name, 'Asha R');
+    userEvent.paste(name, 'Asha R');
     userEvent.click(within(dialog).getByRole('button', { name: 'Save Changes' }));
 
     expect(await screen.findByText('User updated successfully')).toBeInTheDocument();

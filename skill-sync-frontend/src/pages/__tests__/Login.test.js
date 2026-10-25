@@ -26,8 +26,8 @@ const renderLogin = () =>
     );
 
 const fillAndSubmit = () => {
-    userEvent.type(screen.getByLabelText(/Email Address/), 'student@example.com');
-    userEvent.type(screen.getByLabelText(/Password/), 'secret123');
+    userEvent.paste(screen.getByLabelText(/Email Address/), 'student@example.com');
+    userEvent.paste(screen.getByLabelText(/Password/), 'secret123');
     userEvent.click(screen.getByRole('button', { name: 'Sign In' }));
 };
 
@@ -62,7 +62,7 @@ describe('Login page', () => {
         fillAndSubmit();
         await screen.findByText('Incorrect email or password');
 
-        userEvent.type(screen.getByLabelText(/Password/), 'x');
+        userEvent.paste(screen.getByLabelText(/Password/), 'x');
 
         await waitFor(() => expect(screen.queryByText('Incorrect email or password')).not.toBeInTheDocument());
     });
