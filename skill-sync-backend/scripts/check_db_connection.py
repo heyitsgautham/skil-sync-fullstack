@@ -13,7 +13,7 @@ from sqlalchemy import create_engine, text
 load_dotenv()
 
 
-def test_connection():
+def check_connection():
     """Test database connection"""
     try:
         DATABASE_URL = os.getenv("DATABASE_URL")
@@ -61,5 +61,5 @@ def test_connection():
 
 
 if __name__ == "__main__":
-    success = test_connection()
+    success = check_connection()
     sys.exit(0 if success else 1)

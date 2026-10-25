@@ -1,6 +1,8 @@
 """
-Simple SMTP Credentials Test
-Sends a test email to verify SMTP configuration
+SMTP credentials check.
+Sends one test email to the address given on the command line:
+
+    uv run python scripts/check_smtp.py you@example.com
 """
 
 import os
@@ -12,7 +14,7 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from app.services.email_service import email_service
 
 
-def test_smtp_credentials():
+def check_smtp(recipient):
     """Send a test email to verify SMTP credentials"""
 
     print("\n" + "=" * 60)
@@ -35,7 +37,6 @@ def test_smtp_credentials():
         return False
 
     # Test email content
-    recipient = "heyitsgautham@gmail.com"
     subject = "SkillSync SMTP Test - Feature 4"
 
     html_content = (
@@ -174,7 +175,7 @@ def test_smtp_credentials():
             print("=" * 60)
             print(f"\nEmail sent to: {recipient}")
             print(f"Subject: {subject}")
-            print("\nPlease check the inbox at heyitsgautham@gmail.com")
+            print(f"\nPlease check the inbox at {recipient}")
             print("(Check spam folder if not in inbox)")
             print("\n🎉 Your SMTP credentials are configured correctly!")
             print("\nYou can now use Feature 4: Clustered Email Notifications")
@@ -211,4 +212,6 @@ def test_smtp_credentials():
 
 
 if __name__ == "__main__":
-    test_smtp_credentials()
+    if len(sys.argv) != 2:
+        sys.exit("usage: python scripts/check_smtp.py <recipient-email>")
+    sys.exit(0 if check_smtp(sys.argv[1]) else 1)

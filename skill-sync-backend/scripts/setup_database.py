@@ -67,7 +67,7 @@ def main():
             print("\nNext steps:")
             print("1. Ensure PostgreSQL is running")
             print("2. Create database: CREATE DATABASE skillsync;")
-            print("3. Test connection: python scripts\\test_db_connection.py")
+            print("3. Test connection: python scripts\\check_db_connection.py")
             return True
 
     elif choice == "2":
@@ -85,7 +85,7 @@ def main():
                 print("\n✅ Configuration updated successfully!")
                 print("\nNext steps:")
                 print("1. Reload PostgreSQL: pg_ctl reload")
-                print("2. Test connection: python scripts\\test_db_connection.py")
+                print("2. Test connection: python scripts\\check_db_connection.py")
                 return True
         else:
             print("Please configure pg_hba.conf first, then run this script again.")

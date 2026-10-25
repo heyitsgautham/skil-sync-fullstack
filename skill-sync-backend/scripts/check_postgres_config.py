@@ -95,7 +95,7 @@ def suggest_fixes():
     print("   CREATE DATABASE skillsync;")
 
     print("\n4. TEST CONNECTION:")
-    print("   python scripts\\test_db_connection.py")
+    print("   python scripts\\check_db_connection.py")
 
 
 if __name__ == "__main__":

@@ -154,7 +154,6 @@ def check_status():
         print("✅ ALL SYSTEMS OPERATIONAL")
         print("=" * 60)
         print("\n🚀 Ready to process resumes!")
-        print("📝 Next step: Run ./scripts/test_intelligent_filtering.sh")
         return 0
     else:
         print("⚠️  SOME ISSUES DETECTED")
