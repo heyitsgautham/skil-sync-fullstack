@@ -2,6 +2,7 @@
 Test configuration and fixtures
 """
 
+import functools
 import os
 
 # Pin settings before the app modules run load_dotenv(), which walks up the
@@ -70,11 +71,18 @@ def client(db_session):
     app.dependency_overrides.clear()
 
 
+@functools.lru_cache
+def _hash_once(password):
+    """bcrypt takes about 0.2s per hash, and every test user shares a few passwords."""
+    from app.utils.security import get_password_hash
+
+    return get_password_hash(password)
+
+
 @pytest.fixture
 def make_user(db_session):
     """Create and persist a user with the given role."""
     from app.models.user import User, UserRole
-    from app.utils.security import get_password_hash
 
     counter = {"n": 0}
 
@@ -83,7 +91,7 @@ def make_user(db_session):
         user = User(
             email=fields.pop("email", f"{role.value}{counter['n']}@example.com"),
             full_name=fields.pop("full_name", f"Test {role.value.title()} {counter['n']}"),
-            hashed_password=get_password_hash(password),
+            hashed_password=_hash_once(password),
             role=role,
             **fields,
         )
