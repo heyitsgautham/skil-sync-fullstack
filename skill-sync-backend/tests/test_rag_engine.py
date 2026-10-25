@@ -2,7 +2,9 @@
 
 
 def store_internships(rag):
-    rag.store_internship_embedding("1", "Python backend intern", "Build FastAPI services in Python", ["Python", "FastAPI"])
+    rag.store_internship_embedding(
+        "1", "Python backend intern", "Build FastAPI services in Python", ["Python", "FastAPI"]
+    )
     rag.store_internship_embedding("2", "Frontend intern", "Build React pages with JavaScript", ["React", "JavaScript"])
     rag.store_internship_embedding("3", "Data intern", "Clean data with SQL and pandas", ["SQL", "pandas"])
 
