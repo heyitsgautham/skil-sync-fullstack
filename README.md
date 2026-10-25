@@ -113,7 +113,7 @@ Backend tests run against SQLite and need no running services.
 `tests/conftest.py` pins `DATABASE_URL` to a local SQLite file, so a stray `.env` cannot point the suite at a real database.
 
 GitHub Actions runs every check above on each push and pull request, plus a gitleaks scan and the Docker smoke test.
-CI fails when backend coverage drops below 70% or frontend line coverage below 6%.
+CI fails when backend coverage drops below 70% or frontend line coverage below 50%.
 
 ## Configuration
 
