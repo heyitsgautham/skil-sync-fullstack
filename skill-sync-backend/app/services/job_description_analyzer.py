@@ -14,6 +14,7 @@ def _mentions(pattern: str, text: str) -> bool:
     """True when pattern appears in text as a whole word, so "r" does not match "docker"."""
     return re.search(rf"(?<![a-z0-9]){re.escape(pattern)}(?![a-z0-9])", text) is not None
 
+
 logger = logging.getLogger(__name__)
 
 
