@@ -112,3 +112,10 @@ def test_report_fails_when_smtp_fails(client, matched, auth_headers, monkeypatch
     response = client.post(f"{API}/send-job-email/{matched.backend.id}", headers=auth_headers(matched.company))
     assert response.status_code == 500
 
+
+def test_all_jobs_report(client, matched, auth_headers, sent):
+    response = client.post(f"{API}/send-job-email/0", headers=auth_headers(matched.company))
+
+    assert response.status_code == 200
+    assert response.json()["internship_title"] == "All Jobs"
+    assert response.json()["total_applicants"] == 6

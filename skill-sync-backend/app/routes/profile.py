@@ -288,6 +288,7 @@ def send_job_email(
         # Send email for all jobs
         job_stats = stats_response["all_jobs_stats"]
         internship_title = "All Jobs"
+        internship = None  # the exports read each match's own internship
 
         # Get ALL matched candidates for all company internships
         matches_query = (
@@ -470,7 +471,7 @@ def generate_csv_export_from_matches(matches, db, internship):
 
         # Get skills from parsed data and match with required skills
         candidate_skills = parsed_data.get('all_skills', [])
-        required_skills = internship.required_skills or []
+        required_skills = (internship or match.internship).required_skills or []
         matched_skills = [s for s in candidate_skills if s.lower() in [rs.lower() for rs in required_skills]]
         top_skills = ', '.join(matched_skills[:5]) if matched_skills else 'N/A'
 
@@ -532,52 +533,6 @@ def generate_csv_export_from_matches(matches, db, internship):
     return output.getvalue()
 
 
-def generate_csv_export(applications, db):
-    """Generate CSV content from applications (legacy - for backwards compatibility)"""
-    output = io.StringIO()
-    writer = csv.writer(output)
-
-    # Write header
-    writer.writerow(
-        [
-            'Candidate Name',
-            'Email',
-            'Phone',
-            'Match Score (%)',
-            'Tailored Resume',
-            'Top Skills',
-            'Experience (Years)',
-            'Application Date',
-            'Status',
-        ]
-    )
-
-    # Write data
-    for app in applications:
-        student = db.query(User).filter(User.id == app.student_id).first()
-        if not student:
-            continue
-
-        score = app.application_similarity_score or app.match_score or 0
-        skills_str = ', '.join(student.skills[:5]) if student.skills else 'N/A'
-
-        writer.writerow(
-            [
-                student.full_name,
-                student.email,
-                student.phone or 'N/A',
-                score,
-                'Yes' if app.used_tailored_resume == 1 else 'No',
-                skills_str,
-                student.total_experience_years or 0,
-                app.created_at.strftime('%Y-%m-%d %H:%M'),
-                app.status,
-            ]
-        )
-
-    return output.getvalue()
-
-
 def generate_excel_export_from_matches(matches, db, internship):
     """Generate Excel (XLSX) content from matched candidates - matches intelligent_filtering export format"""
 
@@ -598,7 +553,7 @@ def generate_excel_export_from_matches(matches, db, internship):
 
     # Add title row (row 1)
     ws.merge_cells('A1:M1')
-    ws['A1'] = f"Candidate Rankings - {internship.title}"
+    ws['A1'] = f"Candidate Rankings - {internship.title if internship else 'All Jobs'}"
     ws['A1'].font = Font(bold=True, size=14)
     ws['A1'].alignment = Alignment(horizontal="center")
 
@@ -664,7 +619,7 @@ def generate_excel_export_from_matches(matches, db, internship):
 
         # Get skills from parsed data and match with required skills
         candidate_skills = parsed_data.get('all_skills', [])
-        required_skills = internship.required_skills or []
+        required_skills = (internship or match.internship).required_skills or []
         matched_skills = [s for s in candidate_skills if s.lower() in [rs.lower() for rs in required_skills]]
         top_skills = ', '.join(matched_skills[:5]) if matched_skills else 'N/A'
 
