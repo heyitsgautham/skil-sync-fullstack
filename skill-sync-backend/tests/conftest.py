@@ -9,7 +9,9 @@ import os
 # directory tree and would otherwise pick up an unrelated .env. load_dotenv never
 # overrides a variable that is already set, so empty values keep every test
 # away from real Gemini, AWS and SMTP accounts.
-os.environ["DATABASE_URL"] = "sqlite:///./test.db"
+# TEST_DATABASE_URL runs the same suite against another database, such as the Postgres service in CI.
+TEST_DATABASE_URL = os.environ.get("TEST_DATABASE_URL", "sqlite:///./test.db")
+os.environ["DATABASE_URL"] = TEST_DATABASE_URL
 for _name in (
     "GOOGLE_API_KEY",
     "GEMINI_KEY_RESUME_PARSING",
@@ -37,10 +39,12 @@ from sqlalchemy.orm import sessionmaker  # noqa: E402
 from app.database.connection import Base, get_db  # noqa: E402
 from app.main import app  # noqa: E402
 
-# Use in-memory SQLite for testing
-SQLALCHEMY_DATABASE_URL = "sqlite:///./test.db"
+SQLALCHEMY_DATABASE_URL = TEST_DATABASE_URL
 
-engine = create_engine(SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False})
+engine = create_engine(
+    SQLALCHEMY_DATABASE_URL,
+    connect_args={"check_same_thread": False} if SQLALCHEMY_DATABASE_URL.startswith("sqlite") else {},
+)
 TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 

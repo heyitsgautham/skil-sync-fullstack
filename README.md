@@ -110,6 +110,7 @@ The dev server runs on http://localhost:3000.
 | Frontend dependency audit | `npm audit --omit=dev --audit-level=high` |
 
 Backend tests run against SQLite and need no running services.
+Set `TEST_DATABASE_URL` to a Postgres URL to run the same suite there, as the `Backend tests on Postgres` CI job does.
 `tests/conftest.py` pins `DATABASE_URL` to a local SQLite file, so a stray `.env` cannot point the suite at a real database.
 
 GitHub Actions runs every check above on each push and pull request, plus a gitleaks scan and the Docker smoke test.
