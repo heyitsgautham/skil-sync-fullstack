@@ -1,20 +1,17 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { Container, Box, Typography, Paper, Card, CardContent, Button, Alert, Grid, Divider } from '@mui/material';
-import WorkIcon from '@mui/icons-material/Work';
-import LocationOnIcon from '@mui/icons-material/LocationOn';
-import AccessTimeIcon from '@mui/icons-material/AccessTime';
-import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
+import { Container, Box, Typography, Paper, Button, Alert, Grid } from '@mui/material';
 import TrendingUpIcon from '@mui/icons-material/TrendingUp';
-import { motion } from 'framer-motion';
 import toast from 'react-hot-toast';
 import apiClient from '../services/api';
 import Layout from '../components/Layout';
-import AnimatedMatchScore from '../components/AnimatedMatchScore';
 import { InternshipListSkeleton } from '../components/SkeletonLoader';
 import FilterPanel from '../components/FilterPanel';
 import PaginationControls from '../components/PaginationControls';
 import SortControls from '../components/SortControls';
+import NoRecommendations from './recommendations/NoRecommendations';
+import RecommendationCard from './recommendations/RecommendationCard';
+import ResumeTip from './recommendations/ResumeTip';
 
 const RecommendedInternships = () => {
     const navigate = useNavigate();
@@ -379,121 +376,13 @@ const RecommendedInternships = () => {
                 )}
 
                 {!loading && !error && recommendations.length === 0 && total === 0 && (
-                    <Paper
-                        elevation={0}
-                        sx={{
-                            p: 6,
-                            textAlign: 'center',
-                            borderRadius: 4,
-                            background: 'rgba(255, 255, 255, 0.95)',
-                            backdropFilter: 'blur(20px)',
-                            boxShadow: '0 8px 32px rgba(0,0,0,0.08)',
-                        }}
-                    >
-                        <Box
-                            sx={{
-                                width: 120,
-                                height: 120,
-                                borderRadius: '50%',
-                                background:
-                                    'linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(29, 78, 216, 0.1) 100%)',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                margin: '0 auto 24px',
-                            }}
-                        >
-                            <WorkIcon sx={{ fontSize: 60, color: '#3b82f6' }} />
-                        </Box>
-                        <Typography variant="h5" gutterBottom sx={{ fontWeight: 700, mb: 2 }}>
-                            {allRecommendations.length === 0 ? 'No Recommendations Yet' : 'No Matching Jobs Found'}
-                        </Typography>
-                        <Typography variant="body1" color="text.secondary" sx={{ mb: 2, maxWidth: 600, mx: 'auto' }}>
-                            {allRecommendations.length === 0
-                                ? "We're still processing internship matches for your profile. This usually takes a few moments."
-                                : 'No internships match your current filter criteria. Try adjusting your filters to see more results.'}
-                        </Typography>
-                        {allRecommendations.length === 0 && (
-                            <Typography
-                                variant="body2"
-                                color="text.secondary"
-                                sx={{ mb: 4, maxWidth: 600, mx: 'auto', fontStyle: 'italic' }}
-                            >
-                                If you haven't uploaded your resume yet, click the button below to get started. If
-                                you've already uploaded it, matches should appear shortly!
-                            </Typography>
-                        )}
-                        <Box sx={{ display: 'flex', gap: 2, justifyContent: 'center', flexWrap: 'wrap' }}>
-                            {allRecommendations.length === 0 ? (
-                                <>
-                                    <Button
-                                        variant="contained"
-                                        size="large"
-                                        onClick={() => navigate('/upload-resume')}
-                                        sx={{
-                                            py: 1.5,
-                                            px: 4,
-                                            borderRadius: 2,
-                                            background: 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)',
-                                            fontWeight: 700,
-                                            textTransform: 'none',
-                                            fontSize: '1rem',
-                                            boxShadow: '0 4px 16px rgba(59, 130, 246, 0.3)',
-                                            '&:hover': {
-                                                transform: 'translateY(-2px)',
-                                                boxShadow: '0 8px 24px rgba(59, 130, 246, 0.4)',
-                                            },
-                                        }}
-                                    >
-                                        Upload Resume
-                                    </Button>
-                                    <Button
-                                        variant="outlined"
-                                        size="large"
-                                        onClick={fetchRecommendations}
-                                        sx={{
-                                            py: 1.5,
-                                            px: 4,
-                                            borderRadius: 2,
-                                            borderColor: '#3b82f6',
-                                            color: '#3b82f6',
-                                            fontWeight: 700,
-                                            textTransform: 'none',
-                                            fontSize: '1rem',
-                                            '&:hover': {
-                                                borderColor: '#1d4ed8',
-                                                backgroundColor: 'rgba(59, 130, 246, 0.05)',
-                                            },
-                                        }}
-                                    >
-                                        Refresh
-                                    </Button>
-                                </>
-                            ) : (
-                                <Button
-                                    variant="contained"
-                                    size="large"
-                                    onClick={handleClearFilters}
-                                    sx={{
-                                        py: 1.5,
-                                        px: 4,
-                                        borderRadius: 2,
-                                        background: 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)',
-                                        fontWeight: 700,
-                                        textTransform: 'none',
-                                        fontSize: '1rem',
-                                        boxShadow: '0 4px 16px rgba(59, 130, 246, 0.3)',
-                                        '&:hover': {
-                                            transform: 'translateY(-2px)',
-                                            boxShadow: '0 8px 24px rgba(59, 130, 246, 0.4)',
-                                        },
-                                    }}
-                                >
-                                    Clear All Filters
-                                </Button>
-                            )}
-                        </Box>
-                    </Paper>
+                    <NoRecommendations
+                        filters={filters}
+                        allRecommendations={allRecommendations}
+                        navigate={navigate}
+                        fetchRecommendations={fetchRecommendations}
+                        handleClearFilters={handleClearFilters}
+                    />
                 )}
 
                 {!loading && !error && recommendations.length > 0 && (
@@ -502,147 +391,7 @@ const RecommendedInternships = () => {
                         <Grid container spacing={3}>
                             {recommendations.map((internship, index) => (
                                 <Grid size={{ xs: 12 }} key={internship.id} sx={{ display: 'flex' }}>
-                                    <motion.div
-                                        initial={{ opacity: 0, y: 50 }}
-                                        animate={{ opacity: 1, y: 0 }}
-                                        transition={{
-                                            duration: 0.5,
-                                            delay: index * 0.1,
-                                            ease: 'easeOut',
-                                        }}
-                                        style={{ width: '100%' }}
-                                    >
-                                        <Card
-                                            elevation={0}
-                                            sx={{
-                                                width: '100%',
-                                                borderRadius: 4,
-                                                background: 'rgba(255, 255, 255, 0.95)',
-                                                backdropFilter: 'blur(20px)',
-                                                boxShadow: '0 8px 32px rgba(0,0,0,0.08)',
-                                                border: '1px solid rgba(255,255,255,0.3)',
-                                                transition: 'all 0.3s ease',
-                                                '&:hover': {
-                                                    transform: 'translateY(-8px)',
-                                                    boxShadow: '0 16px 48px rgba(0,0,0,0.12)',
-                                                },
-                                            }}
-                                        >
-                                            <CardContent sx={{ p: 4 }}>
-                                                <Box
-                                                    sx={{
-                                                        display: 'flex',
-                                                        justifyContent: 'space-between',
-                                                        alignItems: 'flex-start',
-                                                        mb: 3,
-                                                        gap: 3,
-                                                    }}
-                                                >
-                                                    <Box sx={{ display: 'flex', alignItems: 'center', flex: 1 }}>
-                                                        <Box
-                                                            sx={{
-                                                                width: 56,
-                                                                height: 56,
-                                                                borderRadius: 2,
-                                                                background:
-                                                                    'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)',
-                                                                display: 'flex',
-                                                                alignItems: 'center',
-                                                                justifyContent: 'center',
-                                                                mr: 2,
-                                                                boxShadow: '0 4px 12px rgba(59, 130, 246, 0.3)',
-                                                            }}
-                                                        >
-                                                            <WorkIcon sx={{ color: 'white', fontSize: 32 }} />
-                                                        </Box>
-                                                        <Box>
-                                                            <Typography
-                                                                variant="h5"
-                                                                component="div"
-                                                                sx={{
-                                                                    fontWeight: 700,
-                                                                    color: '#1a1a1a',
-                                                                    mb: 0.5,
-                                                                }}
-                                                            >
-                                                                {internship.title}
-                                                            </Typography>
-                                                            {internship.company_name && (
-                                                                <Typography
-                                                                    variant="subtitle1"
-                                                                    sx={{
-                                                                        fontWeight: 600,
-                                                                        color: '#3b82f6',
-                                                                    }}
-                                                                >
-                                                                    {internship.company_name}
-                                                                </Typography>
-                                                            )}
-                                                        </Box>
-                                                    </Box>
-                                                    <Box sx={{ minWidth: 120 }}>
-                                                        <AnimatedMatchScore
-                                                            score={internship.match_score}
-                                                            size={100}
-                                                            showLabel={false}
-                                                        />
-                                                    </Box>
-                                                </Box>
-
-                                                <Typography
-                                                    variant="body1"
-                                                    color="text.secondary"
-                                                    sx={{
-                                                        mb: 3,
-                                                        lineHeight: 1.7,
-                                                    }}
-                                                >
-                                                    {internship.description}
-                                                </Typography>
-
-                                                <Divider sx={{ my: 3, borderColor: 'rgba(0,0,0,0.08)' }} />
-
-                                                <Grid container spacing={2} sx={{ mb: 2 }}>
-                                                    {internship.location && (
-                                                        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-                                                            <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                                                                <LocationOnIcon
-                                                                    sx={{ mr: 1, color: 'action.active' }}
-                                                                />
-                                                                <Typography variant="body2">
-                                                                    {internship.location}
-                                                                </Typography>
-                                                            </Box>
-                                                        </Grid>
-                                                    )}
-                                                    {internship.duration && (
-                                                        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-                                                            <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                                                                <AccessTimeIcon
-                                                                    sx={{ mr: 1, color: 'action.active' }}
-                                                                />
-                                                                <Typography variant="body2">
-                                                                    {internship.duration}
-                                                                </Typography>
-                                                            </Box>
-                                                        </Grid>
-                                                    )}
-                                                    {internship.stipend && (
-                                                        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-                                                            <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                                                                <AttachMoneyIcon
-                                                                    sx={{ mr: 1, color: 'action.active' }}
-                                                                />
-                                                                <Typography variant="body2">
-                                                                    {internship.stipend}
-                                                                </Typography>
-                                                            </Box>
-                                                        </Grid>
-                                                    )}
-                                                </Grid>
-                                            </CardContent>
-                                        </Card>
-                                    </motion.div>
+                                    <RecommendationCard internship={internship} index={index} />
                                 </Grid>
                             ))}
                         </Grid>
@@ -659,43 +408,7 @@ const RecommendedInternships = () => {
                     </>
                 )}
 
-                {!loading && !error && total > 0 && recommendations.length > 0 && (
-                    <Paper
-                        elevation={0}
-                        sx={{
-                            p: 3,
-                            mt: 4,
-                            borderRadius: 4,
-                            background:
-                                'linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(29, 78, 216, 0.1) 100%)',
-                            border: '1px solid rgba(59, 130, 246, 0.2)',
-                        }}
-                    >
-                        <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                            <Box
-                                sx={{
-                                    width: 48,
-                                    height: 48,
-                                    borderRadius: 2,
-                                    background: 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    mr: 2,
-                                    flexShrink: 0,
-                                }}
-                            >
-                                <Typography variant="h5" sx={{ color: 'white' }}>
-                                    💡
-                                </Typography>
-                            </Box>
-                            <Typography variant="body1" sx={{ color: '#1a1a1a', fontWeight: 500 }}>
-                                <strong>Pro Tip:</strong> Keep your resume updated to get better recommendations. The
-                                more detailed your skills and experience, the better we can match you!
-                            </Typography>
-                        </Box>
-                    </Paper>
-                )}
+                {!loading && !error && total > 0 && recommendations.length > 0 && <ResumeTip />}
             </Container>
         </Layout>
     );
