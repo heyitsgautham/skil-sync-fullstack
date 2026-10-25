@@ -9,6 +9,7 @@ from app.models.internship import Internship
 from app.models.resume import Resume
 from app.models.user import User
 from app.routes.intelligent_filtering.common import router
+from app.services.candidate_filters import experience_years, resume_matches
 from app.utils.security import get_current_company
 
 
@@ -57,7 +58,7 @@ async def get_filtered_ranked_candidates(
     """
     import logging
 
-    from sqlalchemy import and_, func, or_
+    from sqlalchemy import and_
 
     logger = logging.getLogger(__name__)
 
@@ -116,32 +117,12 @@ async def get_filtered_ranked_candidates(
         if max_score is not None:
             filters.append(StudentInternshipMatch.base_similarity_score <= max_score)
 
-        # Skills filter
-        if skills:
-            skill_list = [s.strip().lower() for s in skills.split(',')]
-            # This requires querying the parsed_data JSON field
-            skill_filters = []
-            for skill in skill_list:
-                skill_filters.append(
-                    func.json_search(Resume.parsed_data, 'one', f'%{skill}%', None, '$.all_skills').isnot(None)
-                )
-            if skill_filters:
-                filters.append(or_(*skill_filters))
-
         # Experience filter
         if experience_min is not None or experience_max is not None:
             if experience_min is not None:
-                filters.append(func.json_extract(Resume.parsed_data, '$.total_experience_years') >= experience_min)
+                filters.append(experience_years(Resume.parsed_data) >= experience_min)
             if experience_max is not None:
-                filters.append(func.json_extract(Resume.parsed_data, '$.total_experience_years') <= experience_max)
-
-        # Education level filter
-        if education_level:
-            filters.append(
-                func.json_search(
-                    Resume.parsed_data, 'one', f'%{education_level}%', None, '$.education[*].degree'
-                ).isnot(None)
-            )
+                filters.append(experience_years(Resume.parsed_data) <= experience_max)
 
         # Application status filter (only if filtering applicants)
         if only_applicants and application_status:
@@ -157,7 +138,7 @@ async def get_filtered_ranked_candidates(
             else:
                 query = query.order_by(StudentInternshipMatch.base_similarity_score.desc())
         elif sort_by == "experience":
-            exp_field = func.json_extract(Resume.parsed_data, '$.total_experience_years')
+            exp_field = experience_years(Resume.parsed_data)
             if sort_order == "asc":
                 query = query.order_by(exp_field.asc())
             else:
@@ -176,15 +157,16 @@ async def get_filtered_ranked_candidates(
             # Default: sort by score descending
             query = query.order_by(StudentInternshipMatch.base_similarity_score.desc())
 
-        # Get total count before pagination
-        total = query.count()
-
-        # Apply pagination
+        # Skills and education live inside JSON lists, so they are checked in Python on the rows
+        # the SQL filters already narrowed. Paging then happens on the checked rows.
         offset = (page - 1) * page_size
-        query = query.offset(offset).limit(page_size)
-
-        # Execute query
-        results = query.all()
+        if skills or education_level:
+            matching = [row for row in query.all() if resume_matches(row[2].parsed_data, skills, education_level)]
+            total = len(matching)
+            results = matching[offset : offset + page_size]
+        else:
+            total = query.count()
+            results = query.offset(offset).limit(page_size).all()
 
         logger.info(f"✅ Found {total} total candidates, returning page {page} ({len(results)} items)")
 

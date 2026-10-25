@@ -13,6 +13,7 @@ from app.models.internship import Internship
 from app.models.resume import Resume
 from app.models.user import User
 from app.routes.intelligent_filtering.common import router
+from app.services.candidate_filters import experience_years, resume_matches
 from app.utils.security import get_current_company
 
 
@@ -59,7 +60,7 @@ async def export_candidate_rankings(
 
     import openpyxl
     from openpyxl.styles import Alignment, Border, Font, PatternFill, Side
-    from sqlalchemy import and_, func, or_
+    from sqlalchemy import and_
 
     logger = logging.getLogger(__name__)
 
@@ -117,31 +118,12 @@ async def export_candidate_rankings(
             if max_score is not None:
                 filters.append(StudentInternshipMatch.base_similarity_score <= max_score)
 
-            # Skills filter
-            if skills:
-                skill_list = [s.strip().lower() for s in skills.split(',')]
-                skill_filters = []
-                for skill in skill_list:
-                    skill_filters.append(
-                        func.json_search(Resume.parsed_data, 'one', f'%{skill}%', None, '$.all_skills').isnot(None)
-                    )
-                if skill_filters:
-                    filters.append(or_(*skill_filters))
-
             # Experience filter
             if experience_min is not None or experience_max is not None:
                 if experience_min is not None:
-                    filters.append(func.json_extract(Resume.parsed_data, '$.total_experience_years') >= experience_min)
+                    filters.append(experience_years(Resume.parsed_data) >= experience_min)
                 if experience_max is not None:
-                    filters.append(func.json_extract(Resume.parsed_data, '$.total_experience_years') <= experience_max)
-
-            # Education level filter
-            if education_level:
-                filters.append(
-                    func.json_search(
-                        Resume.parsed_data, 'one', f'%{education_level}%', None, '$.education[*].degree'
-                    ).isnot(None)
-                )
+                    filters.append(experience_years(Resume.parsed_data) <= experience_max)
 
             # Application status filter
             if only_applicants and application_status:
@@ -153,13 +135,16 @@ async def export_candidate_rankings(
         # Sort by match score (highest first)
         query = query.order_by(StudentInternshipMatch.base_similarity_score.desc())
 
+        # Skills and education live inside JSON lists, so they are checked in Python on the rows
+        # the SQL filters already narrowed.
+        results = query.all()
+        if export_type != "all" and (skills or education_level):
+            results = [row for row in results if resume_matches(row[2].parsed_data, skills, education_level)]
+
         # Apply pagination for current_page export
         if export_type == "current_page":
             offset = (page - 1) * page_size
-            query = query.offset(offset).limit(page_size)
-
-        # Execute query
-        results = query.all()
+            results = results[offset : offset + page_size]
 
         logger.info(f"✅ Found {len(results)} candidates to export")
 

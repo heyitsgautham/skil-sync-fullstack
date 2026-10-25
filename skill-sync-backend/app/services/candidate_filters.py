@@ -91,3 +91,33 @@ def attach_flag_info(candidates: list[dict], flag_info: dict[int, dict]) -> None
             candidate['flag_reasons'] = []
             candidate['flagged_with'] = {}
             candidate['flag_reason_text'] = None
+
+
+def experience_years(parsed_data_column):
+    """SQL expression for parsed_data.total_experience_years as a number.
+
+    SQLAlchemy renders it as CAST(parsed_data ->> 'total_experience_years' AS FLOAT) on Postgres and as
+    JSON_EXTRACT on SQLite. A resume without the key yields NULL, which no comparison matches.
+    """
+    return parsed_data_column["total_experience_years"].as_float()
+
+
+def resume_matches(parsed_data: dict | None, skills: str | None = None, education_level: str | None = None) -> bool:
+    """Check the resume-level filters of the filtered ranking and export endpoints.
+
+    skills is comma-separated, and a resume passes when any one of them appears inside one of its
+    all_skills entries. education_level passes when it appears inside one of the education degrees.
+    Both checks ignore case, as the original MySQL json_search filters did.
+    """
+    data = parsed_data or {}
+    if skills:
+        wanted = [s.strip().lower() for s in skills.split(',') if s.strip()]
+        have = [str(s).lower() for s in data.get('all_skills') or []]
+        if wanted and not any(w in h for w in wanted for h in have):
+            return False
+    if education_level:
+        level = education_level.lower()
+        degrees = [str((entry or {}).get('degree', '')).lower() for entry in data.get('education') or []]
+        if not any(level in degree for degree in degrees):
+            return False
+    return True
