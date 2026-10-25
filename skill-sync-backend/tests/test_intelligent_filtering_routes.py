@@ -267,3 +267,13 @@ def test_applications_are_recorded(db_session, client, matched, auth_headers):
     apply(client, auth_headers, matched.students["asha"], matched.backend.id)
     assert db_session.query(Application).count() == 1
 
+
+def test_candidate_profile_by_public_user_id(client, matched, company, auth_headers):
+    student = matched.students["meera"]
+    apply(client, auth_headers, student, matched.backend.id)
+
+    response = client.get(f"{API}/candidate-profile/{student.user_id}", headers=company)
+
+    assert response.status_code == 200
+    assert response.json()["profile"]["all_skills"] == ["Python", "SQL"]
+    assert response.json()["metadata"]["total_applications"] == 1

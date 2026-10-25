@@ -815,7 +815,10 @@ async def get_detailed_candidate_profile(
         if not student:
             raise HTTPException(status_code=404, detail="Candidate not found")
 
-        resume = db.query(Resume).filter(Resume.student_id == student_id).first()
+        resume = (
+            db.query(Resume).filter(Resume.student_id == student.id, Resume.is_active == 1).first()
+            or db.query(Resume).filter(Resume.student_id == student.id).first()
+        )
         if not resume or not resume.parsed_data:
             raise HTTPException(status_code=404, detail="Resume data not found")
 
@@ -825,7 +828,7 @@ async def get_detailed_candidate_profile(
             "profile": resume.parsed_data,
             "metadata": {
                 "resume_uploaded_at": resume.uploaded_at.isoformat() if hasattr(resume, 'uploaded_at') else None,
-                "total_applications": db.query(Application).filter(Application.student_id == student_id).count(),
+                "total_applications": db.query(Application).filter(Application.student_id == student.id).count(),
             },
         }
 
