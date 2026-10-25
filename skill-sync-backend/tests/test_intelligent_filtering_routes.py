@@ -277,3 +277,8 @@ def test_candidate_profile_by_public_user_id(client, matched, company, auth_head
     assert response.status_code == 200
     assert response.json()["profile"]["all_skills"] == ["Python", "SQL"]
     assert response.json()["metadata"]["total_applications"] == 1
+
+
+def test_bulk_parse_stub_is_gone(client, matched, company):
+    files = [("files", ("a.txt", b"x", "text/plain"))]
+    assert client.post(f"{API}/bulk-parse", files=files, headers=company).status_code == 404

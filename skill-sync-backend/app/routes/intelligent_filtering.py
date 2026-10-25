@@ -923,39 +923,6 @@ async def calculate_match_score(
         raise HTTPException(status_code=500, detail=f"Error calculating match: {str(e)}")
 
 
-@router.post("/bulk-parse")
-async def bulk_parse_resumes(
-    files: list[UploadFile] = File(...), db: Session = Depends(get_db), current_user: User = Depends(get_current_user)
-):
-    """
-    Bulk parse multiple resumes at once
-
-    Useful for:
-    - Onboarding multiple students
-    - Batch processing of resumes
-    - Testing with sample data
-    """
-    results = []
-    errors = []
-
-    for file in files:
-        try:
-            # Process each file (similar to single parse endpoint)
-            # ... (simplified for brevity)
-            results.append({"filename": file.filename, "status": "success"})
-        except Exception as e:
-            errors.append({"filename": file.filename, "error": str(e)})
-
-    return {
-        "success": True,
-        "total_processed": len(results),
-        "successful": len(results),
-        "failed": len(errors),
-        "results": results,
-        "errors": errors,
-    }
-
-
 @router.post("/compute-matches")
 async def compute_batch_similarity_matches(
     force_recompute: bool = False,
