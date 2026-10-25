@@ -26,13 +26,13 @@ Every user has one of three roles, student, company or admin.
 
 ```
 skill-sync-frontend/  React 19 + MUI, Create React App
-  src/pages/          one file per screen
+  src/pages/          one file per screen, the largest split into a hook and section components
   src/components/     shared UI
   src/services/       API client, auth, apiConfig.js holds the backend URL
 
 skill-sync-backend/   FastAPI on Python 3.12
   app/main.py         app, CORS and router registration
-  app/routes/         HTTP endpoints, mounted under /api
+  app/routes/         HTTP endpoints, mounted under /api, with /api/filter in its own package
   app/services/       parsing, matching, RAG engine, email, S3, anonymization
   app/models/         SQLAlchemy models
   app/utils/          JWT auth and the Gemini key manager
@@ -113,7 +113,7 @@ Backend tests run against SQLite and need no running services.
 `tests/conftest.py` pins `DATABASE_URL` to a local SQLite file, so a stray `.env` cannot point the suite at a real database.
 
 GitHub Actions runs every check above on each push and pull request, plus a gitleaks scan and the Docker smoke test.
-CI fails when backend coverage drops below 70% or frontend line coverage below 50%.
+CI fails when backend coverage drops below 75% or frontend line coverage below 50%.
 
 ## Configuration
 

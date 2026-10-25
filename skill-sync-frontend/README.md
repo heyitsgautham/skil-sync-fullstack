@@ -32,6 +32,8 @@ Every API call reads its base URL from `src/services/apiConfig.js`, which reads 
 |---|---|
 | `src/App.js` | Routes, with `PrivateRoute` guarding the signed-in pages |
 | `src/pages/` | One component per screen, with role-specific profiles under `admin/`, `company/` and `student/` |
+| `src/pages/dashboard/`, `ranking/`, `resumeIntelligence/` | The hook and sections behind the three largest pages |
+| `src/testUtils/` | The fake backend and router helpers the page tests share |
 | `src/components/` | Shared UI such as `Layout`, `CollapsibleSection` and the candidate modals |
 | `src/services/` | `apiConfig.js`, the axios client in `api.js` and `authService.js` |
 | `src/tests/`, `**/__tests__/` | Jest and Testing Library tests |
