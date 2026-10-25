@@ -179,8 +179,11 @@ class FakeGemini:
 
 @pytest.fixture(autouse=True)
 def offline_guard(monkeypatch):
-    """Fail loudly if a test would load the real embedding model."""
+    """Fail loudly if a test would load the real embedding model, and skip Gemini retry sleeps."""
     from app.services import rag_engine as rag_module
+    from app.utils import gemini_key_manager
+
+    monkeypatch.setattr(gemini_key_manager.time, "sleep", lambda seconds: None)
 
     def refuse():
         raise RuntimeError("This test touched the real RAGEngine. Use the fake_rag fixture.")
