@@ -19,7 +19,9 @@ services:
       retries: 10
 
   backend:
-    build: ./skill-sync-backend
+    build:
+      context: .
+      dockerfile: skill-sync-backend/Dockerfile
     env_file:
       - path: ./skill-sync-backend/.env
         required: false

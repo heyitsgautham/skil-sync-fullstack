@@ -16,9 +16,6 @@ jobs:
   backend:
     name: Backend (lint, test, audit)
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: skill-sync-backend
     steps:
       - uses: actions/checkout@v4
 
@@ -26,7 +23,7 @@ jobs:
         with:
           python-version: "3.12"
           enable-cache: true
-          cache-dependency-glob: skill-sync-backend/uv.lock
+          cache-dependency-glob: uv.lock
 
       - name: Install dependencies
         run: uv sync --frozen
@@ -37,7 +34,7 @@ jobs:
       - name: Check formatting
         run: uv run ruff format --check .
 
-      - name: Test with coverage
+      - name: Test
         run: uv run pytest --cov --cov-report=term --cov-report=xml
 
       - name: Audit dependencies
@@ -67,9 +64,6 @@ jobs:
           --health-interval 5s
           --health-timeout 5s
           --health-retries 10
-    defaults:
-      run:
-        working-directory: skill-sync-backend
     steps:
       - uses: actions/checkout@v4
 
@@ -77,7 +71,7 @@ jobs:
         with:
           python-version: "3.12"
           enable-cache: true
-          cache-dependency-glob: skill-sync-backend/uv.lock
+          cache-dependency-glob: uv.lock
 
       - name: Install dependencies
         run: uv sync --frozen

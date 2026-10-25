@@ -7,8 +7,11 @@ The [root README](../README.md) covers the architecture, Docker and the full con
 
 You need Python 3.11 to 3.13, [uv](https://docs.astral.sh/uv/) and PostgreSQL.
 
+The repository root is the uv workspace, so run `uv sync` there first.
+It installs this package's dependencies and the dev tools into the root `.venv`.
+
 ```bash
-uv sync
+cd .. && uv sync && cd skill-sync-backend
 cp .env.example .env          # set DATABASE_URL, SECRET_KEY and the Gemini keys
 uv run uvicorn app.main:app --reload --port 8000
 ```
@@ -20,13 +23,15 @@ On Linux, `uv sync` installs the CPU-only torch wheel from the PyTorch index ins
 
 ## Test and lint
 
+Run these from the repository root, where the pytest, coverage and ruff settings live.
+
 ```bash
 uv run pytest --cov           # SQLite only, no services needed
 uv run ruff check .
 uv run ruff format --check .
 ```
 
-`tests/test_imports.py` imports every module under `app/`, so a module that imports something deleted fails the suite.
+`skill-sync-backend/tests/test_imports.py` imports every module under `app/`, so a module that imports something deleted fails the suite.
 
 ## Layout
 

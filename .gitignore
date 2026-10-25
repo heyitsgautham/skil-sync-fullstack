@@ -1,0 +1,22 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+.pytest_cache/
+.ruff_cache/
+.coverage
+coverage.xml
+htmlcov/
+*.db
+
+# Node
+node_modules/
+coverage/
+
+# Local settings
+.env
+.env.local
+.env.*.local
+
+# OS
+.DS_Store

@@ -10,12 +10,11 @@ Follow "Local development" in the [README](README.md) to install the backend wit
 Run the same checks CI runs.
 
 ```bash
-cd skill-sync-backend
 uv run ruff check .
 uv run ruff format --check .
 uv run pytest --cov
 
-cd ../skill-sync-frontend
+cd skill-sync-frontend
 npm run lint
 npm run test:coverage
 npm run build
@@ -41,7 +40,7 @@ Mock Gemini, S3 and SMTP, and never call a paid API from a test.
 Frontend tests sit next to the code in `__tests__/` folders or in `src/tests/`.
 Query by role or label with Testing Library, and mock axios at the module boundary.
 
-Coverage floors in `pyproject.toml` and `package.json` only go up.
+Coverage floors in the root `pyproject.toml` and in `skill-sync-frontend/package.json` only go up.
 Raise them in the same pull request that adds the tests.
 
 ## Secrets
@@ -52,6 +51,6 @@ If you find a committed secret, tell the maintainers so they can rotate it.
 
 ## Style
 
-Python follows the ruff config in `skill-sync-backend/pyproject.toml`, with 120-character lines.
+Python follows the ruff config in the root `pyproject.toml`, with 120-character lines.
 JavaScript follows the `react-app` ESLint config, and lint allows zero warnings.
 Backend code logs through `logging.getLogger(__name__)` rather than `print`.

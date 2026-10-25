@@ -76,9 +76,11 @@ You need Python 3.11 to 3.13, [uv](https://docs.astral.sh/uv/), Node 20 and Post
 
 ### Backend
 
+The repository root is a uv workspace, so install from there.
+
 ```bash
+uv sync                       # backend dependencies plus pytest, ruff and pip-audit, in ./.venv
 cd skill-sync-backend
-uv sync
 cp .env.example .env          # then set DATABASE_URL, SECRET_KEY and the Gemini keys
 uv run uvicorn app.main:app --reload --port 8000
 ```
@@ -98,20 +100,22 @@ The dev server runs on http://localhost:3000.
 
 ## Tests and checks
 
+Run the backend checks from the repository root and the frontend checks from `skill-sync-frontend/`.
+
 | Check | Command |
 |---|---|
-| Backend tests with coverage | `cd skill-sync-backend && uv run pytest --cov` |
+| Backend tests with coverage | `uv run pytest --cov` |
 | Backend lint | `uv run ruff check .` |
 | Backend format | `uv run ruff format --check .` |
 | Backend dependency audit | `uv export --frozen --no-dev -o req.txt && uv run pip-audit -r req.txt --disable-pip` |
-| Frontend tests with coverage | `cd skill-sync-frontend && npm run test:coverage` |
+| Frontend tests with coverage | `npm run test:coverage` |
 | Frontend lint | `npm run lint` |
 | Frontend build | `npm run build` |
 | Frontend dependency audit | `npm audit --omit=dev --audit-level=high` |
 
 Backend tests run against SQLite and need no running services.
 Set `TEST_DATABASE_URL` to a Postgres URL to run the same suite there, as the `Backend tests on Postgres` CI job does.
-`tests/conftest.py` pins `DATABASE_URL` to a local SQLite file, so a stray `.env` cannot point the suite at a real database.
+`skill-sync-backend/tests/conftest.py` pins `DATABASE_URL` to a local SQLite file, so a stray `.env` cannot point the suite at a real database.
 
 GitHub Actions runs every check above on each push and pull request, plus a gitleaks scan and the Docker smoke test.
 CI fails when backend coverage drops below 75% or frontend line coverage below 50%.

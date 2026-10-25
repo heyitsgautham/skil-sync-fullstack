@@ -1,0 +1,21 @@
+# The backend image builds from the repository root.
+.git
+.github
+**/.venv
+**/.env
+**/.env.*
+!**/.env.example
+**/__pycache__
+**/*.pyc
+**/.pytest_cache
+**/.ruff_cache
+**/.coverage
+**/coverage.xml
+**/htmlcov
+**/*.db
+**/node_modules
+skill-sync-backend/data/chroma_db
+skill-sync-backend/app/public/resumes
+skill-sync-backend/test_exports
+skill-sync-backend/tests
+skill-sync-frontend

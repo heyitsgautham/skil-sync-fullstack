@@ -1,0 +1,72 @@
+# SkillSync is a full-stack web application: a FastAPI backend in skill-sync-backend/
+# and a React frontend in skill-sync-frontend/.
+# This file is the uv workspace root. `uv sync` here installs the backend with the
+# shared dev tools, and the lint, test and coverage settings below cover the repo.
+
+[project]
+name = "skillsync"
+version = "0.1.0"
+description = "SkillSync, a full-stack web application that matches students to internships"
+readme = "README.md"
+requires-python = ">=3.11,<3.14"
+dependencies = ["skillsync-backend"]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.0",
+    "pytest-asyncio>=0.23",
+    "pytest-cov>=5.0",
+    "httpx>=0.27",
+    "pip-audit>=2.10",
+    "ruff>=0.6",
+]
+
+[tool.uv]
+package = false
+
+[tool.uv.workspace]
+members = ["skill-sync-backend"]
+
+[tool.uv.sources]
+skillsync-backend = { workspace = true }
+
+[tool.pytest.ini_options]
+testpaths = ["skill-sync-backend/tests"]
+asyncio_mode = "auto"
+filterwarnings = ["ignore::DeprecationWarning", "ignore::pydantic.warnings.PydanticDeprecatedSince20"]
+
+[tool.coverage.run]
+source = ["skill-sync-backend/app"]
+branch = true
+
+[tool.coverage.report]
+show_missing = true
+skip_covered = true
+# Raise this as tests land. CI fails if coverage drops below it.
+fail_under = 75
+
+[tool.ruff]
+line-length = 120
+target-version = "py311"
+extend-exclude = ["skill-sync-backend/data"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP"]
+ignore = [
+    "E501",  # long lines are left to the formatter
+    "B008",  # FastAPI uses Depends() in argument defaults by design
+    "B904",  # existing handlers re-raise HTTPException without chaining
+    "E711",  # SQLAlchemy filters need `== None`
+    "E712",  # SQLAlchemy filters need `== True`
+    "UP042",  # StrEnum changes str() of the role and status enums, which the API and DB rely on
+]
+
+[tool.ruff.lint.isort]
+known-first-party = ["app"]
+
+[tool.ruff.lint.per-file-ignores]
+"skill-sync-backend/scripts/*" = ["E402"]  # scripts add the backend root to sys.path before importing app
+"skill-sync-backend/tests/*" = ["B011"]
+
+[tool.ruff.format]
+quote-style = "preserve"
