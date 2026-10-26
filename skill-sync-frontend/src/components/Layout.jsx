@@ -18,23 +18,10 @@ import {
     useTheme,
     useMediaQuery,
 } from '@mui/material';
-import {
-    Menu as MenuIcon,
-    Dashboard as DashboardIcon,
-    Work as WorkIcon,
-    Star as StarIcon,
-    Person as PersonIcon,
-    Logout as LogoutIcon,
-    AutoAwesome as AIIcon,
-    Assignment as AssignmentIcon,
-} from '@mui/icons-material';
+import { Menu as MenuIcon, Star as StarIcon, Logout as LogoutIcon } from '@mui/icons-material';
 import { useNavigate, useLocation } from 'react-router-dom';
 import authService from '../services/authService';
-
-// Titles for signed-in pages that have no sidebar entry of their own
-const PAGE_TITLES = {
-    '/internships/create': 'Post New Internship',
-};
+import { colorsFor, menuItemsFor, pageTitleFor } from './layout/navigation';
 
 const EXPANDED_DRAWER_WIDTH = 240;
 const COLLAPSED_DRAWER_WIDTH = 72;
@@ -55,62 +42,8 @@ const Layout = ({ children }) => {
     const currentUser = authService.getCurrentUser();
     const userRole = currentUser?.role?.toLowerCase();
 
-    // Role-based color schemes
-    const roleColors = {
-        student: {
-            primary: '#1976d2', // Blue
-            light: 'rgba(25, 118, 210, 0.08)',
-            lighter: 'rgba(25, 118, 210, 0.12)',
-            badge: 'rgba(25, 118, 210, 0.2)',
-        },
-        company: {
-            primary: '#2e7d32', // Green
-            light: 'rgba(46, 125, 50, 0.08)',
-            lighter: 'rgba(46, 125, 50, 0.12)',
-            badge: 'rgba(46, 125, 50, 0.2)',
-        },
-        admin: {
-            primary: '#d32f2f', // Red
-            light: 'rgba(211, 47, 47, 0.08)',
-            lighter: 'rgba(211, 47, 47, 0.12)',
-            badge: 'rgba(211, 47, 47, 0.2)',
-        },
-    };
-
-    const currentColors = roleColors[userRole] || roleColors.student;
-
-    // Role-specific menu items
-    const getMenuItems = () => {
-        const baseItems = [
-            { text: 'Dashboard', icon: <DashboardIcon />, path: '/dashboard', roles: ['student', 'company', 'admin'] },
-        ];
-
-        const studentItems = [
-            { text: 'AI Resume Intelligence', icon: <AIIcon />, path: '/resume-intelligence', roles: ['student'] },
-            { text: 'AI Recommendations', icon: <StarIcon />, path: '/recommendations', roles: ['student'] },
-            { text: 'Browse Internships', icon: <WorkIcon />, path: '/internships', roles: ['student'] },
-            { text: 'My Applications', icon: <AssignmentIcon />, path: '/applications', roles: ['student'] },
-            { text: 'My Profile', icon: <PersonIcon />, path: '/student/profile', roles: ['student'] },
-        ];
-
-        const companyItems = [
-            { text: 'My Internships', icon: <WorkIcon />, path: '/internships', roles: ['company'] },
-            { text: 'AI Candidate Ranking', icon: <AIIcon />, path: '/intelligent-ranking', roles: ['company'] },
-            { text: 'My Profile', icon: <PersonIcon />, path: '/company/profile', roles: ['company'] },
-        ];
-
-        const adminItems = [
-            { text: 'User Management', icon: <PersonIcon />, path: '/admin/users', roles: ['admin'] },
-            { text: 'All Internships', icon: <WorkIcon />, path: '/internships', roles: ['admin'] },
-            { text: 'Analytics', icon: <AIIcon />, path: '/admin/analytics', roles: ['admin'] },
-            { text: 'My Profile', icon: <PersonIcon />, path: '/admin/profile', roles: ['admin'] },
-        ];
-
-        const allItems = [...baseItems, ...studentItems, ...companyItems, ...adminItems];
-        return allItems.filter((item) => item.roles.includes(userRole));
-    };
-
-    const menuItems = getMenuItems();
+    const currentColors = colorsFor(userRole);
+    const menuItems = menuItemsFor(userRole);
 
     const handleDrawerToggle = () => {
         setMobileOpen(!mobileOpen);
@@ -284,9 +217,7 @@ const Layout = ({ children }) => {
                             letterSpacing: '-0.5px',
                         }}
                     >
-                        {menuItems.find((item) => item.path === location.pathname)?.text ||
-                            PAGE_TITLES[location.pathname] ||
-                            'SkillSync'}
+                        {pageTitleFor(location.pathname, menuItems)}
                     </Typography>
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                         <Typography
