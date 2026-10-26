@@ -73,6 +73,32 @@ def test_applicant_ranking_blends_a_tailored_resume(
     assert "1 with tailored resumes" in body["performance_note"]
 
 
+def test_applicant_ranking_keeps_an_applicant_with_no_precomputed_match(
+    client, matched, company, auth_headers, db_session
+):
+    """A student who applies before the next batch run has no match row, and used to turn the whole ranking into a 500."""
+    from app.models.student_internship_match import StudentInternshipMatch
+
+    apply(client, auth_headers, matched.students["asha"], matched.backend.id)
+    late = apply(client, auth_headers, matched.students["ravi"], matched.backend.id)
+    db_session.query(StudentInternshipMatch).filter(
+        StudentInternshipMatch.student_id == matched.students["ravi"].id
+    ).delete()
+    db_session.commit()
+
+    response = client.post(
+        f"{API}/rank-candidates/{matched.backend.id}", params={"only_applicants": True}, headers=company
+    )
+
+    assert response.status_code == 200
+    ranked = {c["candidate_id"]: c for c in response.json()["ranked_candidates"]}
+    assert set(ranked) == {matched.students["asha"].id, matched.students["ravi"].id}
+    ravi = ranked[matched.students["ravi"].id]
+    assert ravi["match_score"] == late["match_score"]
+    assert ravi["scoring_breakdown"]["final_weight"] == "application score"
+    assert ravi["scoring_breakdown"]["base_similarity"] is None
+
+
 def test_applicant_ranking_without_applicants(client, matched, company):
     body = client.post(
         f"{API}/rank-candidates/{matched.frontend.id}", params={"only_applicants": True}, headers=company

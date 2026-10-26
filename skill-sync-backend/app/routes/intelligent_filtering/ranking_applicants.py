@@ -10,6 +10,17 @@ from app.services.candidate_flagging_service import CandidateFlaggingService
 from app.services.rag_engine import rag_engine
 
 
+def _application_score(application, student, logger):
+    """Score an applicant who has no pre-computed match and no usable tailored embedding.
+
+    This happens when a student applies before the next batch match run. The score stored on the
+    application at apply time stands in, and the component scores read 0 until the batch run fills them.
+    """
+    logger.warning(f"No pre-computed match for student {student.id}, using the score stored when they applied")
+    score = application.match_score if application.match_score is not None else 0
+    return float(score), 0.0, 0.0, 0.0
+
+
 def rank_applicants(
     db,
     internship,
@@ -169,8 +180,9 @@ def rank_applicants(
                     skills_match = base_match.skills_match_score
                     experience_match = base_match.experience_match_score
                 else:
-                    logger.error(f"  No base match for student {student.id} with missing tailored embedding")
-                    raise ValueError(f"No scoring data available for student {student.id}")
+                    final_score, semantic_similarity, skills_match, experience_match = _application_score(
+                        app, student, logger
+                    )
         else:
             # No tailored resume or same as base, use base match only
             if base_match:
@@ -179,8 +191,9 @@ def rank_applicants(
                 skills_match = base_match.skills_match_score
                 experience_match = base_match.experience_match_score
             else:
-                logger.error(f"  No base match or tailored resume for student {student.id}")
-                raise ValueError(f"No scoring data available for student {student.id}")
+                final_score, semantic_similarity, skills_match, experience_match = _application_score(
+                    app, student, logger
+                )
 
         # Build component_scores for frontend display (using computed/combined scores)
         component_scores = {
@@ -304,7 +317,9 @@ def rank_applicants(
                     'base_similarity': base_match.base_similarity_score if base_match else None,
                     'final_weight': '80% tailored + 20% base'
                     if tailored_is_different and base_match
-                    else ('tailored only' if tailored_is_different else 'base only'),
+                    else (
+                        'tailored only' if tailored_is_different else 'base only' if base_match else 'application score'
+                    ),
                     'has_tailored': tailored_is_different,
                 },
             }
