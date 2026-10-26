@@ -141,6 +141,15 @@ jobs:
           curl -fsS http://localhost:3000/ | grep -q '<div id="root">'
           curl -fsS http://localhost:3000/login | grep -q '<div id="root">'
 
+      - name: Seed demo data and log in
+        env:
+          SEED_PASSWORD: ci-seed-password
+        run: |
+          make seed
+          curl -fsS -X POST http://localhost:8000/api/auth/login \
+            -H 'Content-Type: application/json' \
+            -d '{"email": "hr@techcorp.com", "password": "ci-seed-password"}' | grep -q access_token
+
       - name: Show logs on failure
         if: failure()
         run: docker compose logs

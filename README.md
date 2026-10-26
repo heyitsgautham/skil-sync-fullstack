@@ -2,9 +2,9 @@
 
 [![CI](https://github.com/heyitsgautham/skil-sync-fullstack/actions/workflows/ci.yml/badge.svg)](https://github.com/heyitsgautham/skil-sync-fullstack/actions/workflows/ci.yml)
 
-SkillSync matches students to internships.
+SkillSync is a full-stack web application that matches students to internships.
 Students upload resumes, companies post internships, and the backend ranks candidates for each posting with embeddings plus Gemini-parsed resume data.
-It is a monorepo with a FastAPI backend and a React frontend.
+It is a monorepo with a FastAPI backend and a React frontend, and Docker Compose runs both with PostgreSQL.
 
 [Demo video](https://youtu.be/K7wjLY_iihg)
 
@@ -66,8 +66,13 @@ ChromaDB holds the embeddings on local disk.
 
 ```bash
 cp skill-sync-backend/.env.example skill-sync-backend/.env   # optional, add Gemini keys for AI features
-docker compose up --build
+make up                                                      # docker compose up --build, then checks /api/healthcheck
+SEED_PASSWORD='choose-one' make seed                         # optional demo accounts, internships and resumes
 ```
+
+`make seed` creates an admin, 3 companies with 3 internships each and 53 students, all with `SEED_PASSWORD`, or a random password it prints when that is unset.
+The logins include `admin@skillsync.com`, `hr@techcorp.com` and `aarav.sharma@student.com`.
+`make help` lists the other targets: `install`, `test`, `lint`, `build`, `dev-api`, `dev-web`, `down` and `logs`.
 
 | Service | URL |
 |---|---|
