@@ -1,4 +1,4 @@
-"""Per-request logging context: a request ID, an access log line and a last-resort error handler.
+"""Per-request context: a request ID, an access log line, request metrics and a last-resort error handler.
 
 Every request gets an ID, taken from a well-formed X-Request-ID header or generated. The ID is bound
 to the logging context, so every line logged while the request runs carries it, and it is returned
@@ -12,6 +12,7 @@ import uuid
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 
+from app import metrics
 from app.logging_config import bind_context, clear_context, get_logger
 
 REQUEST_ID_HEADER = "X-Request-ID"
@@ -47,6 +48,7 @@ def add_request_context(app: FastAPI) -> None:
                     content={"detail": "Internal server error", "request_id": request_id},
                 )
             response.headers[REQUEST_ID_HEADER] = request_id
+            metrics.observe(request, response.status_code, time.perf_counter() - started)
             access_log.info(
                 "request",
                 method=request.method,

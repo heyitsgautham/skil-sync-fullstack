@@ -35,6 +35,7 @@ dependencies = [
     "torch>=2.3",
     "numpy>=1.26",
     "structlog>=26.1.0",
+    "prometheus-client>=0.26.0",
 ]
 
 [tool.uv]

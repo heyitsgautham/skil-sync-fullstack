@@ -15,6 +15,7 @@ from app.logging_config import configure_logging
 # time use the configured format instead of Python's bare fallback handler.
 configure_logging()
 
+from app.metrics import router as metrics_router  # noqa: E402
 from app.request_context import REQUEST_ID_HEADER, add_request_context  # noqa: E402
 from app.routes import (  # noqa: E402
     admin,
@@ -81,6 +82,7 @@ app.include_router(auth.router, prefix="/api/auth", tags=["Authentication"])
 app.include_router(students.router, prefix="/api/students", tags=["Students"])
 app.include_router(admin.router, prefix="/api", tags=["Admin"])
 app.include_router(health.router, prefix="/api", tags=["Health"])
+app.include_router(metrics_router, prefix="/api")
 app.include_router(resume.router, prefix="/api", tags=["Resume"])
 app.include_router(resume_view.router, prefix="/api", tags=["Resume Viewing"])  # Anonymization support
 app.include_router(internship.router, prefix="/api", tags=["Internship"])
