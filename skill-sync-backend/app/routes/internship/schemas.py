@@ -82,6 +82,11 @@ class ApplicationResponse(BaseModel):
     application_similarity_score: int | None = None
     used_tailored_resume: int
     created_at: str
+    # Filled in by GET /applications/my-applications so a student sees what they applied to
+    internship_title: str | None = None
+    company_name: str | None = None
+    internship_location: str | None = None
+    internship_is_active: bool | None = None
 
     class Config:
         from_attributes = True

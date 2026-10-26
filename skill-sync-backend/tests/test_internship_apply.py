@@ -1,6 +1,7 @@
 """Applying to an internship scores the student's resume against the posting."""
 
 import json
+from datetime import datetime, timedelta
 
 import pytest
 
@@ -35,6 +36,26 @@ def test_student_applies_with_their_active_resume(client, seeded, asha_headers, 
     mine = client.get(f"{API}/applications/my-applications", headers=asha_headers).json()
     assert [a["internship_id"] for a in mine] == [seeded.backend.id]
     assert client.get(f"{API}/match", headers=asha_headers).json()[0]["has_applied"] is True
+
+
+def test_my_applications_names_the_internship_and_company_newest_first(client, seeded, asha_headers, db_session):
+    client.post(f"{API}/{seeded.backend.id}/apply", headers=asha_headers)
+    client.post(f"{API}/{seeded.frontend.id}/apply", headers=asha_headers)
+    first, second = db_session.query(Application).order_by(Application.id).all()
+    first.created_at = datetime(2026, 1, 1)
+    second.created_at = datetime(2026, 1, 1) + timedelta(days=1)
+    seeded.backend.location = "Chennai"
+    seeded.frontend.is_active = 0
+    db_session.commit()
+
+    mine = client.get(f"{API}/applications/my-applications", headers=asha_headers).json()
+
+    assert [(a["internship_title"], a["company_name"], a["internship_is_active"]) for a in mine] == [
+        ("Frontend Intern", "Acme Labs", False),
+        ("Backend Intern", "Acme Labs", True),
+    ]
+    assert mine[1]["internship_location"] == "Chennai"
+    assert mine[0]["status"] == "pending"
 
 
 def test_applying_twice_is_rejected(client, seeded, asha_headers):

@@ -3,7 +3,7 @@
 import logging
 
 from fastapi import Depends, File, Form, HTTPException, UploadFile, status
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 
 from app.database.connection import get_db
 from app.models import Application, Internship, Resume, StudentInternshipMatch, User, UserRole
@@ -208,13 +208,14 @@ async def apply_to_internship(
 @router.get("/applications/my-applications", response_model=list[ApplicationResponse])
 def get_my_applications(db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     """
-    Get all applications for the current student
+    List the current student's applications, newest first, with the internship and company they went to.
     """
     if current_user.role != UserRole.student:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Only students can view their applications")
 
     applications = (
         db.query(Application)
+        .options(joinedload(Application.internship).joinedload(Internship.company))
         .filter(Application.student_id == current_user.id)
         .order_by(Application.created_at.desc())
         .all()
@@ -231,6 +232,10 @@ def get_my_applications(db: Session = Depends(get_db), current_user: User = Depe
             application_similarity_score=app.application_similarity_score,
             used_tailored_resume=app.used_tailored_resume,
             created_at=str(app.created_at),
+            internship_title=app.internship.title if app.internship else None,
+            company_name=app.internship.company.full_name if app.internship and app.internship.company else None,
+            internship_location=app.internship.location if app.internship else None,
+            internship_is_active=bool(app.internship.is_active) if app.internship else None,
         )
         for app in applications
     ]
