@@ -59,6 +59,7 @@ def update_my_profile(
 
     Students can update: full_name, phone, linkedin_url, github_url
     Companies can update: full_name, hr_contact_name, email, mailing_email, phone, phone_visible
+    Admins can update: full_name
     """
     sent = profile_data.model_fields_set
     try:
@@ -93,6 +94,10 @@ def update_my_profile(
                 current_user.phone = profile_data.phone
             if 'phone_visible' in sent and profile_data.phone_visible is not None:
                 current_user.phone_visible = profile_data.phone_visible
+
+        elif current_user.role == UserRole.admin:
+            if profile_data.full_name:
+                current_user.full_name = profile_data.full_name
 
         db.commit()
         db.refresh(current_user)

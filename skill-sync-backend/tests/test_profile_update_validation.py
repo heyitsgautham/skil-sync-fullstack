@@ -82,3 +82,19 @@ def test_student_fields_are_length_checked(client, make_user, auth_headers):
     )
 
     assert response.status_code == 422
+
+
+def test_admin_can_rename_itself_and_nothing_else(client, make_user, auth_headers, db_session):
+    """The admin profile page saves full_name. The endpoint used to ignore admins and answer 200."""
+    admin = make_user(role=UserRole.admin, full_name="System Administrator")
+
+    response = client.put(
+        API, json={"full_name": "Head Admin", "email": "other@example.com", "phone": "1"}, headers=auth_headers(admin)
+    )
+
+    assert response.status_code == 200
+    assert response.json()["full_name"] == "Head Admin"
+    saved = db_session.query(User).filter(User.id == admin.id).one()
+    assert saved.full_name == "Head Admin"
+    assert saved.email == admin.email
+    assert saved.phone is None

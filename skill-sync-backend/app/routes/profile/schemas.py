@@ -21,7 +21,8 @@ class ProfileUpdate(BaseModel):
 
     Every field is optional and only the fields sent are applied. Students may change full_name,
     phone, linkedin_url and github_url. Companies may change full_name, hr_contact_name, email,
-    mailing_email, phone and phone_visible. Fields outside the caller's role are ignored.
+    mailing_email, phone and phone_visible. Admins may change full_name. Fields outside the
+    caller's role are ignored.
     Lengths match the database columns.
     """
 
