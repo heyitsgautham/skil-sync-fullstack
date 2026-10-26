@@ -14,7 +14,7 @@ concurrency:
 
 jobs:
   backend:
-    name: Backend (lint, test, audit)
+    name: Backend (lint, typecheck, test, audit)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -33,6 +33,9 @@ jobs:
 
       - name: Check formatting
         run: uv run ruff format --check .
+
+      - name: Typecheck
+        run: uv run mypy
 
       - name: Test
         run: uv run pytest --cov --cov-report=term --cov-report=xml

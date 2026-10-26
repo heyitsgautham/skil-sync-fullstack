@@ -11,6 +11,7 @@ Run the same checks CI runs.
 
 ```bash
 npm run lint      # ESLint, ruff check and ruff format --check
+npm run typecheck # mypy over the backend
 npm test          # Vitest and pytest, both with coverage floors
 npm run build
 ```

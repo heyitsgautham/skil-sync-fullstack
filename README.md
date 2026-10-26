@@ -124,6 +124,7 @@ Run every check from the repository root.
 |---|---|
 | Backend tests with coverage | `uv run pytest --cov`, or `npm run test:py` |
 | Backend lint and format | `npm run lint:py` |
+| Backend typecheck | `npm run typecheck`, mypy over `skill-sync-backend/app` |
 | Backend dependency audit | `uv export --frozen --no-dev -o req.txt && uv run pip-audit -r req.txt --disable-pip` |
 | Frontend tests with coverage | `npm run test:js` |
 | Frontend lint | `npm run lint:js` |

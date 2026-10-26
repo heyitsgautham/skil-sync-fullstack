@@ -1,6 +1,6 @@
 # SkillSync, a full-stack web application. `make help` lists the targets.
 
-.PHONY: help install up down logs dev-api dev-web test lint format build seed
+.PHONY: help install up down logs dev-api dev-web test lint typecheck format build seed
 
 help:
 	@grep -E "^[a-z-]+:.*## " $(MAKEFILE_LIST) | sed "s/:.*## /\t/"
@@ -30,6 +30,9 @@ test: ## Run pytest and Vitest, both with coverage floors
 
 lint: ## Run ruff, ESLint and Prettier checks
 	npm run lint
+
+typecheck: ## Type-check the backend with mypy
+	npm run typecheck
 
 format: ## Format Python with ruff and the frontend with Prettier
 	npm run format

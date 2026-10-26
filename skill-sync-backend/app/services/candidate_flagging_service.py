@@ -117,9 +117,9 @@ class CandidateFlaggingService:
         students = db.query(User).filter(User.role == UserRole.student, User.id.in_(student_ids_with_resumes)).all()
 
         # Build normalized lookup maps
-        phone_map = {}  # normalized_phone -> [student_ids]
-        linkedin_map = {}  # normalized_linkedin -> [student_ids]
-        github_map = {}  # normalized_github -> [student_ids]
+        phone_map: dict[str, list[int]] = {}  # normalized_phone -> [student_ids]
+        linkedin_map: dict[str, list[int]] = {}  # normalized_linkedin -> [student_ids]
+        github_map: dict[str, list[int]] = {}  # normalized_github -> [student_ids]
 
         for student in students:
             # Normalize and map phone
@@ -147,7 +147,7 @@ class CandidateFlaggingService:
                     github_map[normalized_github].append(student.id)
 
         # Find duplicates (groups with more than 1 student)
-        flagged_candidates = {}
+        flagged_candidates: dict[int, dict] = {}
 
         # Check phone duplicates
         for normalized_phone, student_ids in phone_map.items():

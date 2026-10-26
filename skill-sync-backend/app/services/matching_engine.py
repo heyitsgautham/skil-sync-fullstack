@@ -49,8 +49,8 @@ class MatchingEngine:
         self,
         candidate_data: dict,
         internship_data: dict,
-        candidate_embedding: list[float],
-        internship_embedding: list[float],
+        candidate_embedding: list[float] | None,
+        internship_embedding: list[float] | None,
     ) -> dict:
         """
         Calculate comprehensive match score between candidate and internship
@@ -119,7 +119,7 @@ class MatchingEngine:
 
         return match_result
 
-    def _calculate_cosine_similarity(self, vec1: list[float], vec2: list[float]) -> float:
+    def _calculate_cosine_similarity(self, vec1: list[float] | None, vec2: list[float] | None) -> float:
         """Calculate cosine similarity between two vectors"""
         # DO NOT USE FALLBACK SCORES - Log error and raise exception instead
         if vec1 is None or vec2 is None or len(vec1) == 0 or len(vec2) == 0:
@@ -174,7 +174,7 @@ class MatchingEngine:
         required_score = (matched_required / len(required_skills_normalized)) * 70
 
         # Count matched preferred skills
-        preferred_score = 0
+        preferred_score: float
         if preferred_skills_normalized:
             matched_preferred = sum(
                 1

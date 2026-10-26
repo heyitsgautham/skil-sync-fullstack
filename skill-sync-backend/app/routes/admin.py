@@ -22,7 +22,7 @@ class RecomputeResponse(BaseModel):
     message: str
     resumes: dict
     internships: dict
-    matches: dict = None
+    matches: dict | None = None
 
     class Config:
         from_attributes = True

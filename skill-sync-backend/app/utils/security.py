@@ -146,7 +146,7 @@ async def get_current_user(token: str = Depends(oauth2_scheme), db: Session = De
         if payload is None:
             raise credentials_exception
 
-        user_email: str = payload.get("sub")
+        user_email: str | None = payload.get("sub")
         if user_email is None:
             raise credentials_exception
 

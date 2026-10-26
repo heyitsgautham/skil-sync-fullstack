@@ -100,7 +100,7 @@ async def parse_internship_document(file: UploadFile = File(...), current_user: 
 
     # Validate file type
     allowed_extensions = ['.pdf', '.docx', '.doc', '.txt']
-    file_extension = os.path.splitext(file.filename)[1].lower()
+    file_extension = os.path.splitext(file.filename or "")[1].lower()
 
     if file_extension not in allowed_extensions:
         raise HTTPException(

@@ -11,6 +11,7 @@ This service provides on-demand anonymization of resumes:
 import logging
 import re
 import tempfile
+from typing import Any
 
 import fitz  # PyMuPDF for better text extraction and redaction
 
@@ -231,7 +232,12 @@ class ResumeAnonymizationService:
         try:
             doc = fitz.open(pdf_path)
 
-            found_pii = {"name_found": False, "email_found": False, "pages_with_pii": [], "is_anonymized": True}
+            found_pii: dict[str, Any] = {
+                "name_found": False,
+                "email_found": False,
+                "pages_with_pii": [],
+                "is_anonymized": True,
+            }
 
             for page_num in range(len(doc)):
                 page = doc[page_num]

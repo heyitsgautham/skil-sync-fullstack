@@ -51,7 +51,8 @@ class ResumeService:
         logger.info(f"📄 Starting {resume_type} resume upload for student {student_id}")
         # Validate file type
         allowed_extensions = ['.pdf', '.docx', '.doc', '.txt']
-        file_extension = os.path.splitext(file.filename)[1].lower()
+        file_name = file.filename or ""
+        file_extension = os.path.splitext(file_name)[1].lower()
 
         if file_extension not in allowed_extensions:
             raise ValueError(f"Invalid file type. Allowed: {', '.join(allowed_extensions)}")
@@ -79,7 +80,7 @@ class ResumeService:
                 s3_key = s3_service.upload_resume(
                     file_path=file_path,
                     student_id=student_id,
-                    file_name=file.filename,
+                    file_name=file_name,
                     is_tailored=is_tailored,
                     internship_id=internship_id,
                 )

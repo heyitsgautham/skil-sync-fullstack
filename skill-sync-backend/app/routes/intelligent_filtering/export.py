@@ -335,11 +335,11 @@ async def export_candidate_rankings(
             )
 
         else:  # CSV format
-            output = io.StringIO()
+            csv_text = io.StringIO()
             if export_data:
                 # Write header
                 headers = list(export_data[0].keys())
-                output.write(','.join(headers) + '\n')
+                csv_text.write(','.join(headers) + '\n')
 
                 # Write rows with special handling for phone numbers
                 for row in export_data:
@@ -360,10 +360,10 @@ async def export_candidate_rankings(
                         else:
                             row_values.append(value_str)
 
-                    output.write(','.join(row_values) + '\n')
+                    csv_text.write(','.join(row_values) + '\n')
 
             # Convert to bytes
-            csv_bytes = io.BytesIO(output.getvalue().encode('utf-8'))
+            csv_bytes = io.BytesIO(csv_text.getvalue().encode('utf-8'))
 
             return StreamingResponse(
                 csv_bytes,

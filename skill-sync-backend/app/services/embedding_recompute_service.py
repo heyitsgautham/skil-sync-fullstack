@@ -4,6 +4,7 @@ Handles recomputing embeddings for resumes and internships with intelligent cach
 """
 
 import hashlib
+from typing import Any
 
 from sqlalchemy.orm import Session
 
@@ -217,7 +218,7 @@ class EmbeddingRecomputeService:
         Returns:
             Dict with progress and results
         """
-        results = {
+        results: dict[str, dict[str, Any]] = {
             'resumes': {'total': 0, 'cached': 0, 'recomputed': 0, 'failed': 0, 'details': []},
             'internships': {'total': 0, 'cached': 0, 'recomputed': 0, 'failed': 0, 'details': []},
         }
@@ -269,7 +270,7 @@ class EmbeddingRecomputeService:
         """
         from app.services.matching_engine import MatchingEngine
 
-        results = {'total_matches': 0, 'successful': 0, 'failed': 0, 'details': []}
+        results: dict[str, Any] = {'total_matches': 0, 'successful': 0, 'failed': 0, 'details': []}
 
         # Get all students with resumes
         students_with_resumes = db.query(Resume.student_id).filter(Resume.is_active == 1).distinct().all()

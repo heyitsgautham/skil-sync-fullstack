@@ -19,8 +19,8 @@ router = APIRouter()
 class UpdateProfileRequest(BaseModel):
     """Student profile update request model"""
 
-    skills: list[str] = Field(default=None, description="List of student skills")
-    total_experience_years: float = Field(default=None, description="Total years of experience")
+    skills: list[str] | None = Field(default=None, description="List of student skills")
+    total_experience_years: float | None = Field(default=None, description="Total years of experience")
 
 
 class MessageResponse(BaseModel):

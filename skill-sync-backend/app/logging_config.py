@@ -14,11 +14,12 @@ import os
 import sys
 
 import structlog
+from structlog.typing import Processor
 
 PLAIN_FORMAT = "%(asctime)s %(levelname)s %(name)s: %(message)s"
 
 # Processors that run for stdlib and structlog records alike, before rendering.
-_SHARED_PROCESSORS = [
+_SHARED_PROCESSORS: list[Processor] = [
     structlog.contextvars.merge_contextvars,
     structlog.stdlib.add_log_level,
     structlog.stdlib.add_logger_name,
@@ -47,6 +48,7 @@ def _plain_renderer(_, __, event_dict):
 
 def build_formatter(use_json: bool) -> logging.Formatter:
     """A stdlib formatter that renders every record through the structlog processor chain."""
+    final: list[Processor]
     if use_json:
         final = [
             structlog.stdlib.ProcessorFormatter.remove_processors_meta,

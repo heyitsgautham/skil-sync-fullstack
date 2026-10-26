@@ -4,6 +4,7 @@ Resume Parser Service - Extract text and metadata from PDF/DOCX/TXT files
 
 import os
 import re
+from typing import Any
 
 import fitz  # PyMuPDF
 from docx import Document
@@ -69,7 +70,7 @@ class ResumeParser:
             raise Exception(f"Error extracting text from TXT: {str(e)}")
 
     @staticmethod
-    def parse_resume(file_path: str) -> dict[str, any]:
+    def parse_resume(file_path: str) -> dict[str, Any]:
         """
         Parse resume file and extract text content
 
@@ -161,7 +162,7 @@ class InternshipParser:
         return ResumeParser.extract_skills(description)
 
     @staticmethod
-    def parse_internship(data: dict) -> dict[str, any]:
+    def parse_internship(data: dict) -> dict[str, Any]:
         """
         Parse internship posting data
 

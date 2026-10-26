@@ -19,6 +19,7 @@ dev = [
     "httpx>=0.27",
     "pip-audit>=2.10",
     "ruff>=0.6",
+    "mypy>=2.4.0",
 ]
 
 [tool.uv]
@@ -44,6 +45,13 @@ show_missing = true
 skip_covered = true
 # Raise this as tests land. CI fails if coverage drops below it.
 fail_under = 80
+
+[tool.mypy]
+files = ["skill-sync-backend/app"]
+python_version = "3.12"
+# chromadb, pymupdf, boto3 and the Gemini SDK ship without complete type stubs.
+ignore_missing_imports = true
+warn_unused_ignores = true
 
 [tool.ruff]
 line-length = 120
