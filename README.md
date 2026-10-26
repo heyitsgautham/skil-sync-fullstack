@@ -163,6 +163,7 @@ The frontend reads one variable, `VITE_API_BASE_URL`, at build time.
 ## Contributing
 
 See [CONTRIBUTING.md](CONTRIBUTING.md).
+Report vulnerabilities as [SECURITY.md](SECURITY.md) describes.
 
 ## Team
 

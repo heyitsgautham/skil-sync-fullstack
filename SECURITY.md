@@ -27,7 +27,7 @@ The controls below are what the code enforces today.
 ## Checks in CI
 
 Every push runs gitleaks over the tree, pip-audit over the backend's locked dependencies and npm audit over the frontend's production dependencies.
-CI fails on any finding except the four ChromaDB advisories below.
+CI fails on any pip-audit finding except the four ChromaDB advisories below, and on any npm advisory rated high or critical.
 
 ## Accepted advisories
 
