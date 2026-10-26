@@ -193,6 +193,18 @@ test('the details dialog shows the posting date, and leaves it out when there is
     expect(within(other).queryByText(/Invalid Date/)).not.toBeInTheDocument();
 });
 
+test('a rupee stipend sits next to a banknote icon, not a dollar sign', async () => {
+    signIn(student);
+    fakeBackend([['get', '/internship/list', [{ ...LISTINGS[0], stipend: '₹40,000/month' }]]]);
+    renderAt(<InternshipList />, '/internships');
+
+    expect(await screen.findByText('₹40,000/month')).toBeInTheDocument();
+
+    // The card's only money icon is the banknote
+    expect(screen.getByTestId('PaymentsIcon')).toBeInTheDocument();
+    expect(screen.queryByTestId('MonetizationOnIcon')).not.toBeInTheDocument();
+});
+
 test('a load failure shows the error', async () => {
     signIn(student);
     fakeBackend([['get', '/internship/list', fail(500, 'Database unavailable')]]);

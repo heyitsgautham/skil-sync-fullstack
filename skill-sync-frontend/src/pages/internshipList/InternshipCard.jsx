@@ -2,7 +2,7 @@
 import { Box, Typography, Card, CardContent, CardActions, Button, Chip } from '@mui/material';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import TimerIcon from '@mui/icons-material/Timer';
-import MonetizationOnIcon from '@mui/icons-material/MonetizationOn';
+import PaymentsIcon from '@mui/icons-material/Payments';
 import WorkIcon from '@mui/icons-material/Work';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -124,7 +124,7 @@ const InternshipCard = ({
             {/* Stipend */}
             {internship.stipend && (
                 <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                    <MonetizationOnIcon fontSize="small" sx={{ mr: 0.5, color: 'text.secondary' }} />
+                    <PaymentsIcon fontSize="small" sx={{ mr: 0.5, color: 'text.secondary' }} />
                     <Typography variant="body2" color="text.secondary">
                         {internship.stipend}
                     </Typography>

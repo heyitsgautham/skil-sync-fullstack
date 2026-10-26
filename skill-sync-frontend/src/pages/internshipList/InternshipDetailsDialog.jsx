@@ -2,7 +2,7 @@
 import { Box, Typography, Button, Chip, Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import TimerIcon from '@mui/icons-material/Timer';
-import MonetizationOnIcon from '@mui/icons-material/MonetizationOn';
+import PaymentsIcon from '@mui/icons-material/Payments';
 import EditIcon from '@mui/icons-material/Edit';
 
 /** "Posted on <date> | " for a valid timestamp, and nothing when the date is missing or unreadable. */
@@ -61,7 +61,7 @@ const InternshipDetailsDialog = ({
                         )}
                         {selectedInternship.stipend && (
                             <Chip
-                                icon={<MonetizationOnIcon />}
+                                icon={<PaymentsIcon />}
                                 label={selectedInternship.stipend}
                                 sx={{ backgroundColor: '#f0fff4', color: '#10b981' }}
                             />

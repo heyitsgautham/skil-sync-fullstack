@@ -3,7 +3,7 @@ import { Box, Typography, Card, CardContent, Grid, Divider } from '@mui/material
 import WorkIcon from '@mui/icons-material/Work';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
-import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
+import PaymentsIcon from '@mui/icons-material/Payments';
 import { motion } from 'framer-motion';
 import AnimatedMatchScore from '../../components/AnimatedMatchScore';
 
@@ -123,7 +123,7 @@ const RecommendationCard = ({ internship, index }) => (
                     {internship.stipend && (
                         <Grid size={{ xs: 12, sm: 6, md: 3 }}>
                             <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                                <AttachMoneyIcon sx={{ mr: 1, color: 'action.active' }} />
+                                <PaymentsIcon sx={{ mr: 1, color: 'action.active' }} />
                                 <Typography variant="body2">{internship.stipend}</Typography>
                             </Box>
                         </Grid>
