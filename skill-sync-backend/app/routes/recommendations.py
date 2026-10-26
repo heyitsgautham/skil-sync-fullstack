@@ -7,7 +7,7 @@ from datetime import datetime, timedelta
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from pydantic import BaseModel
-from sqlalchemy import and_, func, or_
+from sqlalchemy import and_
 from sqlalchemy.orm import Session
 
 from app.database.connection import get_db
@@ -30,7 +30,6 @@ class InternshipMatch(BaseModel):
     stipend: str
     match_score: int
     posted_date: str | None = None
-    experience_level: str | None = None
 
 
 class PaginatedInternshipResponse(BaseModel):
@@ -59,7 +58,6 @@ def get_recommendations_for_student(
     max_score: int | None = Query(None, ge=0, le=100, description="Maximum match score"),
     skills: str | None = Query(None, description="Comma-separated skills to filter"),
     location: str | None = Query(None, description="Location filter"),
-    experience_level: str | None = Query(None, description="Experience level filter"),
     days_posted: int | None = Query(None, ge=1, description="Filter by days since posted"),
     # Sorting
     sort_by: str | None = Query("score", description="Sort by: score, date, title"),
@@ -78,7 +76,6 @@ def get_recommendations_for_student(
     - **min_score/max_score**: Filter by match score range (0-100)
     - **skills**: Filter by required skills (comma-separated)
     - **location**: Filter by location
-    - **experience_level**: Filter by experience level
     - **days_posted**: Filter internships posted within N days
 
     Sorting Options:
@@ -125,19 +122,9 @@ def get_recommendations_for_student(
     if max_score is not None:
         filters.append(StudentInternshipMatch.base_similarity_score <= max_score)
 
-    # Skills filter (check if any of the specified skills are in required_skills)
-    if skills:
-        skill_list = [s.strip() for s in skills.split(',')]
-        skill_filters = [func.json_contains(Internship.required_skills, f'"{skill}"') for skill in skill_list]
-        filters.append(or_(*skill_filters))
-
     # Location filter
     if location:
         filters.append(Internship.location.ilike(f'%{location}%'))
-
-    # Experience level filter
-    if experience_level:
-        filters.append(Internship.experience_level == experience_level)
 
     # Days posted filter
     if days_posted:
@@ -167,15 +154,21 @@ def get_recommendations_for_student(
         # Default: sort by score descending
         query = query.order_by(StudentInternshipMatch.base_similarity_score.desc())
 
-    # Get total count before pagination
-    total = query.count()
-
-    # Apply pagination
+    # Required skills live in a JSON list, so the skills filter runs in Python on the rows the SQL
+    # filters already narrowed, which works on every database. Paging follows the skills filter.
     offset = (page - 1) * page_size
-    query = query.offset(offset).limit(page_size)
-
-    # Execute query
-    results = query.all()
+    wanted = {skill.strip().lower() for skill in (skills or "").split(",") if skill.strip()}
+    if wanted:
+        matching = [
+            (match, internship)
+            for match, internship in query.all()
+            if wanted & {skill.lower() for skill in internship.required_skills or []}
+        ]
+        total = len(matching)
+        results = matching[offset : offset + page_size]
+    else:
+        total = query.count()
+        results = query.offset(offset).limit(page_size).all()
 
     logger.info(f"✅ Found {total} total matches, returning page {page} ({len(results)} items)")
 
@@ -193,7 +186,6 @@ def get_recommendations_for_student(
                 stipend=internship.stipend or "",
                 match_score=int(match.base_similarity_score),
                 posted_date=internship.created_at.isoformat() if internship.created_at else None,
-                experience_level=internship.experience_level,
             )
         )
 
