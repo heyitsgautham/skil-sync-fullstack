@@ -20,8 +20,8 @@ export default [
             'react-hooks/exhaustive-deps': 'warn',
             // The automatic JSX runtime needs no React import, but many files still carry one.
             // Debug output leaks resume and match data into the browser console; errors and warnings may stay.
-      'no-console': ['error', { allow: ['error', 'warn'] }],
-      'no-unused-vars': [
+            'no-console': ['error', { allow: ['error', 'warn'] }],
+            'no-unused-vars': [
                 'error',
                 { args: 'none', caughtErrors: 'none', ignoreRestSiblings: true, varsIgnorePattern: '^React$' },
             ],
