@@ -286,17 +286,25 @@ const RecommendedInternships = () => {
                         boxShadow: '0 8px 32px rgba(0,0,0,0.08)',
                     }}
                 >
-                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                    <Box
+                        sx={{
+                            display: 'flex',
+                            flexDirection: { xs: 'column', sm: 'row' },
+                            alignItems: { xs: 'flex-start', sm: 'center' },
+                        }}
+                    >
                         <Box
                             sx={{
                                 width: 80,
                                 height: 80,
+                                flexShrink: 0,
                                 borderRadius: 3,
                                 background: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
                                 display: 'flex',
                                 alignItems: 'center',
                                 justifyContent: 'center',
-                                mr: 3,
+                                mr: { xs: 0, sm: 3 },
+                                mb: { xs: 2, sm: 0 },
                                 boxShadow: '0 8px 24px rgba(240, 147, 251, 0.3)',
                             }}
                         >
@@ -310,6 +318,7 @@ const RecommendedInternships = () => {
                                     color: '#1a1a1a',
                                     mb: 1,
                                     letterSpacing: '-0.5px',
+                                    fontSize: { xs: '1.6rem', sm: '2.125rem' },
                                 }}
                             >
                                 AI-Powered Recommendations

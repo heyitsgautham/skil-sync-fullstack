@@ -458,6 +458,8 @@ const Layout = ({ children }) => {
                 component="main"
                 sx={{
                     flexGrow: 1,
+                    // Without this the flex item grows to its widest child and the page scrolls sideways on phones
+                    minWidth: 0,
                     p: { xs: 2, sm: 3, md: 4 },
                     width: { sm: `calc(100% - ${currentDrawerWidth}px)` },
                     minHeight: '100vh',

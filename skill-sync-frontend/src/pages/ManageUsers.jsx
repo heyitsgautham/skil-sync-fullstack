@@ -187,7 +187,16 @@ const ManageUsers = () => {
                         boxShadow: '0 8px 32px rgba(0,0,0,0.08)',
                     }}
                 >
-                    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 3 }}>
+                    <Box
+                        sx={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'space-between',
+                            flexWrap: 'wrap',
+                            gap: 2,
+                            mb: 3,
+                        }}
+                    >
                         <Box sx={{ display: 'flex', alignItems: 'center' }}>
                             <Box
                                 sx={{
