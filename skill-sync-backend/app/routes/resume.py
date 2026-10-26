@@ -9,7 +9,7 @@ from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
 from app.database.connection import get_db
-from app.models import Resume, User, UserRole
+from app.models import Resume, StudentInternshipMatch, User, UserRole
 from app.services.rag_engine import rag_engine
 from app.utils.errors import internal_error
 from app.utils.security import get_current_user
@@ -194,16 +194,22 @@ def delete_resume(resume_id: int, db: Session = Depends(get_db), current_user: U
             detail=f"Cannot delete resume. It is being used in {applications_count} application(s). Please withdraw or delete those applications first.",
         )
 
-    # Delete from vector DB
-    if resume.embedding_id:
-        rag_engine.delete_resume_embedding(str(resume.id))
-
-    # Delete file
-    if os.path.exists(resume.file_path):
-        os.remove(resume.file_path)
-
-    # Delete from database
+    # Rows that point at this resume go first, or the database refuses the delete. Pre-computed
+    # matches were scored from it, and tailored copies only lose the link to their base resume.
+    db.query(StudentInternshipMatch).filter(StudentInternshipMatch.resume_id == resume.id).delete(
+        synchronize_session=False
+    )
+    db.query(Resume).filter(Resume.base_resume_id == resume.id).update(
+        {"base_resume_id": None}, synchronize_session=False
+    )
+    embedding_id, file_path = resume.embedding_id, resume.file_path
     db.delete(resume)
     db.commit()
+
+    # Remove the embedding and file only once the record is gone, so a failed delete keeps both.
+    if embedding_id:
+        rag_engine.delete_resume_embedding(str(resume_id))
+    if os.path.exists(file_path):
+        os.remove(file_path)
 
     return None
