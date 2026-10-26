@@ -299,8 +299,9 @@ const FilterPanel = ({
                     {showEducation && (
                         <Grid size={{ xs: 12, md: 6 }}>
                             <FormControl fullWidth>
-                                <InputLabel>Education Level</InputLabel>
+                                <InputLabel id="filter-education-level-label">Education Level</InputLabel>
                                 <Select
+                                    labelId="filter-education-level-label"
                                     value={tempFilters.educationLevel || ''}
                                     onChange={handleFieldChange('educationLevel')}
                                     label="Education Level"
@@ -332,8 +333,9 @@ const FilterPanel = ({
                     {showApplicationStatus && (
                         <Grid size={{ xs: 12, md: 6 }}>
                             <FormControl fullWidth>
-                                <InputLabel>Application Status</InputLabel>
+                                <InputLabel id="filter-application-status-label">Application Status</InputLabel>
                                 <Select
+                                    labelId="filter-application-status-label"
                                     value={tempFilters.applicationStatus || ''}
                                     onChange={handleFieldChange('applicationStatus')}
                                     label="Application Status"
@@ -351,8 +353,9 @@ const FilterPanel = ({
                     {showDaysPosted && (
                         <Grid size={{ xs: 12, md: 6 }}>
                             <FormControl fullWidth>
-                                <InputLabel>Posted Within</InputLabel>
+                                <InputLabel id="filter-days-posted-label">Posted Within</InputLabel>
                                 <Select
+                                    labelId="filter-days-posted-label"
                                     value={tempFilters.daysPosted || ''}
                                     onChange={handleFieldChange('daysPosted')}
                                     label="Posted Within"
