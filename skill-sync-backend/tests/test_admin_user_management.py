@@ -2,10 +2,11 @@
 
 import pytest
 
+from app.models.application import Application
 from app.models.internship import Internship
 from app.models.resume import Resume
+from app.models.student_internship_match import StudentInternshipMatch
 from app.models.user import User, UserRole
-from app.services import rag_engine as rag_module
 
 
 def reload(db_session, user_id):
@@ -108,28 +109,88 @@ def test_delete_unknown_user_returns_404(client, admin, auth_headers):
 
 
 def test_deleting_a_student_removes_resumes_and_embeddings(
-    client, admin, make_user, auth_headers, db_session, monkeypatch
+    client, admin, make_user, auth_headers, db_session, fake_rag
 ):
     student = make_user(role=UserRole.student)
-    db_session.add(
-        Resume(student_id=student.id, file_path="/tmp/cv.pdf", file_name="cv.pdf", embedding_id="resume_emb_1")
-    )
+    resume = Resume(student_id=student.id, file_path="/tmp/cv.pdf", file_name="cv.pdf")
+    db_session.add(resume)
     db_session.commit()
-    deleted_embeddings = []
-
-    class FakeRAGEngine:
-        delete_resume_embedding = staticmethod(deleted_embeddings.append)
-
-    # Swap the whole engine so the test never loads the embedding model.
-    monkeypatch.setattr(rag_module, "rag_engine", FakeRAGEngine())
+    resume.embedding_id = fake_rag.store_resume_embedding(str(resume.id), "Python developer", ["Python"])
+    db_session.commit()
+    resume_id = resume.id
 
     response = client.delete(f"/api/auth/users/{student.id}", headers=auth_headers(admin))
 
     assert response.status_code == 200
     assert "1 resumes" in response.json()["message"]
-    assert deleted_embeddings == ["resume_emb_1"]
+    assert fake_rag.get_resume_embedding(str(resume_id)) is None
     assert db_session.query(User).filter(User.id == student.id).first() is None
     assert db_session.query(Resume).filter(Resume.student_id == student.id).count() == 0
+
+
+def test_deleting_a_student_who_applied_removes_their_matches_and_applications(
+    client, admin, make_user, auth_headers, db_session
+):
+    """On PostgreSQL the foreign keys refused this delete while matches and applications remained."""
+    student = make_user(role=UserRole.student)
+    company = make_user(role=UserRole.company)
+    internship = Internship(company_id=company.id, title="Intern", description="d")
+    resume = Resume(student_id=student.id, file_path="/tmp/cv.pdf", file_name="cv.pdf")
+    db_session.add_all([internship, resume])
+    db_session.commit()
+    tailored = Resume(
+        student_id=student.id, file_path="/tmp/t.pdf", file_name="t.pdf", is_tailored=1, base_resume_id=resume.id
+    )
+    db_session.add(tailored)
+    db_session.commit()
+    db_session.add_all(
+        [
+            StudentInternshipMatch(
+                student_id=student.id, internship_id=internship.id, resume_id=resume.id, base_similarity_score=70
+            ),
+            Application(student_id=student.id, internship_id=internship.id, resume_id=tailored.id),
+        ]
+    )
+    db_session.commit()
+
+    response = client.delete(f"/api/auth/users/{student.id}", headers=auth_headers(admin))
+
+    assert response.status_code == 200, response.text
+    assert db_session.query(User).filter(User.id == student.id).first() is None
+    assert db_session.query(StudentInternshipMatch).count() == 0
+    assert db_session.query(Application).count() == 0
+    assert db_session.query(Internship).count() == 1
+
+
+def test_deleting_a_company_removes_its_internships_with_their_applications_and_matches(
+    client, admin, make_user, auth_headers, db_session, fake_rag
+):
+    company = make_user(role=UserRole.company)
+    student = make_user(role=UserRole.student)
+    internship = Internship(company_id=company.id, title="Intern", description="d")
+    resume = Resume(student_id=student.id, file_path="/tmp/cv.pdf", file_name="cv.pdf")
+    db_session.add_all([internship, resume])
+    db_session.commit()
+    db_session.add_all(
+        [
+            StudentInternshipMatch(
+                student_id=student.id, internship_id=internship.id, resume_id=resume.id, base_similarity_score=70
+            ),
+            Application(student_id=student.id, internship_id=internship.id, resume_id=resume.id),
+        ]
+    )
+    db_session.commit()
+    fake_rag.store_internship_embedding(str(internship.id), "Intern", "d", [])
+    internship_id = internship.id
+
+    response = client.delete(f"/api/auth/users/{company.id}", headers=auth_headers(admin))
+
+    assert response.status_code == 200, response.text
+    assert db_session.query(Internship).count() == 0
+    assert db_session.query(StudentInternshipMatch).count() == 0
+    assert db_session.query(Application).count() == 0
+    assert db_session.query(Resume).count() == 1
+    assert fake_rag.get_internship_embedding(str(internship_id)) is None
 
 
 def test_deleting_a_company_removes_its_internships(client, admin, make_user, auth_headers, db_session):

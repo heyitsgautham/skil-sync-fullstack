@@ -377,45 +377,43 @@ async def delete_user(user_id: int, db: Session = Depends(get_db), current_user:
         # Delete associated data based on user role
         deleted_data = {"resumes": 0, "internships": 0, "matches": 0}
 
+        # Rows that reference the user's resumes or internships go before them, applications and
+        # matches first, or the database's foreign keys refuse the delete.
+        from app.models.application import Application
+        from app.models.student_internship_match import StudentInternshipMatch
+        from app.services.rag_engine import rag_engine
+
         if user.role == UserRole.student:
             from app.models.resume import Resume
-            from app.models.student_internship_match import StudentInternshipMatch
-            from app.services.rag_engine import rag_engine
 
             logger.info(f"Deleting student user: {user.email}")
 
-            # Get resumes to clear embeddings from ChromaDB
             resumes = db.query(Resume).filter(Resume.student_id == user_id).all()
-            for resume in resumes:
-                if resume.embedding_id:
-                    try:
-                        rag_engine.delete_resume_embedding(resume.embedding_id)
-                        logger.info(f"Deleted ChromaDB embedding: {resume.embedding_id}")
-                    except Exception as e:
-                        logger.warning(f"Failed to delete embedding {resume.embedding_id}: {e}")
+            embedded_resume_ids = [resume.id for resume in resumes if resume.embedding_id]
 
-            # Delete resumes
-            deleted_data["resumes"] = db.query(Resume).filter(Resume.student_id == user_id).delete()
-
-            # Delete matches
+            db.query(Application).filter(Application.student_id == user_id).delete(synchronize_session=False)
             deleted_data["matches"] = (
-                db.query(StudentInternshipMatch).filter(StudentInternshipMatch.student_id == user_id).delete()
+                db.query(StudentInternshipMatch)
+                .filter(StudentInternshipMatch.student_id == user_id)
+                .delete(synchronize_session=False)
+            )
+            deleted_data["resumes"] = (
+                db.query(Resume).filter(Resume.student_id == user_id).delete(synchronize_session=False)
             )
 
             logger.info(f"Deleted {deleted_data['resumes']} resumes and {deleted_data['matches']} matches")
 
         elif user.role == UserRole.company:
             from app.models.internship import Internship
-            from app.models.student_internship_match import StudentInternshipMatch
 
             logger.info(f"Deleting company user: {user.email}")
 
-            # Get all internships posted by this company
-            internships = db.query(Internship).filter(Internship.company_id == user_id).all()
-            internship_ids = [i.id for i in internships]
+            internship_ids = [i.id for i in db.query(Internship).filter(Internship.company_id == user_id).all()]
 
             if internship_ids:
-                # Delete matches for these internships
+                db.query(Application).filter(Application.internship_id.in_(internship_ids)).delete(
+                    synchronize_session=False
+                )
                 deleted_data["matches"] = (
                     db.query(StudentInternshipMatch)
                     .filter(StudentInternshipMatch.internship_id.in_(internship_ids))
@@ -424,8 +422,9 @@ async def delete_user(user_id: int, db: Session = Depends(get_db), current_user:
 
                 logger.info(f"Deleted {deleted_data['matches']} matches for {len(internship_ids)} internships")
 
-            # Delete internships
-            deleted_data["internships"] = db.query(Internship).filter(Internship.company_id == user_id).delete()
+            deleted_data["internships"] = (
+                db.query(Internship).filter(Internship.company_id == user_id).delete(synchronize_session=False)
+            )
 
             logger.info(f"Deleted {deleted_data['internships']} internships")
 
@@ -438,6 +437,19 @@ async def delete_user(user_id: int, db: Session = Depends(get_db), current_user:
 
         db.delete(user)
         db.commit()
+
+        # Drop the vector store entries only once the rows are gone, so a failed delete keeps them.
+        # delete_resume_embedding takes the resume ID, not the stored "resume_<id>" embedding ID.
+        # The account is already gone, so a vector store failure is logged rather than reported.
+        try:
+            if user_role == UserRole.student.value:
+                for resume_id in embedded_resume_ids:
+                    rag_engine.delete_resume_embedding(str(resume_id))
+            elif user_role == UserRole.company.value:
+                for internship_id in internship_ids:
+                    rag_engine.delete_internship_embedding(str(internship_id))
+        except Exception:
+            logger.exception(f"Deleted {user_email}, but could not remove their embeddings from ChromaDB")
 
         logger.info(f"✅ Successfully deleted {user_role} user: {user_email}")
 
