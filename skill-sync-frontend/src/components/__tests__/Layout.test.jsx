@@ -53,13 +53,17 @@ test.each([
     expect(sidebarItems()).toEqual(items);
 });
 
-test('the top bar names the current page, and falls back to SkillSync for pages outside the menu', () => {
+test('the top bar names the current page, including the create page, and falls back to SkillSync', () => {
     signIn(company);
     const { unmount } = renderLayout('/intelligent-ranking');
     expect(within(screen.getByRole('banner')).getByText('AI Candidate Ranking')).toBeInTheDocument();
     unmount();
 
-    renderLayout('/internships/create');
+    const { unmount: unmountCreate } = renderLayout('/internships/create');
+    expect(within(screen.getByRole('banner')).getByText('Post New Internship')).toBeInTheDocument();
+    unmountCreate();
+
+    renderLayout('/somewhere-else');
     expect(within(screen.getByRole('banner')).getByText('SkillSync')).toBeInTheDocument();
 });
 

@@ -31,6 +31,11 @@ import {
 import { useNavigate, useLocation } from 'react-router-dom';
 import authService from '../services/authService';
 
+// Titles for signed-in pages that have no sidebar entry of their own
+const PAGE_TITLES = {
+    '/internships/create': 'Post New Internship',
+};
+
 const EXPANDED_DRAWER_WIDTH = 240;
 const COLLAPSED_DRAWER_WIDTH = 72;
 
@@ -279,7 +284,9 @@ const Layout = ({ children }) => {
                             letterSpacing: '-0.5px',
                         }}
                     >
-                        {menuItems.find((item) => item.path === location.pathname)?.text || 'SkillSync'}
+                        {menuItems.find((item) => item.path === location.pathname)?.text ||
+                            PAGE_TITLES[location.pathname] ||
+                            'SkillSync'}
                     </Typography>
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                         <Typography
