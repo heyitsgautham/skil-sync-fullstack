@@ -325,6 +325,7 @@ const Layout = ({ children }) => {
                                     transform: 'scale(1.1)',
                                 },
                             }}
+                            aria-label="Account menu"
                             aria-controls={anchorEl ? 'account-menu' : undefined}
                             aria-haspopup="true"
                             aria-expanded={anchorEl ? 'true' : undefined}

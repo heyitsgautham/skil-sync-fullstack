@@ -77,7 +77,7 @@ test('the account menu shows who is signed in and logs them out', async () => {
     signIn(student);
     renderLayout();
 
-    userEvent.click(within(screen.getByRole('banner')).getByRole('button', { name: 'A' }));
+    userEvent.click(within(screen.getByRole('banner')).getByRole('button', { name: 'Account menu' }));
     const menu = await screen.findByRole('menu');
     expect(within(menu).getByText('asha@example.com')).toBeInTheDocument();
 
