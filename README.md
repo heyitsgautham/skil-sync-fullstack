@@ -57,6 +57,7 @@ Every request gets an ID from its `X-Request-ID` header or a new one, which the 
 Each request also writes one `app.access` line with its method, path, status and duration.
 An exception no route handles is logged with its traceback and answered with a JSON 500 that names the request ID.
 `/api/metrics` serves request counts and latencies per route template in the Prometheus text format.
+Setting `SENTRY_DSN` also reports unhandled errors to Sentry, without request bodies, cookies or IPs.
 
 PostgreSQL holds users, internships, resumes, applications and match scores.
 ChromaDB holds the embeddings on local disk.
@@ -142,6 +143,7 @@ The backend reads its settings from environment variables, and `skill-sync-backe
 | `TEMP_TOKEN_SECRET` | Signing key for short-lived resume view links |
 | `ALLOWED_ORIGINS` | Comma-separated CORS origins, empty allows all |
 | `LOG_LEVEL`, `LOG_FORMAT` | Log level, and `json` for one JSON object per line |
+| `SENTRY_DSN`, `SENTRY_ENVIRONMENT`, `SENTRY_TRACES_SAMPLE_RATE` | Optional Sentry error tracking, off when the DSN is empty |
 | `FRONTEND_URL`, `BACKEND_URL` | Public URLs used in emails and resume links |
 | `GEMINI_KEY_*` | Ten Gemini API keys, one per task plus three fallbacks |
 | `CHROMA_DB_PATH` | ChromaDB directory |

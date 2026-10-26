@@ -36,6 +36,7 @@ dependencies = [
     "numpy>=1.26",
     "structlog>=26.1.0",
     "prometheus-client>=0.26.0",
+    "sentry-sdk[fastapi]>=2.73.0",
 ]
 
 [tool.uv]

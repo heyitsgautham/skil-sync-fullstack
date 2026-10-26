@@ -8,7 +8,7 @@ import os
 # Pin settings before the app modules run load_dotenv(), which walks up the
 # directory tree and would otherwise pick up an unrelated .env. load_dotenv never
 # overrides a variable that is already set, so empty values keep every test
-# away from real Gemini, AWS and SMTP accounts.
+# away from real Gemini, AWS, SMTP and Sentry accounts.
 # TEST_DATABASE_URL runs the same suite against another database, such as the Postgres service in CI.
 TEST_DATABASE_URL = os.environ.get("TEST_DATABASE_URL", "sqlite:///./test.db")
 os.environ["DATABASE_URL"] = TEST_DATABASE_URL
@@ -28,6 +28,7 @@ for _name in (
     "AWS_SECRET_ACCESS_KEY",
     "SMTP_USERNAME",
     "SMTP_PASSWORD",
+    "SENTRY_DSN",
 ):
     os.environ[_name] = ""
 

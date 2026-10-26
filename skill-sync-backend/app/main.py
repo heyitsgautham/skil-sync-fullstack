@@ -15,6 +15,7 @@ from app.logging_config import configure_logging
 # time use the configured format instead of Python's bare fallback handler.
 configure_logging()
 
+from app.error_tracking import init_error_tracking  # noqa: E402
 from app.metrics import router as metrics_router  # noqa: E402
 from app.request_context import REQUEST_ID_HEADER, add_request_context  # noqa: E402
 from app.routes import (  # noqa: E402
@@ -33,6 +34,7 @@ from app.routes import (  # noqa: E402
 )
 
 logger = logging.getLogger(__name__)
+init_error_tracking()
 
 # Initialize FastAPI app
 app = FastAPI(
