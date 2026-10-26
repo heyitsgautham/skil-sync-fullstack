@@ -143,6 +143,28 @@ test('sends the report email for the chosen job with only the ticked match bucke
     await waitFor(() => expect(screen.getByRole('button', { name: /Send Email/ })).toBeDisabled());
 });
 
+test('a refused report email says why, such as no candidates in the chosen buckets', async () => {
+    fakeBackend([
+        ['get', '/profile/me', PROFILE],
+        ['get', '/profile/job-email-stats', STATS],
+        [
+            'post',
+            '/profile/send-job-email/7',
+            fail(404, 'No candidates found matching the selected filters: great, good, other'),
+        ],
+    ]);
+    renderAt(<CompanyProfile />, '/company/profile');
+    await screen.findByDisplayValue('Acme Labs');
+
+    await pickJob();
+    userEvent.click(screen.getByRole('button', { name: /Send Email/ }));
+    userEvent.click(within(await screen.findByRole('dialog')).getByRole('button', { name: /Send Email/ }));
+
+    expect(
+        await screen.findByText('Error: No candidates found matching the selected filters: great, good, other'),
+    ).toBeInTheDocument();
+});
+
 test('the send button stays disabled until a job is chosen', async () => {
     fakeBackend([
         ['get', '/profile/me', PROFILE],

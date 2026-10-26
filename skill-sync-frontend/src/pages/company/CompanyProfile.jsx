@@ -109,7 +109,7 @@ const CompanyProfile = () => {
             });
 
             if (!response.ok) {
-                throw new Error('Failed to fetch job statistics');
+                throw new Error(await responseErrorMessage(response, 'Failed to fetch job statistics'));
             }
 
             const data = await response.json();
@@ -218,7 +218,7 @@ const CompanyProfile = () => {
             );
 
             if (!response.ok) {
-                throw new Error('Failed to send email');
+                throw new Error(await responseErrorMessage(response, 'Failed to send email'));
             }
 
             const data = await response.json();
