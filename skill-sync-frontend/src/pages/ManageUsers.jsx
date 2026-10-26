@@ -88,8 +88,11 @@ const ManageUsers = () => {
 
     const handleEditSubmit = async () => {
         try {
-            // Remove role from the request - role changes not allowed
-            const { role, ...updateData } = editFormData;
+            // Anonymization only applies to companies, so other accounts leave it out.
+            const { anonymization_enabled, ...updateData } = editFormData;
+            if (selectedUser.role === 'company') {
+                updateData.anonymization_enabled = anonymization_enabled;
+            }
             await api.put(`/auth/users/${selectedUser.id}`, updateData);
             setSnackbar({
                 open: true,

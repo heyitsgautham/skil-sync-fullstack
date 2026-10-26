@@ -58,6 +58,24 @@ test('lists every user and filters them by search', async () => {
     expect(screen.queryByText('Asha Raman')).not.toBeInTheDocument();
 });
 
+test('turning on anonymization for a company sends it with the update', async () => {
+    const calls = fakeBackend([
+        ['get', '/auth/users', USERS],
+        ['put', '/auth/users/2', { ...USERS[1], anonymization_enabled: true }],
+    ]);
+    renderAt(<ManageUsers />, '/admin/users');
+    await screen.findByText('Acme Labs');
+
+    userEvent.click(within(rowFor('Acme Labs')).getByRole('button', { name: 'Edit User' }));
+    const dialog = await screen.findByRole('dialog');
+    userEvent.click(within(dialog).getByRole('switch'));
+    userEvent.click(within(dialog).getByRole('button', { name: 'Save Changes' }));
+
+    expect(await screen.findByText('User updated successfully')).toBeInTheDocument();
+    const put = calls.find((c) => c.method === 'put');
+    expect(put.body).toEqual({ full_name: 'Acme Labs', is_active: 1, anonymization_enabled: true });
+});
+
 test('renames a user', async () => {
     const calls = fakeBackend([
         ['get', '/auth/users', USERS],
@@ -75,7 +93,8 @@ test('renames a user', async () => {
 
     expect(await screen.findByText('User updated successfully')).toBeInTheDocument();
     const put = calls.find((c) => c.method === 'put');
-    expect(put.body).toEqual({ full_name: 'Asha R', is_active: 1, anonymization_enabled: false });
+    // Anonymization only applies to companies, so a student's update leaves it out.
+    expect(put.body).toEqual({ full_name: 'Asha R', is_active: 1 });
     expect(calls.filter((c) => c.path === '/auth/users')).toHaveLength(2);
 });
 
