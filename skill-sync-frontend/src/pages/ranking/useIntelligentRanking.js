@@ -238,7 +238,10 @@ export default function useIntelligentRanking() {
             });
 
             // Create blob URL and open in new tab
-            const blob = new Blob([pdfResponse.data], { type: 'application/pdf' });
+            // Resumes can be PDF, Word or plain text, so keep the type the server sent.
+            const blob = new Blob([pdfResponse.data], {
+                type: pdfResponse.headers?.['content-type'] || 'application/pdf',
+            });
             const blobUrl = window.URL.createObjectURL(blob);
             window.open(blobUrl, '_blank');
 

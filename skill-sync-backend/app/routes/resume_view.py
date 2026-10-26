@@ -25,6 +25,19 @@ router = APIRouter(prefix="/resumes", tags=["Resume Viewing"])
 logger = logging.getLogger(__name__)
 
 
+# Resumes may be PDF, Word or plain text, and the browser needs the right type to show one.
+_RESUME_MEDIA_TYPES = {
+    ".pdf": "application/pdf",
+    ".txt": "text/plain; charset=utf-8",
+    ".doc": "application/msword",
+    ".docx": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+}
+
+
+def _media_type(file_name: str) -> str:
+    return _RESUME_MEDIA_TYPES.get(os.path.splitext(file_name)[1].lower(), "application/octet-stream")
+
+
 def _remove_if_present(path: str) -> None:
     """Delete a temp copy of a resume once its response has been sent."""
     if os.path.exists(path):
@@ -137,7 +150,7 @@ async def view_resume(
                 if temp_file_path:
                     return FileResponse(
                         temp_file_path,
-                        media_type="application/pdf",
+                        media_type=_media_type(resume.file_name),
                         headers={"Content-Disposition": f'inline; filename="{resume.file_name}"'},
                         background=BackgroundTask(_remove_if_present, temp_file_path),
                     )
@@ -145,7 +158,7 @@ async def view_resume(
                     # Serve local file directly
                     return FileResponse(
                         pdf_path,
-                        media_type="application/pdf",
+                        media_type=_media_type(resume.file_name),
                         headers={"Content-Disposition": f'inline; filename="{resume.file_name}"'},
                     )
 
@@ -248,12 +261,12 @@ async def download_resume(
                 if temp_file_path:
                     return FileResponse(
                         temp_file_path,
-                        media_type="application/pdf",
+                        media_type=_media_type(resume.file_name),
                         filename=resume.file_name,
                         background=BackgroundTask(_remove_if_present, temp_file_path),
                     )
                 else:
-                    return FileResponse(pdf_path, media_type="application/pdf", filename=resume.file_name)
+                    return FileResponse(pdf_path, media_type=_media_type(resume.file_name), filename=resume.file_name)
 
         except Exception:
             if temp_file_path and os.path.exists(temp_file_path):

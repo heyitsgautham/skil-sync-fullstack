@@ -36,7 +36,10 @@ export function fakeBackend(routes) {
         if (result && result.__error) {
             return Promise.reject({ response: { status: result.status, data: result.data } });
         }
-        return Promise.resolve({ data: result, status: 200 });
+        if (result && result.__withHeaders) {
+            return Promise.resolve({ data: result.data, status: 200, headers: result.headers });
+        }
+        return Promise.resolve({ data: result, status: 200, headers: {} });
     };
 
     METHODS.forEach((method) => {
@@ -64,6 +67,9 @@ export function fakeBackend(routes) {
 }
 
 export const fail = (status, detail) => ({ __error: true, status, data: { detail } });
+
+/** A response that also carries headers, such as the content-type of a file. */
+export const withHeaders = (data, headers) => ({ __withHeaders: true, data, headers });
 
 export function signIn(user) {
     localStorage.setItem('token', 'test-token');

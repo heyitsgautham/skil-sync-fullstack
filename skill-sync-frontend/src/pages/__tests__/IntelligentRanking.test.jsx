@@ -3,7 +3,7 @@ import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import toast from 'react-hot-toast';
 import IntelligentRanking from '../IntelligentRanking';
-import { company, fakeBackend, fail, signIn } from '../../testUtils/backend';
+import { company, fakeBackend, fail, signIn, withHeaders } from '../../testUtils/backend';
 import { renderAt } from '../../testUtils/render';
 
 vi.mock('../../services/api');
@@ -185,6 +185,36 @@ test('opens a candidate resume stored in S3', async () => {
     userEvent.click(screen.getByRole('button', { name: /Resume/ }));
 
     await waitFor(() => expect(open).toHaveBeenCalledWith('https://bucket/cv.pdf', '_blank'));
+});
+
+test('opens a resume served by the API with the type the server sent', async () => {
+    const open = vi.spyOn(window, 'open').mockImplementation(() => null);
+    window.URL.createObjectURL = vi.fn(() => 'blob:resume');
+    window.URL.revokeObjectURL = vi.fn();
+    fakeBackend([
+        ['get', '/internship/my-posts', POSTS],
+        [
+            'get',
+            '/recommendations/resume/1',
+            {
+                storage_type: 'api',
+                url: 'http://localhost:8000/api/resumes/5/view?token=t',
+                anonymized: false,
+            },
+        ],
+        ['get', '/resumes/5/view', withHeaders('Plain text resume', { 'content-type': 'text/plain; charset=utf-8' })],
+        ['get', /^\/internship\/\w+/, POSTS[0]],
+        ['post', '/filter/rank-candidates/uuid-backend', ranking([candidate(1)])],
+    ]);
+    renderAt(<IntelligentRanking />, '/intelligent-ranking');
+    await rankFor('Backend Intern');
+    await screen.findByText('Candidate Name 1');
+
+    userEvent.click(screen.getByRole('button', { name: /Resume/ }));
+
+    await waitFor(() => expect(open).toHaveBeenCalledWith('blob:resume', '_blank'));
+    const [blob] = window.URL.createObjectURL.mock.calls[0];
+    expect(blob.type).toBe('text/plain; charset=utf-8');
 });
 
 test('email selection mode needs at least one candidate', async () => {
