@@ -332,25 +332,14 @@ def get_candidate_resume_url(
             else:
                 logger.warning(f"⚠️ Failed to generate presigned URL for {resume.s3_key}")
 
-        # Fallback to local file if S3 not available
-        if not os.path.exists(resume.file_path):
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Resume file not found")
-
-        logger.info(f"📄 Company {current_user.id} viewing original resume {resume.id} (local file)")
-        return {
-            "resume_id": resume.id,
-            "file_name": resume.file_name,
-            "file_path": resume.file_path,
-            "storage_type": "local",
-            "anonymized": False,
-            "message": "Resume stored locally. Use appropriate endpoint to download.",
-        }
-
-    # If anonymization is ENABLED, generate temporary token and use API endpoint
+    # Everything else is served by GET /api/resumes/{id}/view, which reads S3 or the local file
+    # and redacts contact details when the token asks it to. A local file has to exist first.
+    if not (s3_service.is_enabled() and resume.s3_key) and not os.path.exists(resume.file_path):
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Resume file not found")
 
     token_payload = {
         "resume_id": resume.id,
-        "anonymize": True,
+        "anonymize": bool(anonymization_enabled),
         "company_id": current_user.id,
         "exp": datetime.utcnow() + timedelta(hours=1),
     }
@@ -361,13 +350,17 @@ def get_candidate_resume_url(
     base_url = os.getenv("BACKEND_URL", "http://localhost:8000")
     resume_view_url = f"{base_url}/api/resumes/{resume.id}/view?token={temp_token}"
 
-    logger.info(f"🔒 Company {current_user.id} viewing anonymized resume {resume.id}")
+    logger.info(
+        f"📄 Company {current_user.id} viewing resume {resume.id} ({'anonymized' if anonymization_enabled else 'original'})"
+    )
 
     return {
         "resume_id": resume.id,
         "file_name": resume.file_name,
         "url": resume_view_url,
         "storage_type": "api",
-        "anonymized": True,
-        "message": "Resume will be anonymized (names/emails/phone redacted)",
+        "anonymized": bool(anonymization_enabled),
+        "message": "Resume will be anonymized (names/emails/phone redacted)"
+        if anonymization_enabled
+        else "Original resume through a link that expires in 1 hour",
     }

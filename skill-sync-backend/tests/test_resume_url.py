@@ -34,18 +34,21 @@ def url_for(student_id):
     return f"/api/recommendations/resume/{student_id}"
 
 
-def test_company_without_anonymization_gets_local_resume(client, make_user, auth_headers, student_with_resume):
+def test_company_without_anonymization_can_open_a_local_resume(client, make_user, auth_headers, student_with_resume):
+    """The ranking page opens body["url"]. For local files it used to get no URL and only a server path."""
     company = make_user(UserRole.company, anonymization_enabled=False)
     student, resume = student_with_resume
 
-    response = client.get(url_for(student.id), headers=auth_headers(company))
+    body = client.get(url_for(student.id), headers=auth_headers(company)).json()
 
-    assert response.status_code == 200
-    body = response.json()
-    assert body["storage_type"] == "local"
+    assert body["storage_type"] == "api"
     assert body["anonymized"] is False
     assert body["resume_id"] == resume.id
     assert body["file_name"] == "resume.pdf"
+    assert "file_path" not in body
+    view = client.get(body["url"].replace("http://localhost:8000", ""))
+    assert view.status_code == 200
+    assert view.content == b"%PDF-1.4 test"
 
 
 def test_missing_local_file_returns_404(client, db_session, make_user, auth_headers, student_with_resume):
