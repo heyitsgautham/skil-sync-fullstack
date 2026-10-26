@@ -12,8 +12,9 @@ const RankingPagination = ({ rankedCandidates, page, setPage, pageSize, setPageS
                         {rankedCandidates.length} candidates
                     </Typography>
                     <FormControl size="small" sx={{ minWidth: 120 }}>
-                        <InputLabel>Per Page</InputLabel>
+                        <InputLabel id="ranking-page-size-label">Per Page</InputLabel>
                         <Select
+                            labelId="ranking-page-size-label"
                             value={pageSize}
                             onChange={(e) => {
                                 setPageSize(e.target.value);

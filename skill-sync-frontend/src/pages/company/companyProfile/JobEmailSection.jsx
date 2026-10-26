@@ -41,8 +41,9 @@ const JobEmailSection = ({
         <Grid container spacing={2}>
             <Grid size={{ xs: 12 }}>
                 <FormControl fullWidth>
-                    <InputLabel>Select Job Position</InputLabel>
+                    <InputLabel id="report-job-label">Select Job Position</InputLabel>
                     <Select
+                        labelId="report-job-label"
                         value={selectedJob}
                         onChange={(e) => setSelectedJob(e.target.value)}
                         label="Select Job Position"

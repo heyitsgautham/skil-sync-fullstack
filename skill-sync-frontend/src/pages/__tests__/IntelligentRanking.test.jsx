@@ -1,5 +1,5 @@
 import React from 'react';
-import { screen, waitFor } from '@testing-library/react';
+import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import toast from 'react-hot-toast';
 import IntelligentRanking from '../IntelligentRanking';
@@ -59,7 +59,7 @@ beforeEach(() => {
 afterEach(() => vi.restoreAllMocks());
 
 async function rankFor(title) {
-    const select = await screen.findByRole('combobox');
+    const select = await screen.findByRole('combobox', { name: 'Select Internship' });
     await waitFor(() => expect(select).not.toHaveAttribute('aria-disabled', 'true'));
     userEvent.click(select);
     userEvent.click(await screen.findByRole('option', { name: new RegExp(title) }));
@@ -120,6 +120,12 @@ test('pages through more than five candidates', async () => {
 
     expect(await screen.findByText('Candidate Name 6')).toBeInTheDocument();
     expect(screen.queryByText('Candidate Name 1')).not.toBeInTheDocument();
+
+    userEvent.click(screen.getByRole('combobox', { name: 'Per Page' }));
+    userEvent.click(within(screen.getByRole('listbox')).getByRole('option', { name: '10 per page' }));
+
+    expect(await screen.findByText('Candidate Name 1')).toBeInTheDocument();
+    expect(screen.getByText('Candidate Name 7')).toBeInTheDocument();
 });
 
 test('an empty ranking explains why instead of asking to rank again, until another internship is chosen', async () => {
@@ -130,7 +136,7 @@ test('an empty ranking explains why instead of asking to rank again, until anoth
         ['post', '/filter/rank-candidates/uuid-backend', ranking([], { message: reason })],
     ]);
     renderAt(<IntelligentRanking />, '/intelligent-ranking');
-    await screen.findByRole('combobox');
+    await screen.findByRole('combobox', { name: 'Select Internship' });
 
     await rankFor('Backend Intern');
 
@@ -139,7 +145,7 @@ test('an empty ranking explains why instead of asking to rank again, until anoth
     expect(screen.queryByText(/Click "Rank Candidates"/)).not.toBeInTheDocument();
     expect(toast).toHaveBeenCalledWith(reason, expect.anything());
 
-    userEvent.click(screen.getByRole('combobox'));
+    userEvent.click(screen.getByRole('combobox', { name: 'Select Internship' }));
     userEvent.click(await screen.findByRole('option', { name: /Frontend Intern/ }));
 
     expect(await screen.findByText(/Click "Rank Candidates"/)).toBeInTheDocument();
@@ -163,7 +169,7 @@ test('the rank button stays disabled until an internship is chosen', async () =>
     fakeBackend([['get', '/internship/my-posts', POSTS]]);
     renderAt(<IntelligentRanking />, '/intelligent-ranking');
 
-    await screen.findByRole('combobox');
+    await screen.findByRole('combobox', { name: 'Select Internship' });
 
     expect(screen.getByRole('button', { name: /Rank Candidates/ })).toBeDisabled();
 });

@@ -29,8 +29,9 @@ const InternshipSelector = ({
         <Grid container spacing={2} alignItems="center">
             <Grid size={{ xs: 12, md: 9 }}>
                 <FormControl fullWidth size="medium">
-                    <InputLabel>Select Internship</InputLabel>
+                    <InputLabel id="ranking-internship-label">Select Internship</InputLabel>
                     <Select
+                        labelId="ranking-internship-label"
                         value={selectedInternship || ''}
                         label="Select Internship"
                         onChange={(e) => {

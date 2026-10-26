@@ -205,8 +205,9 @@ const EditUserDialog = ({
             {/* Admin Status */}
             {selectedUser?.role.toLowerCase() === 'admin' && (
                 <FormControl fullWidth margin="normal" sx={{ mt: 2 }}>
-                    <InputLabel>Account Status</InputLabel>
+                    <InputLabel id="edit-user-status-label">Account Status</InputLabel>
                     <Select
+                        labelId="edit-user-status-label"
                         value={editFormData.is_active}
                         label="Account Status"
                         onChange={(e) => setEditFormData({ ...editFormData, is_active: e.target.value })}

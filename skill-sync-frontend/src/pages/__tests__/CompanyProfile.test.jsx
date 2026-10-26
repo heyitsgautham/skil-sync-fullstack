@@ -39,7 +39,7 @@ beforeEach(() => {
 const field = (label) => screen.getByLabelText(label);
 
 const pickJob = async () => {
-    userEvent.click(screen.getByRole('combobox'));
+    userEvent.click(screen.getByRole('combobox', { name: 'Select Job Position' }));
     userEvent.click(await screen.findByRole('option', { name: /Data Intern/ }));
     await waitFor(() => expect(screen.queryByRole('listbox')).not.toBeInTheDocument());
 };
