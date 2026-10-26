@@ -1,6 +1,6 @@
 """POST /api/filter/parse-resume."""
 
-from fastapi import Depends, File, HTTPException, UploadFile
+from fastapi import Depends, File, HTTPException, UploadFile, status
 from sqlalchemy.orm import Session
 
 from app.database.connection import get_db
@@ -64,6 +64,9 @@ async def parse_and_extract_resume(
             },
         }
 
+    except ValueError as e:
+        # ResumeService raises ValueError for input the user can fix, such as an unsupported file type.
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
     except Exception as e:
         import traceback
 

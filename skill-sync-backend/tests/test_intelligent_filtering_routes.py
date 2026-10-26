@@ -259,8 +259,8 @@ def test_parse_resume_rejects_unsupported_files(client, make_user, auth_headers,
         files={"file": ("cv.exe", b"x", "application/octet-stream")},
         headers=auth_headers(make_user()),
     )
-    assert response.status_code == 500
-    assert "Invalid file type" in response.json()["detail"]
+    assert response.status_code == 400
+    assert response.json()["detail"].startswith("Invalid file type")
 
 
 def test_applications_are_recorded(db_session, client, matched, auth_headers):
