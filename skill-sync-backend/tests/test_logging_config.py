@@ -1,4 +1,4 @@
-"""configure_logging sets the level and the output format."""
+"""configure_logging sets the level and the output format for stdlib and structlog loggers."""
 
 import io
 import json
@@ -6,7 +6,7 @@ import logging
 
 import pytest
 
-from app.logging_config import configure_logging
+from app.logging_config import bind_context, clear_context, configure_logging, get_logger
 
 
 @pytest.fixture(autouse=True)
@@ -14,6 +14,7 @@ def restore_root_logger():
     root = logging.getLogger()
     handlers, level = list(root.handlers), root.level
     yield
+    clear_context()
     root.handlers[:] = handlers
     root.setLevel(level)
 
@@ -68,3 +69,39 @@ def test_calling_twice_keeps_a_single_handler():
     configure_logging(stream=io.StringIO())
     configure_logging(stream=io.StringIO())
     assert len(logging.getLogger().handlers) == 1
+
+
+def test_structlog_fields_land_as_json_keys():
+    stream = io.StringIO()
+    configure_logging(fmt="json", stream=stream)
+    get_logger("app.ranking").info("ranked candidates", internship_id=7, count=3)
+
+    record = json.loads(stream.getvalue().strip())
+    assert record["message"] == "ranked candidates"
+    assert record["logger"] == "app.ranking"
+    assert record["level"] == "INFO"
+    assert (record["internship_id"], record["count"]) == (7, 3)
+
+
+def test_bound_context_reaches_stdlib_and_structlog_lines_until_cleared():
+    stream = io.StringIO()
+    configure_logging(fmt="json", stream=stream)
+
+    bind_context(request_id="req-123")
+    logging.getLogger("app.example").info("from stdlib")
+    get_logger("app.example").info("from structlog")
+    clear_context()
+    logging.getLogger("app.example").info("after the request")
+
+    first, second, third = (json.loads(line) for line in stream.getvalue().splitlines())
+    assert first["request_id"] == second["request_id"] == "req-123"
+    assert "request_id" not in third
+
+
+def test_plain_format_appends_fields_as_key_value_pairs():
+    stream = io.StringIO()
+    configure_logging(fmt="plain", stream=stream)
+    get_logger("app.example").warning("slow query", ms=812)
+
+    assert "WARNING app.example: slow query ms=812" in stream.getvalue()
+
