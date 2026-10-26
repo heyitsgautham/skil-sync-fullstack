@@ -18,13 +18,10 @@ from app.models import Resume, User, UserRole
 from app.services.resume_anonymization_service import anonymization_service
 from app.services.s3_service import s3_service
 from app.utils.errors import internal_error
-from app.utils.security import get_current_user
+from app.utils.security import TEMP_TOKEN_SECRET, get_current_user
 
 router = APIRouter(prefix="/resumes", tags=["Resume Viewing"])
 logger = logging.getLogger(__name__)
-
-# Secret key for signing temporary tokens (use environment variable in production)
-TEMP_TOKEN_SECRET = os.getenv("TEMP_TOKEN_SECRET", "your-secret-key-change-in-production")
 
 
 def get_optional_user(token: str | None = Query(None), db: Session = Depends(get_db)):

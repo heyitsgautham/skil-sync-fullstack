@@ -27,8 +27,6 @@ services:
         required: false
     environment:
       DATABASE_URL: postgresql://skillsync:skillsync@db:5432/skillsync
-      SECRET_KEY: ${SECRET_KEY:-local-dev-only-change-me}
-      TEMP_TOKEN_SECRET: ${TEMP_TOKEN_SECRET:-local-dev-only-change-me-too}
       ALLOWED_ORIGINS: http://localhost:3000
       FRONTEND_URL: http://localhost:3000
       BACKEND_URL: http://localhost:8000

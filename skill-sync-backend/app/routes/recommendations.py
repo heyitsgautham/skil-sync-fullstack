@@ -14,7 +14,7 @@ from app.database.connection import get_db
 from app.models import Internship, Resume, User, UserRole
 from app.services.rag_engine import rag_engine
 from app.services.s3_service import s3_service
-from app.utils.security import get_current_user
+from app.utils.security import TEMP_TOKEN_SECRET, get_current_user
 
 router = APIRouter(prefix="/recommendations", tags=["Recommendations"])
 
@@ -347,7 +347,6 @@ def get_candidate_resume_url(
         }
 
     # If anonymization is ENABLED, generate temporary token and use API endpoint
-    TEMP_TOKEN_SECRET = os.getenv("TEMP_TOKEN_SECRET", "your-secret-key-change-in-production")
 
     token_payload = {
         "resume_id": resume.id,

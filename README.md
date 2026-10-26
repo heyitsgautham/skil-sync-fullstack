@@ -155,6 +155,9 @@ The backend reads its settings from environment variables, and `skill-sync-backe
 | `AWS_*` | S3 resume storage, leave empty for local storage |
 | `SMTP_*`, `SENDER_EMAIL`, `SENDER_NAME` | Outgoing email |
 
+Set `SECRET_KEY` and `TEMP_TOKEN_SECRET` to the output of `openssl rand -hex 32`.
+When either is unset or still a placeholder from this repository, the backend signs with a random key and logs a warning, so sessions and resume links end when it restarts.
+
 The frontend reads one variable, `VITE_API_BASE_URL`, at build time.
 
 ## Contributing

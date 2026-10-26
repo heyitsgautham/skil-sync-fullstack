@@ -2,7 +2,9 @@
 Security utilities for password hashing and JWT token management
 """
 
+import logging
 import os
+import secrets
 from datetime import datetime, timedelta
 
 import jwt
@@ -21,8 +23,44 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="api/auth/login")
 # Same scheme for endpoints that serve anonymous callers too: a missing token gives None, not a 401.
 optional_oauth2_scheme = OAuth2PasswordBearer(tokenUrl="api/auth/login", auto_error=False)
 
+logger = logging.getLogger(__name__)
+
+# Values that appear in this repository as defaults or examples. Anyone can read them, so a token
+# signed with one of them can be forged.
+PUBLISHED_PLACEHOLDER_KEYS = frozenset(
+    {
+        "your-secret-key-change-in-production",
+        "replace-with-openssl-rand-hex-32",
+        "replace-with-another-openssl-rand-hex-32",
+        "local-dev-only-change-me",
+        "local-dev-only-change-me-too",
+    }
+)
+
+
+def signing_key(name: str, environ=os.environ) -> str:
+    """The token signing key in the environment variable `name`.
+
+    When it is unset or still one of the published placeholders, a random key is used for this process
+    instead, so tokens cannot be forged. Those tokens stop working when the server restarts, and a
+    warning says so.
+    """
+    value = (environ.get(name) or "").strip()
+    if value and value not in PUBLISHED_PLACEHOLDER_KEYS:
+        return value
+    logger.warning(
+        "%s is %s, so a random key signs tokens and they stop working when the server restarts. "
+        "Set it to the output of `openssl rand -hex 32`.",
+        name,
+        "a published placeholder" if value else "not set",
+    )
+    return secrets.token_urlsafe(32)
+
+
 # Security configuration
-SECRET_KEY = os.getenv("SECRET_KEY", "your-secret-key-change-in-production")
+SECRET_KEY = signing_key("SECRET_KEY")
+# Signs the short-lived links that open a resume without a session
+TEMP_TOKEN_SECRET = signing_key("TEMP_TOKEN_SECRET")
 ALGORITHM = os.getenv("ALGORITHM", "HS256")
 ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", "30"))
 
