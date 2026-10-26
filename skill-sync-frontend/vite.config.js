@@ -17,7 +17,7 @@ export default defineConfig({
             include: ['src/**/*.{js,jsx}'],
             exclude: ['src/testUtils/**', 'src/**/__mocks__/**', 'src/**/*.test.{js,jsx}', 'src/index.jsx'],
             reporter: ['text', 'lcov'],
-            thresholds: { statements: 50, branches: 48, functions: 44, lines: 50 },
+            thresholds: { statements: 74, branches: 68, functions: 65, lines: 75 },
         },
     },
 });
