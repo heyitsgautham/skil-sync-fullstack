@@ -43,6 +43,15 @@ describe('apiClient', () => {
         expect(window.location.href).toBe('/login');
     });
 
+    test('a 401 from a login attempt is left for the form to report', async () => {
+        localStorage.setItem('token', 'stale');
+        const error = { config: { url: '/auth/login' }, response: { status: 401 } };
+
+        await expect(responseInterceptor().rejected(error)).rejects.toBe(error);
+        expect(window.location.href).toBe('/dashboard');
+        expect(localStorage.getItem('token')).toBe('stale');
+    });
+
     test('other errors pass through without touching the session', async () => {
         localStorage.setItem('token', 'still-valid');
         const error = { response: { status: 500 } };

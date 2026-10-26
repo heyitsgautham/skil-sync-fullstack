@@ -27,7 +27,10 @@ apiClient.interceptors.request.use(
 apiClient.interceptors.response.use(
     (response) => response,
     (error) => {
-        if (error.response?.status === 401) {
+        // A 401 from the login form means a wrong email or password, which the form reports itself.
+        // Reloading /login there would wipe the form and the message before anyone could read them.
+        const isLoginAttempt = error.config?.url === '/auth/login';
+        if (error.response?.status === 401 && !isLoginAttempt) {
             // Clear token and redirect to login on unauthorized
             localStorage.removeItem('token');
             localStorage.removeItem('user');
