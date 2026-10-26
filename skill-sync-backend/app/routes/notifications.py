@@ -26,12 +26,6 @@ class DailySummaryResponse(BaseModel):
     preview_html: str | None = None
 
 
-class EmailPreviewRequest(BaseModel):
-    """Request model for email preview"""
-
-    hours: int = 24  # Number of hours to look back for applications
-
-
 @router.post("/send-daily-summary", response_model=DailySummaryResponse)
 def send_daily_summary(
     hours: int = 24,
@@ -100,58 +94,4 @@ def preview_daily_summary(
         "total_applications": result.total_applications,
         "internships_with_applications": result.internships_with_applications,
         "preview_html": result.preview_html,
-    }
-
-
-@router.get("/email-settings")
-def get_email_settings(current_user: User = Depends(get_current_user)):
-    """
-    Get current email notification settings for the user
-
-    Returns:
-    - Email preferences (enabled/disabled)
-    - Last email sent timestamp
-    - Email delivery status
-
-    Only authenticated users can access this endpoint.
-    """
-    # Placeholder for future email preferences implementation
-    # Would store preferences in database
-
-    return {
-        "email": current_user.email,
-        "daily_summary_enabled": True,  # Default enabled for companies
-        "email_verified": True,  # Placeholder
-        "last_email_sent": None,  # Would track in database
-        "preferences": {"new_applications": True, "daily_summary": True, "weekly_report": False},
-    }
-
-
-@router.put("/email-settings")
-def update_email_settings(
-    daily_summary_enabled: bool = True,
-    new_applications_enabled: bool = True,
-    weekly_report_enabled: bool = False,
-    current_user: User = Depends(get_current_user),
-):
-    """
-    Update email notification preferences
-
-    - **daily_summary_enabled**: Enable/disable daily summary emails
-    - **new_applications_enabled**: Enable/disable immediate notifications for new applications
-    - **weekly_report_enabled**: Enable/disable weekly analytics reports
-
-    Only authenticated users can update their email settings.
-    """
-    # Placeholder for future email preferences implementation
-    # Would update preferences in database
-
-    return {
-        "success": True,
-        "message": "Email preferences updated successfully",
-        "preferences": {
-            "daily_summary": daily_summary_enabled,
-            "new_applications": new_applications_enabled,
-            "weekly_report": weekly_report_enabled,
-        },
     }
