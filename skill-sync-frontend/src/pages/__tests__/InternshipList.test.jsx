@@ -69,6 +69,35 @@ test('a student applies with their active resume', async () => {
     expect(apply.body.get('use_tailored_resume')).toBe('false');
 });
 
+test('a student sees which internships they already applied to, and the list updates after applying', async () => {
+    signIn(student);
+    const applied = [{ id: 5, internship_id: 2, status: 'pending' }];
+    fakeBackend([
+        ['get', '/internship/list', LISTINGS],
+        ['get', '/internship/applications/my-applications', () => applied],
+        [
+            'post',
+            '/internship/1/apply',
+            () => {
+                applied.push({ id: 6, internship_id: 1, status: 'pending' });
+                return { match_score: 70, used_tailored_resume: 0 };
+            },
+        ],
+    ]);
+    renderAt(<InternshipList />, '/internships');
+
+    const appliedButton = await screen.findByRole('button', { name: 'Applied' });
+    expect(appliedButton).toBeDisabled();
+    expect(screen.getAllByRole('button', { name: 'Apply Now' })).toHaveLength(1);
+
+    userEvent.click(screen.getByRole('button', { name: 'Apply Now' }));
+    const dialog = await screen.findByRole('dialog');
+    userEvent.click(within(dialog).getByRole('button', { name: 'Submit Application' }));
+
+    await waitFor(() => expect(screen.getAllByRole('button', { name: 'Applied' })).toHaveLength(2));
+    expect(screen.queryByRole('button', { name: 'Apply Now' })).not.toBeInTheDocument();
+});
+
 test('a failed application stays in the dialog with the error', async () => {
     signIn(student);
     fakeBackend([

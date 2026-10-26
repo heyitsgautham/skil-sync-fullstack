@@ -6,11 +6,13 @@ import MonetizationOnIcon from '@mui/icons-material/MonetizationOn';
 import WorkIcon from '@mui/icons-material/Work';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 
 const InternshipCard = ({
     internship,
     userRole,
     handleApply,
+    hasApplied = false,
     handleViewDetails,
     handleEditClick,
     handleDeleteClick,
@@ -223,6 +225,8 @@ const InternshipCard = ({
                 <Button
                     variant="contained"
                     fullWidth
+                    disabled={hasApplied}
+                    startIcon={hasApplied ? <CheckCircleIcon /> : null}
                     onClick={() => (userRole === 'company' ? handleViewDetails(internship) : handleApply(internship))}
                     sx={{
                         py: 1.5,
@@ -238,9 +242,14 @@ const InternshipCard = ({
                             boxShadow: '0 8px 24px rgba(76, 175, 80, 0.4)',
                             background: 'linear-gradient(135deg, #45a049 0%, #4caf50 100%)',
                         },
+                        '&.Mui-disabled': {
+                            background: 'rgba(76, 175, 80, 0.12)',
+                            color: '#2e7d32',
+                            boxShadow: 'none',
+                        },
                     }}
                 >
-                    {userRole === 'company' ? 'View Details' : 'Apply Now'}
+                    {userRole === 'company' ? 'View Details' : hasApplied ? 'Applied' : 'Apply Now'}
                 </Button>
             )}
         </CardActions>

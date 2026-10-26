@@ -20,12 +20,24 @@ import EditInternshipDialog from './internshipList/EditInternshipDialog';
 import DeleteInternshipDialog from './internshipList/DeleteInternshipDialog';
 import InternshipDetailsDialog from './internshipList/InternshipDetailsDialog';
 
+// The internships a student already applied to, so the list does not offer a form the API will refuse
+const fetchAppliedIds = async () => {
+    try {
+        const response = await apiClient.get('/internship/applications/my-applications');
+        return new Set(response.data.map((application) => application.internship_id));
+    } catch (err) {
+        console.error('Error fetching applications:', err);
+        return new Set();
+    }
+};
+
 const InternshipList = () => {
     const [internships, setInternships] = useState([]);
     const [filteredInternships, setFilteredInternships] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
     const [searchQuery, setSearchQuery] = useState('');
+    const [appliedIds, setAppliedIds] = useState(() => new Set());
     const [userRole, setUserRole] = useState('');
     const [selectedInternship, setSelectedInternship] = useState(null);
     const [applicationDialogOpen, setApplicationDialogOpen] = useState(false);
@@ -79,6 +91,9 @@ const InternshipList = () => {
             const response = await apiClient.get(endpoint);
             setInternships(response.data);
             setFilteredInternships(response.data);
+            if (role === 'student') {
+                fetchAppliedIds().then(setAppliedIds);
+            }
         } catch (err) {
             console.error('Error fetching internships:', err);
             setError(err.response?.data?.detail || 'Failed to load internships');
@@ -240,6 +255,7 @@ const InternshipList = () => {
                                     <InternshipCard
                                         internship={internship}
                                         userRole={userRole}
+                                        hasApplied={appliedIds.has(internship.id)}
                                         handleApply={handleApply}
                                         handleViewDetails={handleViewDetails}
                                         handleEditClick={handleEditClick}
