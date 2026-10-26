@@ -1,10 +1,13 @@
 """HTML and plain-text bodies for the job report email."""
 
 from datetime import datetime
+from html import escape
 
 
 def generate_job_email_html(company_name, internship_title, job_stats, matches, db, applied_filters=None):
     """Generate HTML email content for job report"""
+    # Names typed by people go into the HTML escaped.
+    company_name, internship_title = escape(company_name), escape(internship_title)
 
     # Generate filter info HTML if filters were applied
     filter_info = ""

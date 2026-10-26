@@ -10,6 +10,7 @@ from email import encoders
 from email.mime.base import MIMEBase
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
+from html import escape
 
 from dotenv import load_dotenv
 
@@ -282,7 +283,7 @@ class EmailService:
                 </div>
 
                 <div class="summary-box">
-                    <h2>Hello, {company_name}!</h2>
+                    <h2>Hello, {escape(company_name)}!</h2>
                     <p>Here's your daily summary of new internship applications.</p>
                     <p><strong>{total_applications}</strong> new application(s) across <strong>{len(internship_summaries)}</strong> internship posting(s)</p>
                 </div>
@@ -301,7 +302,7 @@ class EmailService:
 
                 html += f"""
                 <div class="internship-section">
-                    <h3>{internship_title}</h3>
+                    <h3>{escape(internship_title)}</h3>
                     <div class="internship-meta">
                         {len(applicants)} new application(s)
                     </div>
@@ -315,31 +316,31 @@ class EmailService:
                     if applicant.get('top_skills'):
                         skills_html = '<div class="skills">'
                         for skill in applicant['top_skills'][:5]:  # Show top 5 skills
-                            skills_html += f'<span class="skill-tag">{skill}</span>'
+                            skills_html += f'<span class="skill-tag">{escape(skill)}</span>'
                         skills_html += '</div>'
 
                     html += f"""
                     <div class="applicant-card">
                         <div class="applicant-header">
-                            <div class="applicant-name">{applicant['name']}</div>
+                            <div class="applicant-name">{escape(applicant['name'])}</div>
                             <div class="match-score {match_class}">{match_score}% Match</div>
                         </div>
                         <div class="applicant-details">
-                            <div><strong>Email:</strong> {applicant['email']}</div>
+                            <div><strong>Email:</strong> {escape(applicant['email'])}</div>
                     """
 
                     if applicant.get('phone'):
-                        html += f"""<div><strong>Phone:</strong> {applicant['phone']}</div>"""
+                        html += f"""<div><strong>Phone:</strong> {escape(applicant['phone'])}</div>"""
 
                     if applicant.get('experience_years') is not None:
                         html += f"""<div><strong>Experience:</strong> {applicant['experience_years']} years</div>"""
 
                     html += f"""
-                            <div><strong>Applied:</strong> {applicant['applied_at']}</div>
+                            <div><strong>Applied:</strong> {escape(applicant['applied_at'])}</div>
                     """
 
                     if applicant.get('key_strengths'):
-                        html += f"""<div><strong>Key Strengths:</strong> {applicant['key_strengths']}</div>"""
+                        html += f"""<div><strong>Key Strengths:</strong> {escape(applicant['key_strengths'])}</div>"""
 
                     html += skills_html
                     html += """

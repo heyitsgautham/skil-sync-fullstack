@@ -3,6 +3,7 @@ Candidate Email Routes - Send emails to selected candidates
 """
 
 import os
+from html import escape
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel
@@ -149,6 +150,10 @@ def generate_candidate_selection_email_html(
     candidate_name: str, company_name: str, internship_title: str, message: str
 ) -> str:
     """Generate HTML email for candidate selection notification"""
+    # Every value is text a person typed, so it goes into the HTML escaped.
+    candidate_name, company_name, internship_title, message = (
+        escape(value) for value in (candidate_name, company_name, internship_title, message)
+    )
 
     html = f"""
     <!DOCTYPE html>
