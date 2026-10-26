@@ -76,12 +76,6 @@ const CreateInternship = () => {
             const extractedData = response.data;
 
             // Log extracted data for debugging
-            console.log('📄 Extracted data from document:', {
-                title: extractedData.title,
-                descriptionLength: extractedData.description?.length || 0,
-                requiredSkillsCount: extractedData.required_skills?.length || 0,
-                preferredSkillsCount: extractedData.preferred_skills?.length || 0,
-            });
 
             // Pre-fill form with extracted data (but NOT skills - user must click Extract button)
             setFormData({
@@ -121,8 +115,6 @@ const CreateInternship = () => {
             return;
         }
 
-        console.log('🔍 Extracting skills from description. Description length:', formData.description.length);
-
         setExtracting(true);
         setError('');
         setExtractionSuccess('');
@@ -133,11 +125,6 @@ const CreateInternship = () => {
             });
 
             const { required_skills, preferred_skills } = response.data;
-
-            console.log('✅ Skills extracted successfully:', {
-                required: required_skills.length,
-                preferred: preferred_skills.length,
-            });
 
             // Merge with existing skills (avoiding duplicates)
             const newRequiredSkills = [...new Set([...formData.required_skills, ...required_skills])];

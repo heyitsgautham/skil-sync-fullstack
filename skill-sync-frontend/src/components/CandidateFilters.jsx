@@ -69,7 +69,6 @@ const CandidateFilters = ({ onApplyFilters, onReset, scoringInfo }) => {
         // Use the NEW value for exclude_flagged (not the old state)
         apiFilters.exclude_flagged = newExcludeFlaggedValue;
 
-        console.log('🚩 Hide Flagged toggled - applying filter immediately:', apiFilters);
         onApplyFilters(apiFilters);
     };
 
@@ -94,8 +93,6 @@ const CandidateFilters = ({ onApplyFilters, onReset, scoringInfo }) => {
 
         // Exclude flagged - always send this parameter
         apiFilters.exclude_flagged = filters.excludeFlagged;
-
-        console.log('🔍 Applying filters:', apiFilters); // Debug log
 
         onApplyFilters(apiFilters);
     };

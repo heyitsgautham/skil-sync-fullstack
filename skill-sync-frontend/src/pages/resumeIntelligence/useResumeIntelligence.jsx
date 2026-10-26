@@ -60,8 +60,6 @@ export default function useResumeIntelligence() {
         try {
             const token = localStorage.getItem('token');
 
-            console.log('Loading resume data for ID:', resumeId);
-
             // First, update the UI immediately for instant feedback
             setMyResumes((prevResumes) =>
                 prevResumes.map((resume) => ({
@@ -79,7 +77,6 @@ export default function useResumeIntelligence() {
                         headers: { Authorization: `Bearer ${token}` },
                     },
                 );
-                console.log('Resume activated successfully');
             } catch (activateError) {
                 console.error('Error activating resume:', activateError);
                 // Revert the optimistic update if activation failed

@@ -152,15 +152,11 @@ const RecommendedInternships = () => {
             setLoading(true);
             setError(null);
 
-            console.log('Fetching recommendations...');
-
             // Call the internship match endpoint (old working endpoint)
             // Fetch max allowed recommendations, then filter/sort client-side
             const response = await apiClient.get('/internship/match', {
                 params: { top_k: 50 }, // Max allowed by endpoint
             });
-
-            console.log('Recommendations response:', response.data);
 
             // Store unfiltered data
             const allItems = response.data || [];
@@ -186,15 +182,8 @@ const RecommendedInternships = () => {
             });
             setAvailableSkills(Array.from(skills).sort());
 
-            if (allItems.length === 0) {
-                console.log(
-                    'No recommendations found. Student may need to upload resume or matches need to be computed.',
-                );
-            } else if (paginatedItems.length === 0 && sortedItems.length > 0) {
-                console.log('No results on this page. Adjusting to page 1.');
+            if (paginatedItems.length === 0 && sortedItems.length > 0) {
                 setPage(1); // Reset to first page if current page is empty
-            } else if (sortedItems.length === 0 && allItems.length > 0) {
-                console.log('No results match current filters.');
             }
         } catch (err) {
             console.error('Error fetching recommendations:', err);
@@ -218,7 +207,6 @@ const RecommendedInternships = () => {
                 }
             }
 
-            console.log('Processed error message:', errorMessage);
             setError(errorMessage);
 
             if (err.response?.status === 404) {
