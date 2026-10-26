@@ -18,6 +18,8 @@ load_dotenv()
 
 # OAuth2 scheme for token extraction
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="api/auth/login")
+# Same scheme for endpoints that serve anonymous callers too: a missing token gives None, not a 401.
+optional_oauth2_scheme = OAuth2PasswordBearer(tokenUrl="api/auth/login", auto_error=False)
 
 # Security configuration
 SECRET_KEY = os.getenv("SECRET_KEY", "your-secret-key-change-in-production")
@@ -190,3 +192,13 @@ async def get_current_admin(current_user=Depends(get_current_user)):
         )
 
     return current_user
+
+
+async def get_optional_user(token: str | None = Depends(optional_oauth2_scheme), db: Session = Depends(get_db)):
+    """The signed-in active user, or None when the request has no valid token."""
+    if not token:
+        return None
+    try:
+        return await get_current_user(token=token, db=db)
+    except HTTPException:
+        return None

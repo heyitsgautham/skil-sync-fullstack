@@ -11,7 +11,7 @@ from app.database.connection import get_db
 from app.models.user import User, UserRole
 from app.services.auth_service import AuthService
 from app.utils.errors import internal_error
-from app.utils.security import get_current_user
+from app.utils.security import get_current_user, get_optional_user
 
 router = APIRouter()
 
@@ -78,15 +78,23 @@ class AnalyticsResponse(BaseModel):
 
 
 @router.post("/register", response_model=MessageResponse, status_code=status.HTTP_201_CREATED)
-async def register(request: RegisterRequest, db: Session = Depends(get_db)):
+async def register(
+    request: RegisterRequest,
+    db: Session = Depends(get_db),
+    caller: User | None = Depends(get_optional_user),
+):
     """
     Register a new user
 
     - **email**: Valid email address
     - **password**: Minimum 8 characters
     - **full_name**: User's full name
-    - **role**: User role (student, company, admin)
+    - **role**: student or company for anyone; admin only when the request carries an admin's token
     """
+    if request.role == UserRole.admin.value and (caller is None or caller.role != UserRole.admin):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN, detail="Only an administrator can create administrator accounts"
+        )
     try:
         user = AuthService.register_user(
             db=db, email=request.email, password=request.password, full_name=request.full_name, role=request.role
