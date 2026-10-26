@@ -5,6 +5,12 @@ import TimerIcon from '@mui/icons-material/Timer';
 import MonetizationOnIcon from '@mui/icons-material/MonetizationOn';
 import EditIcon from '@mui/icons-material/Edit';
 
+/** "Posted on <date> | " for a valid timestamp, and nothing when the date is missing or unreadable. */
+const postedOn = (createdAt) => {
+    const date = createdAt ? new Date(createdAt) : null;
+    return date && !Number.isNaN(date.getTime()) ? `Posted on: ${date.toLocaleDateString()} | ` : '';
+};
+
 const InternshipDetailsDialog = ({
     detailsDialogOpen,
     setDetailsDialogOpen,
@@ -131,7 +137,7 @@ const InternshipDetailsDialog = ({
 
                     <Box sx={{ mt: 3, p: 2, backgroundColor: '#f9fafb', borderRadius: 2 }}>
                         <Typography variant="caption" color="text.secondary">
-                            Posted on: {new Date(selectedInternship.created_at).toLocaleDateString()} | Status:{' '}
+                            {postedOn(selectedInternship.created_at)}Status:
                             {selectedInternship.is_active ? ' Active' : ' Inactive'}
                         </Typography>
                     </Box>

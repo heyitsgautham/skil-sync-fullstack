@@ -164,6 +164,35 @@ test('companies open the details dialog instead of applying', async () => {
     expect(within(dialog).getByText('Docker')).toBeInTheDocument();
 });
 
+test('the details dialog shows the posting date, and leaves it out when there is none', async () => {
+    signIn(company);
+    const posted = '2026-10-20T09:30:00Z';
+    fakeBackend([
+        [
+            'get',
+            '/internship/my-posts',
+            [
+                { ...LISTINGS[0], created_at: posted },
+                { ...LISTINGS[1], created_at: null },
+            ],
+        ],
+    ]);
+    renderAt(<InternshipList />, '/internships');
+
+    const [first, second] = await screen.findAllByRole('button', { name: 'View Details' });
+    userEvent.click(first);
+    const dialog = await screen.findByRole('dialog');
+    const expected = `Posted on: ${new Date(posted).toLocaleDateString()} | Status: Active`;
+    expect(within(dialog).getByText(expected)).toBeInTheDocument();
+    userEvent.click(within(dialog).getByRole('button', { name: 'Close' }));
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+
+    userEvent.click(second);
+    const other = await screen.findByRole('dialog');
+    expect(within(other).getByText('Status: Active')).toBeInTheDocument();
+    expect(within(other).queryByText(/Invalid Date/)).not.toBeInTheDocument();
+});
+
 test('a load failure shows the error', async () => {
     signIn(student);
     fakeBackend([['get', '/internship/list', fail(500, 'Database unavailable')]]);
