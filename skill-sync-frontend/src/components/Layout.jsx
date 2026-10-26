@@ -26,6 +26,7 @@ import {
     Person as PersonIcon,
     Logout as LogoutIcon,
     AutoAwesome as AIIcon,
+    Assignment as AssignmentIcon,
 } from '@mui/icons-material';
 import { useNavigate, useLocation } from 'react-router-dom';
 import authService from '../services/authService';
@@ -82,6 +83,8 @@ const Layout = ({ children }) => {
         const studentItems = [
             { text: 'AI Resume Intelligence', icon: <AIIcon />, path: '/resume-intelligence', roles: ['student'] },
             { text: 'AI Recommendations', icon: <StarIcon />, path: '/recommendations', roles: ['student'] },
+            { text: 'Browse Internships', icon: <WorkIcon />, path: '/internships', roles: ['student'] },
+            { text: 'My Applications', icon: <AssignmentIcon />, path: '/applications', roles: ['student'] },
             { text: 'My Profile', icon: <PersonIcon />, path: '/student/profile', roles: ['student'] },
         ];
 

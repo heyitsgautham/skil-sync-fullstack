@@ -7,6 +7,7 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
 import InternshipList from './pages/InternshipList';
+import MyApplications from './pages/MyApplications';
 import RecommendedInternships from './pages/RecommendedInternships';
 import CreateInternship from './pages/CreateInternship';
 import ManageUsers from './pages/ManageUsers';
@@ -99,6 +100,14 @@ function App() {
                         element={
                             <PrivateRoute>
                                 <RecommendedInternships />
+                            </PrivateRoute>
+                        }
+                    />
+                    <Route
+                        path="/applications"
+                        element={
+                            <PrivateRoute>
+                                <MyApplications />
                             </PrivateRoute>
                         }
                     />
