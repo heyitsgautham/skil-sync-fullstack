@@ -78,17 +78,17 @@ test('admins load the system status and can recompute embeddings', async () => {
     expect(screen.getByText(/Matches: 30 recalculated/)).toBeInTheDocument();
 });
 
-test('a failed recompute shows an error', async () => {
+test('a failed recompute shows the reason the API gave', async () => {
     signIn(admin);
     fakeBackend([
         ['get', '/admin/system-status', STATUS],
-        ['post', '/admin/recompute-embeddings', fail(500, 'boom')],
+        ['post', '/admin/recompute-embeddings', fail(500, 'Error recomputing embeddings')],
     ]);
     renderAt(<Dashboard />, '/dashboard');
 
     userEvent.click(screen.getByRole('button', { name: /Recompute Embeddings/ }));
 
-    expect(await screen.findByText('Failed to recompute embeddings. Please try again.')).toBeInTheDocument();
+    expect(await screen.findByText('Error recomputing embeddings. Please try again.')).toBeInTheDocument();
 });
 
 test('clearing ChromaDB asks first, then reports what it deleted', async () => {
@@ -109,6 +109,20 @@ test('clearing ChromaDB asks first, then reports what it deleted', async () => {
     userEvent.click(within(await screen.findByRole('dialog')).getByRole('button', { name: /Yes, Delete Everything/ }));
 
     expect(await screen.findByText(/12 embeddings and 40 matches deleted/)).toBeInTheDocument();
+});
+
+test('re-indexing with no resume files on disk says so', async () => {
+    signIn(admin);
+    fakeBackend([
+        ['get', '/admin/system-status', STATUS],
+        ['post', '/admin/reindex-all-students', fail(404, 'No resume files found in directory')],
+    ]);
+    renderAt(<Dashboard />, '/dashboard');
+
+    userEvent.click(screen.getByRole('button', { name: /Re-index/ }));
+    userEvent.click(within(await screen.findByRole('dialog')).getByRole('button', { name: /Start Re-indexing/ }));
+
+    expect(await screen.findByText('No resume files found in directory. Please try again.')).toBeInTheDocument();
 });
 
 test('re-indexing starts, then refreshes the status 30 seconds later', async () => {

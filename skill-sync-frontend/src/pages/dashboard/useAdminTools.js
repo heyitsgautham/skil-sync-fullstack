@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import authService from '../../services/authService';
 import { API_BASE_URL } from '../../services/apiConfig';
+import { responseErrorMessage } from '../../services/apiErrors';
 
 /**
  * State and handlers behind the admin dashboard tools: recompute embeddings,
@@ -34,7 +35,7 @@ export default function useAdminTools(role) {
             });
 
             if (!response.ok) {
-                throw new Error('Failed to recompute embeddings');
+                throw new Error(await responseErrorMessage(response, 'Failed to recompute embeddings'));
             }
 
             const data = await response.json();
@@ -48,7 +49,7 @@ export default function useAdminTools(role) {
             console.error('Error recomputing embeddings:', error);
             setSnackbar({
                 open: true,
-                message: 'Failed to recompute embeddings. Please try again.',
+                message: `${error.message}. Please try again.`,
                 severity: 'error',
             });
         } finally {
@@ -71,7 +72,7 @@ export default function useAdminTools(role) {
             });
 
             if (!response.ok) {
-                throw new Error('Failed to clear ChromaDB');
+                throw new Error(await responseErrorMessage(response, 'Failed to clear ChromaDB'));
             }
 
             const data = await response.json();
@@ -87,7 +88,7 @@ export default function useAdminTools(role) {
             console.error('Error clearing ChromaDB:', error);
             setSnackbar({
                 open: true,
-                message: 'Failed to clear ChromaDB. Please try again.',
+                message: `${error.message}. Please try again.`,
                 severity: 'error',
             });
         } finally {
@@ -110,7 +111,7 @@ export default function useAdminTools(role) {
             });
 
             if (!response.ok) {
-                throw new Error('Failed to start reindexing');
+                throw new Error(await responseErrorMessage(response, 'Failed to start reindexing'));
             }
 
             const data = await response.json();
@@ -134,7 +135,7 @@ export default function useAdminTools(role) {
             console.error('Error starting reindex:', error);
             setSnackbar({
                 open: true,
-                message: 'Failed to start reindexing. Please try again.',
+                message: `${error.message}. Please try again.`,
                 severity: 'error',
             });
             setIsReindexing(false);
