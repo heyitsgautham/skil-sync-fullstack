@@ -10,7 +10,12 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.logging_config import configure_logging
-from app.routes import (
+
+# Configure logging before importing the routes, so the warnings their services log at import
+# time use the configured format instead of Python's bare fallback handler.
+configure_logging()
+
+from app.routes import (  # noqa: E402
     admin,
     auth,
     candidate_emails,
@@ -25,7 +30,6 @@ from app.routes import (
     students,
 )
 
-configure_logging()
 logger = logging.getLogger(__name__)
 
 # Initialize FastAPI app

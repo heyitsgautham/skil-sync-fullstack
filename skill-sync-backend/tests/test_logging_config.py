@@ -105,3 +105,32 @@ def test_plain_format_appends_fields_as_key_value_pairs():
 
     assert "WARNING app.example: slow query ms=812" in stream.getvalue()
 
+
+def test_warnings_logged_while_the_app_imports_use_the_configured_format(tmp_path):
+    """Services warn at import time (no S3 keys, no Gemini keys); those lines must be JSON too."""
+    import os
+    import subprocess
+    import sys
+    from pathlib import Path
+
+    env = {
+        **os.environ,
+        "LOG_FORMAT": "json",
+        "DATABASE_URL": f"sqlite:///{tmp_path / 'startup.db'}",
+        "AWS_ACCESS_KEY_ID": "",
+        "AWS_SECRET_ACCESS_KEY": "",
+    }
+    result = subprocess.run(
+        [sys.executable, "-W", "ignore", "-c", "import app.main"],
+        cwd=Path(__file__).resolve().parents[1],
+        env=env,
+        capture_output=True,
+        text=True,
+        timeout=120,
+    )
+
+    assert result.returncode == 0, result.stderr
+    app_lines = [line for line in result.stderr.splitlines() if "S3 credentials" in line or "app.main" in line]
+    assert app_lines, result.stderr
+    for line in app_lines:
+        assert json.loads(line)["logger"].startswith("app.")
