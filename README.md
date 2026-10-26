@@ -135,7 +135,7 @@ Set `TEST_DATABASE_URL` to a Postgres URL to run the same suite there, as the `B
 `skill-sync-backend/tests/conftest.py` pins `DATABASE_URL` to a local SQLite file, so a stray `.env` cannot point the suite at a real database.
 
 GitHub Actions runs every check above on each push and pull request, plus a gitleaks scan and the Docker smoke test.
-CI fails when backend coverage drops below 75% or frontend line coverage below 75%.
+CI fails when backend coverage drops below 80% or frontend line coverage below 75%.
 
 ## Configuration
 
