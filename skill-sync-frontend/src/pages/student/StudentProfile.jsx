@@ -30,6 +30,7 @@ import {
 import Layout from '../../components/Layout';
 import authService from '../../services/authService';
 import { API_BASE_URL } from '../../services/apiConfig';
+import { responseErrorMessage } from '../../services/apiErrors';
 
 const StudentProfile = () => {
     const [profile, setProfile] = useState(null);
@@ -96,7 +97,7 @@ const StudentProfile = () => {
             });
 
             if (!response.ok) {
-                throw new Error('Failed to update profile');
+                throw new Error(await responseErrorMessage(response, 'Failed to update profile'));
             }
 
             const data = await response.json();

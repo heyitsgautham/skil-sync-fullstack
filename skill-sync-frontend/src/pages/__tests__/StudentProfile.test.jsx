@@ -80,3 +80,30 @@ test('a failed load reports the error', async () => {
 
     expect(await screen.findByText('Error: Failed to fetch profile')).toBeInTheDocument();
 });
+
+test('a rejected save shows the reason the API gave and stays in edit mode', async () => {
+    const invalid = {
+        __error: true,
+        status: 422,
+        data: {
+            detail: [
+                {
+                    loc: ['body', 'github_url'],
+                    msg: 'Value error, GitHub URL cannot contain spaces',
+                },
+            ],
+        },
+    };
+    fakeBackend([
+        ['get', '/profile/me', PROFILE],
+        ['put', '/profile/me', invalid],
+    ]);
+    renderAt(<StudentProfile />, '/student/profile');
+
+    userEvent.click(await screen.findByRole('button', { name: /Edit Profile/ }));
+    userEvent.paste(field('GitHub Profile URL'), 'not a url');
+    userEvent.click(screen.getByRole('button', { name: /Save/ }));
+
+    expect(await screen.findByText('Error: GitHub URL cannot contain spaces')).toBeInTheDocument();
+    expect(field('GitHub Profile URL')).toBeEnabled();
+});

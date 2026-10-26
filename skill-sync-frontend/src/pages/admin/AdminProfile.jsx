@@ -28,6 +28,7 @@ import {
 import Layout from '../../components/Layout';
 import authService from '../../services/authService';
 import { API_BASE_URL } from '../../services/apiConfig';
+import { responseErrorMessage } from '../../services/apiErrors';
 
 const AdminProfile = () => {
     const [profile, setProfile] = useState(null);
@@ -88,7 +89,7 @@ const AdminProfile = () => {
             });
 
             if (!response.ok) {
-                throw new Error('Failed to update profile');
+                throw new Error(await responseErrorMessage(response, 'Failed to update profile'));
             }
 
             const data = await response.json();

@@ -41,6 +41,6 @@ test('a rejected save keeps the form open', async () => {
     userEvent.click(await screen.findByRole('button', { name: /Edit Profile/ }));
     userEvent.click(screen.getByRole('button', { name: /Save/ }));
 
-    expect(await screen.findByText('Error: Failed to update profile')).toBeInTheDocument();
+    expect(await screen.findByText('Error: String should have at most 255 characters')).toBeInTheDocument();
     expect(screen.getByLabelText('Full Name')).toBeEnabled();
 });
