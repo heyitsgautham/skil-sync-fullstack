@@ -23,7 +23,7 @@ const Analytics = () => {
         totalInternships: 0,
         totalResumes: 0,
         activeInternships: 0,
-        averageMatchScore: 0,
+        averageMatchScore: null,
     });
 
     useEffect(() => {
@@ -46,7 +46,7 @@ const Analytics = () => {
                 totalInternships: response.data.total_internships,
                 totalResumes: response.data.total_resumes,
                 activeInternships: response.data.active_internships,
-                averageMatchScore: 85, // This can be calculated based on actual matching data
+                averageMatchScore: response.data.average_match_score ?? null,
             });
         } catch (err) {
             console.error('Error fetching analytics:', err);
@@ -55,6 +55,8 @@ const Analytics = () => {
             setLoading(false);
         }
     };
+
+    const averageScoreText = stats.averageMatchScore === null ? 'N/A' : `${stats.averageMatchScore}%`;
 
     const StatCard = ({ title, value, icon: Icon, color, gradient }) => (
         <Card
@@ -267,7 +269,7 @@ const Analytics = () => {
                                             AI Matching Performance
                                         </Typography>
                                         <Typography variant="body2" color="text.secondary">
-                                            System-wide matching accuracy
+                                            Mean score across every student-internship match
                                         </Typography>
                                     </Box>
                                 </Box>
@@ -291,11 +293,16 @@ const Analytics = () => {
                                                 letterSpacing: '-2px',
                                             }}
                                         >
-                                            {stats.averageMatchScore}%
+                                            {averageScoreText}
                                         </Typography>
                                         <Typography variant="body1" color="text.secondary" sx={{ fontWeight: 600 }}>
                                             Average Match Score
                                         </Typography>
+                                        {stats.averageMatchScore === null && (
+                                            <Typography variant="body2" color="text.secondary">
+                                                No student-internship matches computed yet
+                                            </Typography>
+                                        )}
                                     </Box>
                                     <Box
                                         sx={{
@@ -317,7 +324,7 @@ const Analytics = () => {
                                                 color: '#667eea',
                                             }}
                                         >
-                                            {stats.averageMatchScore}%
+                                            {averageScoreText}
                                         </Typography>
                                     </Box>
                                 </Box>

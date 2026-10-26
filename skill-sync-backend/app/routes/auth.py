@@ -75,6 +75,7 @@ class AnalyticsResponse(BaseModel):
     total_internships: int
     active_internships: int
     total_resumes: int
+    average_match_score: float | None = None  # mean base match score in percent, None before any matches
 
 
 @router.post("/register", response_model=MessageResponse, status_code=status.HTTP_201_CREATED)
@@ -172,8 +173,11 @@ async def get_analytics(db: Session = Depends(get_db), current_user: User = Depe
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Only administrators can access analytics")
 
     try:
+        from sqlalchemy import func
+
         from app.models.internship import Internship
         from app.models.resume import Resume
+        from app.models.student_internship_match import StudentInternshipMatch
 
         # Count users by role
         total_users = db.query(User).count()
@@ -188,6 +192,10 @@ async def get_analytics(db: Session = Depends(get_db), current_user: User = Depe
         # Count resumes
         total_resumes = db.query(Resume).filter(Resume.is_active == 1).count()
 
+        # Mean of every pre-computed student-internship match score
+        average = db.query(func.avg(StudentInternshipMatch.base_similarity_score)).scalar()
+        average_match_score = round(float(average), 1) if average is not None else None
+
         return AnalyticsResponse(
             total_users=total_users,
             total_students=total_students,
@@ -196,6 +204,7 @@ async def get_analytics(db: Session = Depends(get_db), current_user: User = Depe
             total_internships=total_internships,
             active_internships=active_internships,
             total_resumes=total_resumes,
+            average_match_score=average_match_score,
         )
     except Exception:
         raise internal_error("Failed to fetch analytics")
