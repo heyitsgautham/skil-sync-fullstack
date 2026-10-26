@@ -2,16 +2,14 @@
 Email Notification Routes - Handle email notification endpoints
 """
 
-from datetime import datetime, timedelta
-
 from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel
-from sqlalchemy import and_
 from sqlalchemy.orm import Session
 
 from app.database.connection import get_db
-from app.models import Application, Internship, User, UserRole
-from app.services.email_service import email_service
+from app.models import User, UserRole
+from app.services.daily_summary import build_daily_summary, summary_recipient
+from app.services.daily_summary import send_daily_summary as send_summary_email
 from app.utils.security import get_current_user
 
 router = APIRouter(prefix="/notifications", tags=["Notifications"])
@@ -58,123 +56,28 @@ def send_daily_summary(
             status_code=status.HTTP_403_FORBIDDEN, detail="Only companies can access daily summary reports"
         )
 
-    # Get cutoff time (last N hours)
-    cutoff_time = datetime.utcnow() - timedelta(hours=hours)
-
-    # Get all internships posted by this company
-    internships = db.query(Internship).filter(Internship.company_id == current_user.id, Internship.is_active == 1).all()
-
-    if not internships:
+    summary = build_daily_summary(db, current_user, hours=hours)
+    if summary is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="No active internship postings found")
 
-    # Get all applications for these internships within the time window
-    internship_ids = [i.id for i in internships]
-
-    recent_applications = (
-        db.query(Application)
-        .filter(and_(Application.internship_id.in_(internship_ids), Application.created_at >= cutoff_time))
-        .order_by(Application.created_at.desc())
-        .all()
-    )
-
-    # Group applications by internship
-    internship_summaries = []
-    total_applications = 0
-
-    for internship in internships:
-        # Get applications for this internship
-        internship_apps = [app for app in recent_applications if app.internship_id == internship.id]
-
-        if not internship_apps:
-            continue
-
-        applicants = []
-        for app in internship_apps:
-            # Get student details
-            student = db.query(User).filter(User.id == app.student_id).first()
-
-            if not student:
-                continue
-
-            # Extract phone from student profile if available
-            # (Would need to add phone field to User model in future)
-            phone = None  # Placeholder for future implementation
-
-            # Extract top skills from student profile
-            top_skills = student.skills[:5] if student.skills else []
-
-            # Generate key strengths summary (simplified version)
-            key_strengths = ""
-            if student.skills:
-                key_strengths = f"Proficient in {', '.join(student.skills[:3])}"
-            if student.total_experience_years:
-                if key_strengths:
-                    key_strengths += f", {student.total_experience_years} years experience"
-                else:
-                    key_strengths = f"{student.total_experience_years} years of experience"
-
-            applicants.append(
-                {
-                    'name': student.full_name,
-                    'email': student.email,
-                    'phone': phone,
-                    'match_score': app.match_score or app.application_similarity_score or 0,
-                    'top_skills': top_skills,
-                    'experience_years': student.total_experience_years,
-                    'applied_at': app.created_at.strftime("%b %d, %Y at %I:%M %p"),
-                    'key_strengths': key_strengths or "Details available in dashboard",
-                }
-            )
-
-        if applicants:
-            internship_summaries.append({'internship_title': internship.title, 'applicants': applicants})
-            total_applications += len(applicants)
-
-    # Generate email content
-    date = datetime.utcnow()
-    html_content = email_service.generate_daily_summary_html(
-        company_name=current_user.full_name, internship_summaries=internship_summaries, date=date
-    )
-
-    text_content = email_service.generate_daily_summary_text(
-        company_name=current_user.full_name, internship_summaries=internship_summaries, date=date
-    )
+    def respond(success: bool, message: str, email_sent: bool, preview_html: str | None = None):
+        return DailySummaryResponse(
+            success=success,
+            message=message,
+            total_applications=summary.total_applications,
+            internships_with_applications=len(summary.internship_summaries),
+            email_sent=email_sent,
+            preview_html=preview_html,
+        )
 
     # If preview only, return HTML without sending
     if preview_only:
-        return DailySummaryResponse(
-            success=True,
-            message="Email preview generated successfully",
-            total_applications=total_applications,
-            internships_with_applications=len(internship_summaries),
-            email_sent=False,
-            preview_html=html_content,
-        )
+        return respond(True, "Email preview generated successfully", False, summary.html)
 
-    # Send email
-    email_sent = email_service.send_email(
-        to_email=current_user.email,
-        subject=f"SkillSync Daily Summary - {total_applications} New Application(s) - {date.strftime('%b %d, %Y')}",
-        html_content=html_content,
-        text_content=text_content,
-    )
+    if not send_summary_email(current_user, summary):
+        return respond(False, "Failed to send email. Please check email configuration.", False)
 
-    if not email_sent:
-        return DailySummaryResponse(
-            success=False,
-            message="Failed to send email. Please check email configuration.",
-            total_applications=total_applications,
-            internships_with_applications=len(internship_summaries),
-            email_sent=False,
-        )
-
-    return DailySummaryResponse(
-        success=True,
-        message=f"Daily summary email sent successfully to {current_user.email}",
-        total_applications=total_applications,
-        internships_with_applications=len(internship_summaries),
-        email_sent=True,
-    )
+    return respond(True, f"Daily summary email sent successfully to {summary_recipient(current_user)}", True)
 
 
 @router.get("/preview-daily-summary")
