@@ -14,6 +14,7 @@ It is a monorepo with a FastAPI backend and a React frontend, and Docker Compose
 |---|---|
 | Resume parsing | Extracts text from PDF and DOCX uploads, then asks Gemini for structured skills, experience, education and projects |
 | Matching | Scores a student against an internship as 45% skills, 25% experience, 10% semantic similarity, 10% education and 10% projects and certifications |
+| Applications | Students browse postings, apply with their active resume or a tailored one, and follow each application on My Applications |
 | Ranking | Lists a posting's candidates by score with filters, pagination and CSV or Excel export |
 | Anonymized review | Redacts the student's name, email, phone and profile links from the resume PDF a company sees |
 | Duplicate flags | Flags candidates who share a phone number, LinkedIn URL or GitHub URL |
@@ -56,6 +57,7 @@ The backend logs through structlog, as plain text or as one JSON object per line
 Every request gets an ID from its `X-Request-ID` header or a new one, which the response returns and every log line of that request carries.
 Each request also writes one `app.access` line with its method, path, status and duration.
 An exception no route handles is logged with its traceback and answered with a JSON 500 that names the request ID.
+When Gemini cannot parse a new resume, the upload answers 503 and the student's current resume and skills stay as they were.
 `/api/metrics` serves request counts and latencies per route template in the Prometheus text format.
 Setting `SENTRY_DSN` also reports unhandled errors to Sentry, without request bodies, cookies or IPs.
 
