@@ -15,6 +15,9 @@ from app.utils.security import get_current_user
 
 router = APIRouter(prefix="/admin", tags=["Admin"])
 
+# Where uploaded and seeded resume files live, relative to the backend root.
+RESUME_DIR = "app/public/resumes"
+
 
 class RecomputeResponse(BaseModel):
     """Response model for recompute embeddings endpoint"""
@@ -184,13 +187,14 @@ def reindex_all_student_resumes(
     background_tasks: BackgroundTasks, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)
 ):
     """
-    Re-upload and re-index all 50 student resumes (Admin only)
+    Re-parse and re-index every stored student resume file (Admin only)
 
     This will:
     1. Find all resume files in app/public/resumes/
-    2. For each resume: extract text → parse with Gemini → generate embeddings
-    3. Store in ChromaDB and update database
-    4. Recalculate student-internship matches
+    2. Match each file to the active resume record with that file name, skipping files no one owns
+    3. Extract the text, parse it with Gemini and store a new embedding in ChromaDB
+    4. Update that resume and the student's skills in place
+    5. Recalculate student-internship matches
 
     This is a background task that may take several minutes.
     """
@@ -214,16 +218,17 @@ def reindex_all_student_resumes(
         logger.info(f"🔄 Admin {current_user.email} initiated full resume reindexing")
 
         # Find all resume files in app/public/resumes/
-        resume_dir = "app/public/resumes"
+        resume_dir = RESUME_DIR
         if not os.path.exists(resume_dir):
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND, detail=f"Resume directory not found: {resume_dir}"
             )
 
-        # Get all PDF, DOCX, and TXT files
+        # Get all PDF, DOCX, and TXT files, in name order so runs are repeatable
         resume_files = []
         for ext in ['*.pdf', '*.docx', '*.txt']:
             resume_files.extend(glob.glob(os.path.join(resume_dir, ext)))
+        resume_files.sort()
 
         if not resume_files:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="No resume files found in directory")
@@ -234,87 +239,65 @@ def reindex_all_student_resumes(
         parser = ResumeParser()
         intelligence_service = ResumeIntelligenceService()
 
-        # Process each resume in background
+        def read_text(resume_file):
+            if resume_file.endswith('.pdf'):
+                return parser.extract_text_from_pdf(resume_file)
+            if resume_file.endswith('.docx'):
+                return parser.extract_text_from_docx(resume_file)
+            with open(resume_file, encoding='utf-8') as f:
+                return f.read()
+
         def process_all_resumes():
             successful = 0
             failed = 0
 
-            # Get all students
-            students = db.query(UserModel).filter(UserModel.role == UserRole.student).all()
-            student_map = {student.email.split('@')[0].lower(): student for student in students}
-
             for resume_file in resume_files:
+                file_name = os.path.basename(resume_file)
                 try:
-                    file_name = os.path.basename(resume_file)
-                    logger.info(f"📄 Processing: {file_name}")
-
-                    # Extract text
-                    if resume_file.endswith('.pdf'):
-                        text = parser.extract_text_from_pdf(resume_file)
-                    elif resume_file.endswith('.docx'):
-                        text = parser.extract_text_from_docx(resume_file)
-                    else:
-                        with open(resume_file, encoding='utf-8') as f:
-                            text = f.read()
-
-                    # Extract structured data using Gemini
-                    structured_data = intelligence_service.extract_structured_data(text)
-
-                    # Generate embedding
-                    embedding_text = f"{text}\n\nSkills: {', '.join(structured_data.get('all_skills', []))}"
-                    embedding = rag_engine.generate_embedding(embedding_text)
-
-                    # Find matching student by filename (e.g., "alex_resume.pdf" -> "alex")
-                    student_name = file_name.split('_')[0].lower().replace('-', '').replace('.', '')
-                    student = student_map.get(student_name)
-
-                    if not student:
-                        logger.warning(f"⚠️  No student found for resume: {file_name}")
+                    # The stored resume that points at this file says whose it is. Files no
+                    # account owns are skipped before any Gemini call.
+                    resume = (
+                        db.query(Resume)
+                        .filter(Resume.file_name == file_name, Resume.is_active == 1)
+                        .order_by(Resume.id.desc())
+                        .first()
+                    )
+                    if resume is None:
+                        logger.warning(f"⚠️  No active resume record for file: {file_name}")
                         failed += 1
                         continue
+                    student = db.get(UserModel, resume.student_id)
 
-                    # Deactivate old resumes
-                    db.query(Resume).filter(Resume.student_id == student.id, Resume.is_active == 1).update(
-                        {"is_active": 0}
-                    )
+                    logger.info(f"📄 Processing: {file_name}")
+                    text = read_text(resume_file)
+                    structured_data = intelligence_service.extract_structured_data(text)
+                    skills = structured_data.get('all_skills', [])
 
-                    # Create new resume entry
-                    resume = Resume(
-                        student_id=student.id,
-                        file_name=file_name,
-                        file_path=resume_file,
-                        parsed_data=structured_data,
-                        embedding=embedding,
-                        is_active=1,
-                    )
-                    db.add(resume)
-                    db.flush()  # Get the resume.id
-
-                    # Store in ChromaDB
                     embedding_id = rag_engine.store_resume_embedding(
                         resume_id=str(resume.id),
                         content=text,
-                        skills=structured_data.get('all_skills', []),
+                        skills=skills,
                         metadata={
-                            'student_id': student.id,
+                            'student_id': resume.student_id,
                             'file_name': file_name,
                             'total_experience': structured_data.get('total_experience_years', 0),
                         },
                     )
 
-                    # Update resume with embedding_id
+                    resume.parsed_content = text
+                    resume.parsed_data = structured_data
+                    resume.extracted_skills = skills
                     resume.embedding_id = embedding_id
-
-                    # Update student profile
-                    student.skills = structured_data.get('all_skills', [])
-                    student.total_experience_years = structured_data.get('total_experience_years', 0)
+                    if student is not None:
+                        student.skills = skills
+                        student.total_experience_years = structured_data.get('total_experience_years', 0)
 
                     db.commit()
                     successful += 1
                     logger.info(f"✅ Successfully processed: {file_name}")
 
-                except Exception as e:
-                    logger.error(f"  Failed to process {file_name}: {str(e)}")
+                except Exception:
+                    logger.exception(f"  Failed to process {file_name}")
                     db.rollback()
                     failed += 1
 
@@ -325,8 +308,8 @@ def reindex_all_student_resumes(
                 logger.info("🔗 Recalculating student-internship matches...")
                 match_results = EmbeddingRecomputeService.recalculate_all_matches(db)
                 logger.info(f"✅ Matches recalculated: {match_results['successful']}")
-            except Exception as e:
-                logger.error(f"  Failed to recalculate matches: {str(e)}")
+            except Exception:
+                logger.exception("  Failed to recalculate matches")
 
         # Add to background tasks
         background_tasks.add_task(process_all_resumes)
