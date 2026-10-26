@@ -2,6 +2,7 @@
 Candidate Email Routes - Send emails to selected candidates
 """
 
+import logging
 import os
 from html import escape
 
@@ -13,6 +14,8 @@ from app.database.connection import get_db
 from app.models import Internship, User, UserRole
 from app.services.email_service import email_service
 from app.utils.security import get_current_user
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/candidate-emails", tags=["Candidate Emails"])
 
@@ -125,7 +128,9 @@ def send_email_to_candidates(
                         "error": "Email delivery failed",
                     }
                 )
-        except Exception as e:
+        except Exception:
+            # The exception names mail servers and credentials problems, so it goes to the log only.
+            logger.exception("Could not email candidate %s", candidate.id)
             failed_emails += 1
             details.append(
                 {
@@ -133,7 +138,7 @@ def send_email_to_candidates(
                     "candidate_name": candidate.full_name,
                     "email": candidate.email,
                     "status": "error",
-                    "error": str(e),
+                    "error": "Email could not be sent",
                 }
             )
 
