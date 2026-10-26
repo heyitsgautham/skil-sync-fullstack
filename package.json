@@ -3,6 +3,15 @@
   "version": "0.1.0",
   "private": true,
   "description": "SkillSync, a full-stack web application that matches students to internships: FastAPI backend and React frontend",
+  "keywords": [
+    "web-application",
+    "fullstack",
+    "fastapi",
+    "react",
+    "vite",
+    "internships",
+    "resume-parsing"
+  ],
   "workspaces": [
     "skill-sync-frontend"
   ],
