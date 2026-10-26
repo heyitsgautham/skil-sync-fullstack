@@ -4,6 +4,8 @@ from typing import Annotated
 
 from pydantic import BaseModel, BeforeValidator, ConfigDict, EmailStr, Field
 
+from app.utils.contact_fields import GitHubUrl, LinkedInUrl, Phone
+
 
 def _blank_to_none(value):
     """The profile forms send "" for an empty field, which means "no value" rather than an invalid email."""
@@ -29,9 +31,9 @@ class ProfileUpdate(BaseModel):
     model_config = ConfigDict(extra="ignore")
 
     full_name: str | None = Field(default=None, max_length=255)
-    phone: str | None = Field(default=None, max_length=50)
-    linkedin_url: str | None = Field(default=None, max_length=500)
-    github_url: str | None = Field(default=None, max_length=500)
+    phone: Phone = None
+    linkedin_url: LinkedInUrl = None
+    github_url: GitHubUrl = None
     hr_contact_name: str | None = Field(default=None, max_length=255)
     email: OptionalEmail = None
     mailing_email: OptionalEmail = None

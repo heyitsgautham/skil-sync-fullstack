@@ -40,12 +40,18 @@ def test_each_role_gets_its_own_profile_fields(client, make_user, auth_headers):
 
 def test_student_updates_contact_details(client, make_user, auth_headers, db_session):
     student = make_user(role=UserRole.student)
-    body = {"full_name": "New Name", "phone": "123", "linkedin_url": "l", "github_url": "g", "email": "x@y.z"}
+    body = {
+        "full_name": "New Name",
+        "phone": "9876543210",
+        "linkedin_url": "https://linkedin.com/in/new-name",
+        "github_url": "https://github.com/new-name",
+        "email": "x@y.z",
+    }
 
     updated = client.put(f"{API}/me", json=body, headers=auth_headers(student)).json()
 
     assert updated["full_name"] == "New Name"
-    assert updated["github_url"] == "g"
+    assert updated["github_url"] == "https://github.com/new-name"
     assert db_session.query(User).filter(User.id == student.id).one().email == student.email
 
 

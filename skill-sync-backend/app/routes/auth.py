@@ -10,6 +10,7 @@ from sqlalchemy.orm import Session
 from app.database.connection import get_db
 from app.models.user import User, UserRole
 from app.services.auth_service import AuthService
+from app.utils.contact_fields import GitHubUrl, LinkedInUrl, Phone
 from app.utils.errors import internal_error
 from app.utils.security import get_current_user, get_optional_user
 
@@ -216,9 +217,9 @@ class UpdateUserRequest(BaseModel):
     full_name: str | None = Field(None, min_length=2, max_length=255)
     role: UserRole | None = None  # Deprecated: Role changes not allowed for security
     is_active: int | None = Field(None, ge=0, le=1)
-    phone: str | None = None
-    linkedin_url: str | None = None
-    github_url: str | None = None
+    phone: Phone = None
+    linkedin_url: LinkedInUrl = None
+    github_url: GitHubUrl = None
     hr_contact_name: str | None = None
     mailing_email: EmailStr | None = None
     anonymization_enabled: bool | None = None  # Admin can toggle resume anonymization for companies
