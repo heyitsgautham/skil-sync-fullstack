@@ -10,6 +10,7 @@ from sqlalchemy.orm import Session
 from app.database.connection import get_db
 from app.models.user import User, UserRole
 from app.services.auth_service import AuthService
+from app.utils.errors import internal_error
 from app.utils.security import get_current_user
 
 router = APIRouter()
@@ -95,8 +96,8 @@ async def register(request: RegisterRequest, db: Session = Depends(get_db)):
 
     except HTTPException as e:
         raise e
-    except Exception as e:
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Registration failed: {str(e)}")
+    except Exception:
+        raise internal_error("Registration failed")
 
 
 @router.post("/login", response_model=TokenResponse)
@@ -116,8 +117,8 @@ async def login(request: LoginRequest, db: Session = Depends(get_db)):
 
     except HTTPException as e:
         raise e
-    except Exception as e:
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Login failed: {str(e)}")
+    except Exception:
+        raise internal_error("Login failed")
 
 
 @router.get("/users", response_model=list[UserResponse])
@@ -146,10 +147,8 @@ async def list_users(db: Session = Depends(get_db), current_user: User = Depends
             )
             for user in users
         ]
-    except Exception as e:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Failed to fetch users: {str(e)}"
-        )
+    except Exception:
+        raise internal_error("Failed to fetch users")
 
 
 @router.get("/analytics", response_model=AnalyticsResponse)
@@ -190,10 +189,8 @@ async def get_analytics(db: Session = Depends(get_db), current_user: User = Depe
             active_internships=active_internships,
             total_resumes=total_resumes,
         )
-    except Exception as e:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Failed to fetch analytics: {str(e)}"
-        )
+    except Exception:
+        raise internal_error("Failed to fetch analytics")
 
 
 class UpdateUserRequest(BaseModel):
@@ -307,11 +304,9 @@ async def update_user(
 
     except HTTPException as e:
         raise e
-    except Exception as e:
+    except Exception:
         db.rollback()
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Failed to update user: {str(e)}"
-        )
+        raise internal_error("Failed to update user")
 
 
 @router.delete("/users/{user_id}", response_model=MessageResponse)
@@ -445,9 +440,6 @@ async def delete_user(user_id: int, db: Session = Depends(get_db), current_user:
     except HTTPException as e:
         db.rollback()
         raise e
-    except Exception as e:
+    except Exception:
         db.rollback()
-        logger.error(f"Error deleting user {user_id}: {str(e)}")
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Failed to delete user: {str(e)}"
-        )
+        raise internal_error("Failed to delete user")

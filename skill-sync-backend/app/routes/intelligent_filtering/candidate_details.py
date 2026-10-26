@@ -11,6 +11,7 @@ from app.models.user import User, UserRole
 from app.routes.intelligent_filtering.common import matching_engine, router
 from app.services.candidate_flagging_service import CandidateFlaggingService
 from app.services.rag_engine import rag_engine
+from app.utils.errors import internal_error
 from app.utils.security import get_current_company, get_current_user
 
 
@@ -78,12 +79,8 @@ async def get_flagged_candidates_details(
 
     except HTTPException:
         raise
-    except Exception as e:
-        import traceback
-
-        logger.error(f"  Error fetching flagged candidate details: {str(e)}")
-        logger.error(traceback.format_exc())
-        raise HTTPException(status_code=500, detail=f"Error fetching candidate details: {str(e)}")
+    except Exception:
+        raise internal_error("Error fetching candidate details")
 
 
 @router.get("/candidate-profile/{student_id}")
@@ -125,8 +122,8 @@ async def get_detailed_candidate_profile(
 
     except HTTPException:
         raise
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error retrieving profile: {str(e)}")
+    except Exception:
+        raise internal_error("Error retrieving profile")
 
 
 @router.post("/match-score")
@@ -210,8 +207,8 @@ async def calculate_match_score(
 
     except HTTPException:
         raise
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error calculating match: {str(e)}")
+    except Exception:
+        raise internal_error("Error calculating match")
 
 
 @router.post("/compute-matches")
@@ -281,9 +278,5 @@ async def compute_batch_similarity_matches(
             },
         }
 
-    except Exception as e:
-        import traceback
-
-        logger.error(f"  Error computing batch matches: {str(e)}")
-        logger.error(traceback.format_exc())
-        raise HTTPException(status_code=500, detail=f"Error computing batch matches: {str(e)}")
+    except Exception:
+        raise internal_error("Error computing batch matches")

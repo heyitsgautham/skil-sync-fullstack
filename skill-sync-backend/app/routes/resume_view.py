@@ -17,6 +17,7 @@ from app.database.connection import get_db
 from app.models import Resume, User, UserRole
 from app.services.resume_anonymization_service import anonymization_service
 from app.services.s3_service import s3_service
+from app.utils.errors import internal_error
 from app.utils.security import get_current_user
 
 router = APIRouter(prefix="/resumes", tags=["Resume Viewing"])
@@ -165,9 +166,8 @@ async def view_resume(
 
     except HTTPException:
         raise
-    except Exception as e:
-        logger.error(f"  Error viewing resume: {str(e)}")
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Error viewing resume: {str(e)}")
+    except Exception:
+        raise internal_error("Error viewing resume")
 
 
 @router.get("/{resume_id}/download")
@@ -271,8 +271,5 @@ async def download_resume(
 
     except HTTPException:
         raise
-    except Exception as e:
-        logger.error(f"  Error downloading resume: {str(e)}")
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Error downloading resume: {str(e)}"
-        )
+    except Exception:
+        raise internal_error("Error downloading resume")

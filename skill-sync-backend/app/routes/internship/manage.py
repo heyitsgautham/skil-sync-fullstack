@@ -11,6 +11,7 @@ from app.routes.internship.common import router
 from app.routes.internship.schemas import InternshipCreate, InternshipResponse
 from app.services.parser_service import InternshipParser
 from app.services.rag_engine import rag_engine
+from app.utils.errors import internal_error
 from app.utils.security import get_current_user
 
 logger = logging.getLogger(__name__)
@@ -103,11 +104,9 @@ def update_internship(
 
         return internship
 
-    except Exception as e:
+    except Exception:
         db.rollback()
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Error updating internship: {str(e)}"
-        )
+        raise internal_error("Error updating internship")
 
 
 @router.delete("/{internship_id}", status_code=status.HTTP_204_NO_CONTENT)

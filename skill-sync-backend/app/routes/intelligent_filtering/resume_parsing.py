@@ -7,6 +7,7 @@ from app.database.connection import get_db
 from app.models.user import User
 from app.routes.intelligent_filtering.common import router
 from app.services.resume_service import ResumeService
+from app.utils.errors import internal_error
 from app.utils.security import get_current_user
 
 
@@ -67,9 +68,5 @@ async def parse_and_extract_resume(
     except ValueError as e:
         # ResumeService raises ValueError for input the user can fix, such as an unsupported file type.
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
-    except Exception as e:
-        import traceback
-
-        logger.error(f"[RESUME UPLOAD]   Error processing resume: {str(e)}")
-        logger.error(f"[RESUME UPLOAD] Traceback: {traceback.format_exc()}")
-        raise HTTPException(status_code=500, detail=f"Error processing resume: {str(e)}")
+    except Exception:
+        raise internal_error("Error processing resume")

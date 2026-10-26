@@ -10,6 +10,7 @@ from app.models import Application, Internship, Resume, User, UserRole
 from app.routes.internship.common import router
 from app.routes.internship.schemas import InternshipResponse, InternshipWithMatchScore
 from app.services.rag_engine import rag_engine
+from app.utils.errors import internal_error
 from app.utils.security import get_current_user
 
 logger = logging.getLogger(__name__)
@@ -203,8 +204,5 @@ def match_internships(top_k: int = 10, db: Session = Depends(get_db), current_us
         logger.info(f"Returning {len(recommendations)} recommendations")
         return recommendations
 
-    except Exception as e:
-        logger.exception("Error in match_internships")
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Error generating recommendations: {str(e)}"
-        )
+    except Exception:
+        raise internal_error("Error generating recommendations")

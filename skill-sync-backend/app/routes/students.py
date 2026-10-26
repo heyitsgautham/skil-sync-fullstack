@@ -9,6 +9,7 @@ from sqlalchemy.orm import Session
 
 from app.database.connection import get_db
 from app.models.user import User, UserRole
+from app.utils.errors import internal_error
 from app.utils.security import get_current_user
 
 router = APIRouter()
@@ -55,8 +56,6 @@ async def update_student_profile(
         db.commit()
 
         return MessageResponse(message="Student profile updated successfully")
-    except Exception as e:
+    except Exception:
         db.rollback()
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Failed to update profile: {str(e)}"
-        )
+        raise internal_error("Failed to update profile")

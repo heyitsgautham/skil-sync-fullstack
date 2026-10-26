@@ -11,6 +11,7 @@ from sqlalchemy.orm import Session
 from app.database.connection import get_db
 from app.models import Resume, User, UserRole
 from app.services.rag_engine import rag_engine
+from app.utils.errors import internal_error
 from app.utils.security import get_current_user
 
 router = APIRouter(prefix="/resume", tags=["Resume"])
@@ -74,10 +75,8 @@ async def upload_resume(
 
     except ValueError as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
-    except Exception as e:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Error processing resume: {str(e)}"
-        )
+    except Exception:
+        raise internal_error("Error processing resume")
 
 
 @router.get("/my-resumes", response_model=list[ResumeResponse])

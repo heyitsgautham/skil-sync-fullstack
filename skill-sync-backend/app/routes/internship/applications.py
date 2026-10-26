@@ -11,6 +11,7 @@ from app.routes.internship.common import router
 from app.routes.internship.schemas import ApplicationResponse
 from app.services.matching_engine import MatchingEngine
 from app.services.rag_engine import rag_engine
+from app.utils.errors import internal_error
 from app.utils.security import get_current_user
 
 logger = logging.getLogger(__name__)
@@ -199,15 +200,9 @@ async def apply_to_internship(
             created_at=str(new_application.created_at),
         )
 
-    except Exception as e:
-        import traceback
-
-        logger.error(f"  Error creating application: {str(e)}")
-        logger.error(f"Traceback: {traceback.format_exc()}")
+    except Exception:
         db.rollback()
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Error creating application: {str(e)}"
-        )
+        raise internal_error("Error creating application")
 
 
 @router.get("/applications/my-applications", response_model=list[ApplicationResponse])

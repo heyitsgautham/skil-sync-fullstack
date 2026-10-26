@@ -20,6 +20,7 @@ from app.services.internship_document_parser import get_internship_document_pars
 from app.services.job_description_analyzer import get_job_description_analyzer
 from app.services.parser_service import InternshipParser
 from app.services.rag_engine import rag_engine
+from app.utils.errors import internal_error
 from app.utils.security import get_current_user
 
 logger = logging.getLogger(__name__)
@@ -59,11 +60,8 @@ def extract_skills_from_description(request: SkillExtractionRequest, current_use
             required_skills=result['required_skills'], preferred_skills=result['preferred_skills']
         )
 
-    except Exception as e:
-        logger.exception("Error extracting skills")
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Error extracting skills: {str(e)}"
-        )
+    except Exception:
+        raise internal_error("Error extracting skills")
 
 
 @router.post("/parse-document", response_model=DocumentParseResponse)
@@ -137,14 +135,8 @@ async def parse_internship_document(file: UploadFile = File(...), current_user: 
     except ValueError as ve:
         # User-friendly validation errors
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(ve))
-    except Exception as e:
-        import traceback
-
-        logger.error(f"  Error parsing document: {str(e)}")
-        logger.error(f"Traceback: {traceback.format_exc()}")
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Error parsing document: {str(e)}"
-        )
+    except Exception:
+        raise internal_error("Error parsing document")
     finally:
         # Cleanup temporary file
         if temp_file and os.path.exists(temp_file_path):
@@ -216,8 +208,6 @@ def post_internship(
 
         return new_internship
 
-    except Exception as e:
+    except Exception:
         db.rollback()
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Error posting internship: {str(e)}"
-        )
+        raise internal_error("Error posting internship")

@@ -7,6 +7,7 @@ from app.database.connection import get_db
 from app.models import User, UserRole
 from app.routes.profile.common import router
 from app.routes.profile.schemas import ProfileUpdate
+from app.utils.errors import internal_error
 from app.utils.security import get_current_user
 
 
@@ -101,8 +102,6 @@ def update_my_profile(
 
     except HTTPException:
         raise
-    except Exception as e:
+    except Exception:
         db.rollback()
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Failed to update profile: {str(e)}"
-        )
+        raise internal_error("Failed to update profile")

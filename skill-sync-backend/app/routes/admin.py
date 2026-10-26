@@ -10,6 +10,7 @@ from sqlalchemy.orm import Session
 from app.database.connection import get_db
 from app.models import User, UserRole
 from app.services.embedding_recompute_service import EmbeddingRecomputeService
+from app.utils.errors import internal_error
 from app.utils.security import get_current_user
 
 router = APIRouter(prefix="/admin", tags=["Admin"])
@@ -111,14 +112,8 @@ def recompute_all_embeddings_and_matches(db: Session = Depends(get_db), current_
             },
         )
 
-    except Exception as e:
-        logger.error(f"  Error recomputing embeddings: {str(e)}")
-        import traceback
-
-        logger.error(traceback.format_exc())
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Error recomputing embeddings: {str(e)}"
-        )
+    except Exception:
+        raise internal_error("Error recomputing embeddings")
 
 
 @router.post("/clear-chromadb")
@@ -179,15 +174,9 @@ def clear_chromadb_embeddings(db: Session = Depends(get_db), current_user: User 
             "matches_cleared": matches_deleted,
         }
 
-    except Exception as e:
-        logger.error(f"  Error clearing ChromaDB: {str(e)}")
-        import traceback
-
-        logger.error(traceback.format_exc())
+    except Exception:
         db.rollback()
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Error clearing ChromaDB: {str(e)}"
-        )
+        raise internal_error("Error clearing ChromaDB")
 
 
 @router.post("/reindex-all-students")
@@ -351,14 +340,8 @@ def reindex_all_student_resumes(
 
     except HTTPException:
         raise
-    except Exception as e:
-        logger.error(f"  Error starting reindexing: {str(e)}")
-        import traceback
-
-        logger.error(traceback.format_exc())
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Error starting reindexing: {str(e)}"
-        )
+    except Exception:
+        raise internal_error("Error starting reindexing")
 
 
 @router.get("/system-status")
@@ -399,7 +382,5 @@ def get_system_status(db: Session = Depends(get_db), current_user: User = Depend
             'matches': {'total': total_matches},
         }
 
-    except Exception as e:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Error retrieving system status: {str(e)}"
-        )
+    except Exception:
+        raise internal_error("Error retrieving system status")

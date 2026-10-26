@@ -9,6 +9,7 @@ from app.models.user import User
 from app.routes.intelligent_filtering.common import router
 from app.routes.intelligent_filtering.ranking_applicants import rank_applicants
 from app.routes.intelligent_filtering.ranking_discovery import rank_discovery
+from app.utils.errors import internal_error
 from app.utils.security import get_current_company
 
 
@@ -119,6 +120,5 @@ async def rank_candidates_for_internship(
 
     except HTTPException:
         raise
-    except Exception as e:
-        logger.exception("Error ranking candidates")
-        raise HTTPException(status_code=500, detail=f"Error ranking candidates: {str(e)}")
+    except Exception:
+        raise internal_error("Error ranking candidates")

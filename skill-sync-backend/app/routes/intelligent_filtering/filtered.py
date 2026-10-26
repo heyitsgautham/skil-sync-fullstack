@@ -10,6 +10,7 @@ from app.models.resume import Resume
 from app.models.user import User
 from app.routes.intelligent_filtering.common import router
 from app.services.candidate_filters import experience_years, resume_matches
+from app.utils.errors import internal_error
 from app.utils.security import get_current_company
 
 
@@ -238,9 +239,5 @@ async def get_filtered_ranked_candidates(
 
     except HTTPException:
         raise
-    except Exception as e:
-        import traceback
-
-        logger.error(f"  Error filtering candidates: {str(e)}")
-        logger.error(traceback.format_exc())
-        raise HTTPException(status_code=500, detail=f"Error filtering candidates: {str(e)}")
+    except Exception:
+        raise internal_error("Error filtering candidates")
