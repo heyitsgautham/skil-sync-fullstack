@@ -44,7 +44,7 @@ branch = true
 show_missing = true
 skip_covered = true
 # Raise this as tests land. CI fails if coverage drops below it.
-fail_under = 80
+fail_under = 85
 
 [tool.mypy]
 files = ["skill-sync-backend/app"]
