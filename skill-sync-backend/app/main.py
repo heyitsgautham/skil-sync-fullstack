@@ -15,6 +15,7 @@ from app.logging_config import configure_logging
 # time use the configured format instead of Python's bare fallback handler.
 configure_logging()
 
+from app.request_context import REQUEST_ID_HEADER, add_request_context  # noqa: E402
 from app.routes import (  # noqa: E402
     admin,
     auth,
@@ -61,6 +62,10 @@ def parse_allowed_origins(value: str | None) -> list[str]:
     return origins or ["*"]
 
 
+# Request IDs, access logs and the last-resort 500 handler. Added before CORS, so CORS stays the
+# outermost middleware and its headers reach the 500 responses too.
+add_request_context(app)
+
 # Configure CORS from ALLOWED_ORIGINS, for example "http://localhost:3000,https://app.example.com"
 app.add_middleware(
     CORSMiddleware,
@@ -68,6 +73,7 @@ app.add_middleware(
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
+    expose_headers=[REQUEST_ID_HEADER],
 )
 
 # Include routers
