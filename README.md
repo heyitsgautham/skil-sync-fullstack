@@ -50,6 +50,14 @@ A resume upload goes through these steps.
 The Gemini key manager holds up to ten keys, one per task plus three fallbacks.
 When a key is rate limited or invalid, the manager marks it failed and tries the next key in that task's priority list.
 
+### Observability
+
+The backend logs through structlog, as plain text or as one JSON object per line with `LOG_FORMAT=json`.
+Every request gets an ID from its `X-Request-ID` header or a new one, which the response returns and every log line of that request carries.
+Each request also writes one `app.access` line with its method, path, status and duration.
+An exception no route handles is logged with its traceback and answered with a JSON 500 that names the request ID.
+`/api/metrics` serves request counts and latencies per route template in the Prometheus text format.
+
 PostgreSQL holds users, internships, resumes, applications and match scores.
 ChromaDB holds the embeddings on local disk.
 
@@ -64,7 +72,8 @@ docker compose up --build
 |---|---|
 | Frontend | http://localhost:3000 |
 | API docs | http://localhost:8000/api/docs |
-| Health check | http://localhost:8000/api/healthcheck |
+| Health check | http://localhost:8000/api/healthcheck, 503 when the database is down |
+| Prometheus metrics | http://localhost:8000/api/metrics |
 
 Compose starts PostgreSQL 16, the backend and the frontend.
 The root `Dockerfile` builds both images, as its `backend` and `frontend` targets.
