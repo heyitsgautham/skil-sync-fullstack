@@ -122,6 +122,30 @@ test('pages through more than five candidates', async () => {
     expect(screen.queryByText('Candidate Name 1')).not.toBeInTheDocument();
 });
 
+test('an empty ranking explains why instead of asking to rank again, until another internship is chosen', async () => {
+    const reason = 'No pre-computed matches found. Run batch computation first.';
+    fakeBackend([
+        ['get', '/internship/my-posts', POSTS],
+        ['get', /^\/internship\/\w+/, POSTS[0]],
+        ['post', '/filter/rank-candidates/uuid-backend', ranking([], { message: reason })],
+    ]);
+    renderAt(<IntelligentRanking />, '/intelligent-ranking');
+    await screen.findByRole('combobox');
+
+    await rankFor('Backend Intern');
+
+    expect(await screen.findByText(reason)).toBeInTheDocument();
+    expect(screen.getByText('No candidates to show')).toBeInTheDocument();
+    expect(screen.queryByText(/Click "Rank Candidates"/)).not.toBeInTheDocument();
+    expect(toast).toHaveBeenCalledWith(reason, expect.anything());
+
+    userEvent.click(screen.getByRole('combobox'));
+    userEvent.click(await screen.findByRole('option', { name: /Frontend Intern/ }));
+
+    expect(await screen.findByText(/Click "Rank Candidates"/)).toBeInTheDocument();
+    expect(screen.queryByText(reason)).not.toBeInTheDocument();
+});
+
 test('a failed ranking shows the server error', async () => {
     fakeBackend([
         ['get', '/internship/my-posts', POSTS],

@@ -16,6 +16,8 @@ export default function useIntelligentRanking() {
     const [exportLoading, setExportLoading] = useState(false);
     const [expandedAccordions, setExpandedAccordions] = useState({});
     const [onlyApplicants] = useState(false); // Default to showing all candidates
+    // Why the last ranking came back empty, in the API's words; empty until a ranking returns no one
+    const [emptyRankingMessage, setEmptyRankingMessage] = useState('');
 
     // Flagged candidates modal state
     const [flaggedModalOpen, setFlaggedModalOpen] = useState(false);
@@ -61,6 +63,11 @@ export default function useIntelligentRanking() {
             handleRankCandidates();
         }
     }, [onlyApplicants]); // eslint-disable-line react-hooks/exhaustive-deps
+
+    // A message about one internship's empty ranking must not linger after choosing another
+    useEffect(() => {
+        setEmptyRankingMessage('');
+    }, [selectedInternship]);
 
     // Pagination effect - update displayed candidates when page or pageSize changes
     useEffect(() => {
@@ -169,6 +176,7 @@ export default function useIntelligentRanking() {
             setExpandedAccordions(initialState);
 
             if (response.data.ranked_candidates?.length > 0) {
+                setEmptyRankingMessage('');
                 const filterInfo =
                     response.data.filters_applied?.length > 0
                         ? ` (${response.data.filters_applied.length} filters applied)`
@@ -177,10 +185,8 @@ export default function useIntelligentRanking() {
                     `✨ Ranked ${response.data.ranked_candidates.length} candidates successfully!${filterInfo}`,
                 );
             } else {
-                const message =
-                    response.data.total_candidates === 0
-                        ? 'No candidates found with uploaded resumes'
-                        : 'No matching candidates found for this internship';
+                const message = response.data.message || 'No matching candidates found for this internship';
+                setEmptyRankingMessage(message);
                 toast(message, { icon: 'ℹ️' });
             }
         } catch (error) {
@@ -430,6 +436,7 @@ export default function useIntelligentRanking() {
         setSelectedInternshipData,
         rankedCandidates,
         setRankedCandidates,
+        emptyRankingMessage,
         loading,
         setLoading,
         loadingInternships,

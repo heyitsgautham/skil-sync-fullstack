@@ -18,6 +18,7 @@ const IntelligentRanking = () => {
         selectedInternship,
         selectedInternshipData,
         rankedCandidates,
+        emptyRankingMessage,
         loading,
         scoringInfo,
         flaggedModalOpen,
@@ -103,10 +104,10 @@ const IntelligentRanking = () => {
                     <Paper sx={{ p: 6, textAlign: 'center' }}>
                         <PsychologyIcon sx={{ fontSize: 80, color: 'text.secondary', mb: 2 }} />
                         <Typography variant="h6" color="text.secondary" gutterBottom>
-                            No candidates ranked yet
+                            {emptyRankingMessage ? 'No candidates to show' : 'No candidates ranked yet'}
                         </Typography>
                         <Typography variant="body2" color="text.secondary">
-                            Click "Rank Candidates" to see AI-powered intelligent rankings
+                            {emptyRankingMessage || 'Click "Rank Candidates" to see AI-powered intelligent rankings'}
                         </Typography>
                     </Paper>
                 )}
