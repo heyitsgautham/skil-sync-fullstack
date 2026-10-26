@@ -12,6 +12,7 @@ import jwt
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from fastapi.responses import FileResponse, StreamingResponse
 from sqlalchemy.orm import Session
+from starlette.background import BackgroundTask
 
 from app.database.connection import get_db
 from app.models import Resume, User, UserRole
@@ -24,17 +25,10 @@ router = APIRouter(prefix="/resumes", tags=["Resume Viewing"])
 logger = logging.getLogger(__name__)
 
 
-def get_optional_user(token: str | None = Query(None), db: Session = Depends(get_db)):
-    """Get current user or None if using temporary token"""
-    if token:
-        # Using temporary token, skip user authentication
-        return None
-    try:
-        from app.utils.security import get_current_user_direct
-
-        return get_current_user_direct(db)
-    except Exception:
-        raise HTTPException(status_code=401, detail="Authentication required")
+def _remove_if_present(path: str) -> None:
+    """Delete a temp copy of a resume once its response has been sent."""
+    if os.path.exists(path):
+        os.remove(path)
 
 
 @router.get("/{resume_id}/view")
@@ -145,7 +139,7 @@ async def view_resume(
                         temp_file_path,
                         media_type="application/pdf",
                         headers={"Content-Disposition": f'inline; filename="{resume.file_name}"'},
-                        background=lambda: os.remove(temp_file_path) if os.path.exists(temp_file_path) else None,
+                        background=BackgroundTask(_remove_if_present, temp_file_path),
                     )
                 else:
                     # Serve local file directly
@@ -256,7 +250,7 @@ async def download_resume(
                         temp_file_path,
                         media_type="application/pdf",
                         filename=resume.file_name,
-                        background=lambda: os.remove(temp_file_path) if os.path.exists(temp_file_path) else None,
+                        background=BackgroundTask(_remove_if_present, temp_file_path),
                     )
                 else:
                     return FileResponse(pdf_path, media_type="application/pdf", filename=resume.file_name)
