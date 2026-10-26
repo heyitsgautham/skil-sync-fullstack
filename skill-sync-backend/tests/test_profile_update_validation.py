@@ -7,6 +7,7 @@ itself out, and a wrong type reached the database and came back as a 500.
 import pytest
 
 from app.models.user import User, UserRole
+from tests.conftest import TEST_PASSWORD
 
 API = "/api/profile/me"
 
@@ -24,7 +25,7 @@ def test_company_cannot_save_an_invalid_login_email(client, company, db_session)
 
     assert response.status_code == 422
     assert db_session.query(User).filter(User.id == user.id).one().email == "hr@acme.example"
-    login = client.post("/api/auth/login", json={"email": "hr@acme.example", "password": "password123"})
+    login = client.post("/api/auth/login", json={"email": "hr@acme.example", "password": TEST_PASSWORD})
     assert login.status_code == 200
 
 
@@ -35,7 +36,7 @@ def test_company_can_change_its_email_and_log_in_with_it(client, company):
 
     assert updated.status_code == 200
     assert updated.json()["email"] == "talent@acme.example"
-    login = client.post("/api/auth/login", json={"email": "talent@acme.example", "password": "password123"})
+    login = client.post("/api/auth/login", json={"email": "talent@acme.example", "password": TEST_PASSWORD})
     assert login.status_code == 200
 
 

@@ -10,6 +10,7 @@ from pathlib import Path
 from sqlalchemy.exc import OperationalError
 
 from app.models.user import UserRole
+from tests.conftest import TEST_PASSWORD
 
 SECRET = 'connection to server at "db.internal.example" (10.0.0.7), port 5432 failed'
 
@@ -23,7 +24,7 @@ def test_login_failure_hides_the_database_error(client, monkeypatch, caplog):
 
     monkeypatch.setattr(AuthService, "authenticate_user", boom)
 
-    response = client.post("/api/auth/login", json={"email": "asha@example.com", "password": "password123"})
+    response = client.post("/api/auth/login", json={"email": "asha@example.com", "password": TEST_PASSWORD})
 
     assert response.status_code == 500
     assert response.json()["detail"] == "Login failed"

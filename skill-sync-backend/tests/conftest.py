@@ -76,6 +76,10 @@ def client(db_session):
     app.dependency_overrides.clear()
 
 
+# The password make_user gives every test account unless a test passes its own.
+TEST_PASSWORD = "test-account-password"
+
+
 @functools.lru_cache
 def _hash_once(password):
     """bcrypt takes about 0.2s per hash, and every test user shares a few passwords."""
@@ -91,7 +95,7 @@ def make_user(db_session):
 
     counter = {"n": 0}
 
-    def _make_user(role=UserRole.student, password="password123", **fields):
+    def _make_user(role=UserRole.student, password=TEST_PASSWORD, **fields):
         counter["n"] += 1
         user = User(
             email=fields.pop("email", f"{role.value}{counter['n']}@example.com"),
