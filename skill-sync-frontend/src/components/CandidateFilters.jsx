@@ -19,6 +19,21 @@ import ClearIcon from '@mui/icons-material/Clear';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 
+/**
+ * Turn the panel's slider state into ranking API query parameters.
+ * A bound at its default (0 or 100 for the score, 0 or 24 months for experience) is left out,
+ * experience goes from months to the years the API expects, and exclude_flagged is always sent.
+ */
+export const toApiFilters = ({ matchScoreRange, experienceRange, excludeFlagged }) => {
+    const apiFilters = {};
+    if (matchScoreRange[0] > 0) apiFilters.min_match_score = matchScoreRange[0];
+    if (matchScoreRange[1] < 100) apiFilters.max_match_score = matchScoreRange[1];
+    if (experienceRange[0] > 0) apiFilters.min_experience = experienceRange[0] / 12;
+    if (experienceRange[1] < 24) apiFilters.max_experience = experienceRange[1] / 12;
+    apiFilters.exclude_flagged = excludeFlagged;
+    return apiFilters;
+};
+
 const CandidateFilters = ({ onApplyFilters, onReset, scoringInfo }) => {
     const [expanded, setExpanded] = useState(false);
     const [filters, setFilters] = useState({
@@ -44,57 +59,14 @@ const CandidateFilters = ({ onApplyFilters, onReset, scoringInfo }) => {
     };
 
     const handleExcludeFlaggedChange = (event) => {
-        const newExcludeFlaggedValue = event.target.checked;
-        setFilters({ ...filters, excludeFlagged: newExcludeFlaggedValue });
-
+        const next = { ...filters, excludeFlagged: event.target.checked };
+        setFilters(next);
         // Apply the filter immediately when toggled
-        const apiFilters = {};
-
-        // Match score range (only send if different from default [0, 100])
-        if (filters.matchScoreRange[0] > 0) {
-            apiFilters.min_match_score = filters.matchScoreRange[0];
-        }
-        if (filters.matchScoreRange[1] < 100) {
-            apiFilters.max_match_score = filters.matchScoreRange[1];
-        }
-
-        // Experience range - Convert months to years for API (backend expects years)
-        if (filters.experienceRange[0] > 0) {
-            apiFilters.min_experience = filters.experienceRange[0] / 12;
-        }
-        if (filters.experienceRange[1] < 24) {
-            apiFilters.max_experience = filters.experienceRange[1] / 12;
-        }
-
-        // Use the NEW value for exclude_flagged (not the old state)
-        apiFilters.exclude_flagged = newExcludeFlaggedValue;
-
-        onApplyFilters(apiFilters);
+        onApplyFilters(toApiFilters(next));
     };
 
     const handleApplyFilters = () => {
-        const apiFilters = {};
-
-        // Match score range (only send if different from default [0, 100])
-        if (filters.matchScoreRange[0] > 0) {
-            apiFilters.min_match_score = filters.matchScoreRange[0];
-        }
-        if (filters.matchScoreRange[1] < 100) {
-            apiFilters.max_match_score = filters.matchScoreRange[1];
-        }
-
-        // Experience range - Convert months to years for API (backend expects years)
-        if (filters.experienceRange[0] > 0) {
-            apiFilters.min_experience = filters.experienceRange[0] / 12; // Convert months to years
-        }
-        if (filters.experienceRange[1] < 24) {
-            apiFilters.max_experience = filters.experienceRange[1] / 12; // Convert months to years
-        }
-
-        // Exclude flagged - always send this parameter
-        apiFilters.exclude_flagged = filters.excludeFlagged;
-
-        onApplyFilters(apiFilters);
+        onApplyFilters(toApiFilters(filters));
     };
 
     const handleResetFilters = () => {
