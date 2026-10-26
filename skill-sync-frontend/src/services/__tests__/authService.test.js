@@ -32,6 +32,32 @@ describe('authService', () => {
         expect(localStorage.getItem('token')).toBeNull();
     });
 
+    test('updateCurrentUser merges new profile fields into the stored user', () => {
+        localStorage.setItem(
+            'user',
+            JSON.stringify({ id: 7, email: 'a@example.com', full_name: 'Old', role: 'admin' }),
+        );
+
+        authService.updateCurrentUser({ full_name: 'New Name', email: 'b@example.com' });
+
+        expect(authService.getCurrentUser()).toEqual({
+            id: 7,
+            email: 'b@example.com',
+            full_name: 'New Name',
+            role: 'admin',
+        });
+    });
+
+    test('updateCurrentUser ignores fields the profile response left out and does nothing when signed out', () => {
+        localStorage.setItem('user', JSON.stringify({ id: 7, email: 'a@example.com', full_name: 'Old' }));
+        authService.updateCurrentUser({ full_name: 'New', email: undefined });
+        expect(authService.getCurrentUser()).toEqual({ id: 7, email: 'a@example.com', full_name: 'New' });
+
+        localStorage.clear();
+        authService.updateCurrentUser({ full_name: 'Nobody' });
+        expect(localStorage.getItem('user')).toBeNull();
+    });
+
     test('register returns the response body', async () => {
         apiClient.post.mockResolvedValue({ data: { message: 'User registered successfully' } });
         const payload = { email: 'b@example.com', password: 'pw', full_name: 'B', role: 'company' };

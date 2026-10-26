@@ -28,6 +28,7 @@ import {
     Email as EmailIcon,
 } from '@mui/icons-material';
 import Layout from '../../components/Layout';
+import authService from '../../services/authService';
 import { API_BASE_URL } from '../../services/apiConfig';
 
 const StudentProfile = () => {
@@ -99,6 +100,8 @@ const StudentProfile = () => {
             }
 
             const data = await response.json();
+
+            authService.updateCurrentUser({ full_name: data.full_name, email: data.email });
             setProfile(data);
             setEditing(false);
             setSnackbar({

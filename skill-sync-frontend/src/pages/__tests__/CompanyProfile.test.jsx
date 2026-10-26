@@ -83,6 +83,24 @@ test('editing and saving sends the form as a profile update', async () => {
     expect(field('HR Contact Name')).toBeDisabled();
 });
 
+test('a new company name shows in the top bar right after saving', async () => {
+    fakeBackend([
+        ['get', '/profile/me', PROFILE],
+        ['get', '/profile/job-email-stats', STATS],
+        ['put', '/profile/me', ({ body }) => ({ ...PROFILE, ...body, full_name: body.full_name })],
+    ]);
+    renderAt(<CompanyProfile />, '/company/profile');
+
+    userEvent.click(await screen.findByRole('button', { name: /Edit Profile/ }));
+    userEvent.clear(screen.getByLabelText('Company Name'));
+    userEvent.paste(screen.getByLabelText('Company Name'), 'Acme Robotics');
+    userEvent.click(screen.getByRole('button', { name: /Save/ }));
+
+    expect(await screen.findByText('Profile updated successfully!')).toBeInTheDocument();
+    expect(screen.queryByText('Acme Labs')).not.toBeInTheDocument();
+    expect(JSON.parse(localStorage.getItem('user')).full_name).toBe('Acme Robotics');
+});
+
 test('a failed save keeps the form open and reports the error', async () => {
     fakeBackend([
         ['get', '/profile/me', PROFILE],

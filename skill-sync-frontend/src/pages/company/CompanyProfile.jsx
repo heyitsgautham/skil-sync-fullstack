@@ -150,6 +150,8 @@ const CompanyProfile = () => {
             }
 
             const data = await response.json();
+
+            authService.updateCurrentUser({ full_name: data.full_name, email: data.email });
             setProfile({ ...data, company_name: data.full_name || data.company_name });
             setEditing(false);
             setSnackbar({

@@ -70,6 +70,18 @@ class AuthService {
     }
 
     /**
+     * Merge fields from a saved profile into the stored user, so the top bar shows a new name at once.
+     * Fields that are undefined are left as they were. Does nothing when no one is signed in.
+     * @param {Object} fields - Such as { full_name, email } from PUT /profile/me
+     */
+    updateCurrentUser(fields) {
+        const user = this.getCurrentUser();
+        if (!user) return;
+        const defined = Object.fromEntries(Object.entries(fields).filter(([, value]) => value !== undefined));
+        localStorage.setItem('user', JSON.stringify({ ...user, ...defined }));
+    }
+
+    /**
      * Check if user is authenticated
      * @returns {boolean} True if user has valid token
      */
