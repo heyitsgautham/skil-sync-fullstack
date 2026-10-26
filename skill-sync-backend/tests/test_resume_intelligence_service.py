@@ -47,6 +47,7 @@ def test_falls_back_to_regex_contact_details(service, fake_gemini, reply):
     assert data["personal_info"]["phone"] == "9876543210"
     assert data["all_skills"] == []
     assert data["summary"].startswith("Resume parsing failed")
+    assert data["parse_failed"] is True
 
 
 def test_total_experience_merges_overlaps(service):

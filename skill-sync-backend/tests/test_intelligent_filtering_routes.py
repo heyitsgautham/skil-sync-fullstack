@@ -278,6 +278,34 @@ def test_parse_resume_stores_and_indexes_it(
     assert (tmp_path / "app/public/resumes" / f"{student.id}_cv.txt").exists()
 
 
+@pytest.mark.parametrize("endpoint", [f"{API}/parse-resume", "/api/resume/upload"])
+def test_a_failed_parse_keeps_the_current_resume_and_skills(
+    client, seeded, auth_headers, fake_gemini, db_session, tmp_path, monkeypatch, endpoint
+):
+    """A Gemini outage used to make an empty parse the active resume and wipe the student's skills."""
+    from app.models.resume import Resume
+
+    monkeypatch.chdir(tmp_path)
+    student = seeded.students["asha"]
+    student.skills = ["Python", "FastAPI"]
+    db_session.commit()
+    fake_gemini.reply(RuntimeError("quota exceeded"))
+
+    response = client.post(
+        endpoint,
+        files={"file": ("new.txt", b"Python FastAPI developer", "text/plain")},
+        headers=auth_headers(student),
+    )
+
+    assert response.status_code == 503
+    assert "current resume and skills are unchanged" in response.json()["detail"]
+    db_session.expire_all()
+    resumes = db_session.query(Resume).filter(Resume.student_id == student.id).all()
+    assert [(r.id, r.is_active) for r in resumes] == [(seeded.resumes["asha"].id, 1)]
+    assert db_session.get(User, student.id).skills == ["Python", "FastAPI"]
+    assert not (tmp_path / "app/public/resumes" / f"{student.id}_new.txt").exists()
+
+
 def test_parse_resume_rejects_unsupported_files(client, make_user, auth_headers, fake_rag, tmp_path, monkeypatch):
     monkeypatch.chdir(tmp_path)
     response = client.post(

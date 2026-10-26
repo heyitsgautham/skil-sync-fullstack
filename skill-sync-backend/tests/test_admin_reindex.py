@@ -72,3 +72,25 @@ def test_only_admins_can_reindex(client, make_user, auth_headers):
     response = client.post("/api/admin/reindex-all-students", headers=auth_headers(make_user(role=UserRole.company)))
 
     assert response.status_code == 403
+
+
+def test_reindex_keeps_a_resume_gemini_cannot_parse(
+    client, make_user, auth_headers, db_session, stored_resumes, fake_gemini
+):
+    diya = stored_resumes["diya_patel_resume.txt"]
+    resume = db_session.query(Resume).filter(Resume.student_id == diya.id).one()
+    resume.parsed_data = {"all_skills": ["React"], "summary": "Frontend developer"}
+    diya.skills = ["React"]
+    db_session.commit()
+    # aarav parses, then Gemini fails for diya
+    fake_gemini.replies[1] = RuntimeError("quota exceeded")
+
+    response = client.post("/api/admin/reindex-all-students", headers=auth_headers(make_user(role=UserRole.admin)))
+
+    assert response.status_code == 200
+    db_session.expire_all()
+    resume = db_session.query(Resume).filter(Resume.student_id == diya.id).one()
+    assert resume.parsed_data == {"all_skills": ["React"], "summary": "Frontend developer"}
+    assert db_session.get(User, diya.id).skills == ["React"]
+    aarav = stored_resumes["aarav_sharma_resume.txt"]
+    assert sorted(db_session.get(User, aarav.id).skills) == ["FastAPI", "Python"]

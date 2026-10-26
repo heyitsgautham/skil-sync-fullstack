@@ -11,6 +11,7 @@ from sqlalchemy.orm import Session
 from app.database.connection import get_db
 from app.models import Resume, StudentInternshipMatch, User, UserRole
 from app.services.rag_engine import rag_engine
+from app.services.resume_service import ResumeParsingFailed
 from app.utils.errors import internal_error
 from app.utils.security import get_current_user
 
@@ -73,6 +74,8 @@ async def upload_resume(
 
         return ResumeResponse.from_orm(new_resume)
 
+    except ResumeParsingFailed as e:
+        raise HTTPException(status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail=str(e))
     except ValueError as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
     except Exception:

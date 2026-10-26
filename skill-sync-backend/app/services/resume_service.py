@@ -15,6 +15,16 @@ from app.services.resume_intelligence_service import ResumeIntelligenceService
 from app.services.s3_service import s3_service
 
 
+class ResumeParsingFailed(Exception):
+    """Gemini could not parse a new base resume, so the student's current resume stays active."""
+
+    def __init__(self):
+        super().__init__(
+            "We could not read this resume right now, so your current resume and skills are unchanged. "
+            "Please try again in a few minutes."
+        )
+
+
 class ResumeService:
     """Service for handling resume uploads and processing"""
 
@@ -103,6 +113,14 @@ class ResumeService:
             structured_data = intelligence_service.extract_structured_data(resume_text)
             logger.info(f"✅ Structured data extracted - {len(structured_data.get('all_skills', []))} skills found")
 
+            # A failed parse must not replace a working base resume and wipe the student's skills.
+            # A tailored resume still goes through, because the application scores it from the base match.
+            if structured_data.get('parse_failed') and not is_tailored:
+                logger.warning(f"Resume parsing failed for student {student_id}, keeping the current resume")
+                if s3_key:
+                    s3_service.delete_resume(s3_key)
+                raise ResumeParsingFailed()
+
             # Deactivate old active resumes if this is a base resume
             if deactivate_others and not is_tailored:
                 db.query(Resume).filter(
@@ -164,6 +182,11 @@ class ResumeService:
             logger.info(f"🎉 {resume_type.capitalize()} resume processing complete!")
             return new_resume
 
+        except ResumeParsingFailed:
+            if os.path.exists(file_path):
+                os.remove(file_path)
+            db.rollback()
+            raise
         except Exception as e:
             # Cleanup on error
             if os.path.exists(file_path):

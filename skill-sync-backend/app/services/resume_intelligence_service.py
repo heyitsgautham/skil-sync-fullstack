@@ -248,6 +248,8 @@ Return ONLY the JSON object, no markdown, no explanation.
             "projects": [],
             "certifications": [],
             "summary": "Resume parsing failed. Manual review required.",
+            # Callers that would replace a good parse with this one check the flag first
+            "parse_failed": True,
             "total_experience_months": 0,
             "total_experience_years": 0,
             "all_skills": [],

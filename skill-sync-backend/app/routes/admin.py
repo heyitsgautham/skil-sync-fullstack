@@ -271,6 +271,11 @@ def reindex_all_student_resumes(
                     logger.info(f"📄 Processing: {file_name}")
                     text = read_text(resume_file)
                     structured_data = intelligence_service.extract_structured_data(text)
+                    if structured_data.get('parse_failed'):
+                        # Keep the resume's last good parse rather than overwrite it with an empty one
+                        logger.warning(f"⚠️  Gemini could not parse {file_name}, keeping its previous data")
+                        failed += 1
+                        continue
                     skills = structured_data.get('all_skills', [])
 
                     embedding_id = rag_engine.store_resume_embedding(
