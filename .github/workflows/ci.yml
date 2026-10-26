@@ -38,7 +38,9 @@ jobs:
         run: uv run pytest --cov --cov-report=term --cov-report=xml
 
       - name: Audit dependencies
-        # chromadb 1.5.9 is the newest release and has no fix for these advisories yet.
+        # chromadb 1.5.9 is the newest release and has no fix for these four advisories.
+        # Each one needs Chroma's own HTTP server, and SkillSync only runs Chroma embedded through
+        # PersistentClient, which tests/test_vector_store_embedded.py checks. See SECURITY.md.
         run: |
           uv export --frozen --no-dev -o requirements-audit.txt
           uv run pip-audit -r requirements-audit.txt --disable-pip \
