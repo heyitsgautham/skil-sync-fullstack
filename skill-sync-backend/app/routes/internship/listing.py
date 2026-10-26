@@ -44,6 +44,7 @@ def list_internships(skip: int = 0, limit: int = 50, db: Session = Depends(get_d
             "max_experience": internship.max_experience,
             "required_education": internship.required_education,
             "is_active": internship.is_active,
+            "created_at": internship.created_at,
         }
         result.append(internship_dict)
 
@@ -84,6 +85,7 @@ def get_my_internships(db: Session = Depends(get_db), current_user: User = Depen
             "max_experience": internship.max_experience,
             "required_education": internship.required_education,
             "is_active": internship.is_active,
+            "created_at": internship.created_at,
         }
         result.append(internship_dict)
 
@@ -193,6 +195,7 @@ def match_internships(top_k: int = 10, db: Session = Depends(get_db), current_us
                     "duration": internship.duration or "",
                     "stipend": internship.stipend or "",
                     "is_active": internship.is_active,
+                    "created_at": internship.created_at,
                     "match_score": match['match_score'],
                     "has_applied": app_info['has_applied'],
                     "application_resume_name": app_info['resume_name'],

@@ -43,6 +43,7 @@ def get_internship(internship_id: int, db: Session = Depends(get_db), current_us
         "max_experience": internship.max_experience,
         "required_education": internship.required_education,
         "is_active": internship.is_active,
+        "created_at": internship.created_at,
     }
 
     return internship_dict

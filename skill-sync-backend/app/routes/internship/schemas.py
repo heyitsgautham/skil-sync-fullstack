@@ -1,5 +1,7 @@
 """Request and response models for /api/internship."""
 
+from datetime import datetime
+
 from pydantic import BaseModel
 
 
@@ -56,6 +58,7 @@ class InternshipResponse(BaseModel):
     max_experience: float | None = None
     required_education: str | None = None
     is_active: int
+    created_at: datetime | None = None
 
     class Config:
         from_attributes = True

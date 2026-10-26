@@ -1,6 +1,7 @@
 """Internship routes: posting, listing, matching, editing, applying."""
 
 import json
+from datetime import UTC, datetime
 
 import pytest
 
@@ -55,6 +56,25 @@ def test_list_get_and_my_posts(client, seeded, company_headers, asha_headers):
     assert len(mine.json()) == 2
 
     assert client.get(f"{API}/999999", headers=asha_headers).status_code == 404
+
+
+def test_every_internship_response_says_when_it_was_posted(client, seeded, company_headers, asha_headers, db_session):
+    """The details dialog read created_at, which no response carried, and showed "Posted on: Invalid Date"."""
+    seeded.backend.created_at = datetime(2026, 10, 20, 9, 30, tzinfo=UTC)
+    db_session.commit()
+
+    responses = {
+        "list": client.get(f"{API}/list").json(),
+        "my-posts": client.get(f"{API}/my-posts", headers=company_headers).json(),
+        "detail": [client.get(f"{API}/{seeded.backend.id}", headers=asha_headers).json()],
+    }
+
+    for name, items in responses.items():
+        backend = next(item for item in items if item["id"] == seeded.backend.id)
+        posted = datetime.fromisoformat(backend["created_at"])
+        # PostgreSQL answers in the server's time zone, SQLite drops the zone and keeps UTC
+        posted = posted if posted.tzinfo else posted.replace(tzinfo=UTC)
+        assert posted == datetime(2026, 10, 20, 9, 30, tzinfo=UTC), name
 
 
 def test_update_replaces_fields_and_the_embedding(client, seeded, company_headers, fake_rag):
