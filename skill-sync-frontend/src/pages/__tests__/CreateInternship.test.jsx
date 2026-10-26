@@ -44,7 +44,7 @@ test('extracts skills, lets the company edit them, and posts the internship', as
     fillBasics();
 
     userEvent.click(screen.getByRole('button', { name: /Extract Skills from Description/ }));
-    expect(await screen.findByText(/Extracted 3 skills!/)).toBeInTheDocument();
+    expect(await screen.findByText(/^Extracted 3 skills!/)).toBeInTheDocument();
 
     userEvent.paste(screen.getByPlaceholderText('Type a required skill...'), 'SQL');
     userEvent.type(screen.getByPlaceholderText('Type a required skill...'), '{enter}');
@@ -69,7 +69,8 @@ test('extraction waits for a description', () => {
     fakeBackend([]);
     renderAt(<CreateInternship />, '/internships/create');
 
-    expect(screen.getByRole('button', { name: /Extract Skills from Description/ })).toBeDisabled();
+    // The button already shows a sparkle icon, so its label carries no emoji of its own
+    expect(screen.getByRole('button', { name: 'Extract Skills from Description' })).toBeDisabled();
     userEvent.paste(screen.getByLabelText(/Job Description/), DESCRIPTION);
     expect(screen.getByRole('button', { name: /Extract Skills from Description/ })).toBeEnabled();
 });

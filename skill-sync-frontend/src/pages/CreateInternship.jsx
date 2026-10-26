@@ -92,7 +92,7 @@ const CreateInternship = () => {
                 (extractedData.required_skills?.length || 0) + (extractedData.preferred_skills?.length || 0);
 
             setExtractionSuccess(
-                `✨ Successfully extracted internship details from "${file.name}"! Found ${totalSkills} skills in the document. Click "Extract Skills from Description" button below to populate skill fields (max 7 required + 7 preferred).`,
+                `Successfully extracted internship details from "${file.name}"! Found ${totalSkills} skills in the document. Click "Extract Skills from Description" button below to populate skill fields (max 7 required + 7 preferred).`,
             );
             toast.success('Document parsed successfully! Click "Extract Skills from Description" to add skills.');
         } catch (err) {
@@ -138,7 +138,7 @@ const CreateInternship = () => {
 
             const totalExtracted = required_skills.length + preferred_skills.length;
             setExtractionSuccess(
-                `✨ Extracted ${totalExtracted} skills! (${required_skills.length} required, ${preferred_skills.length} preferred). Limit: max 7+7, total max 15.`,
+                `Extracted ${totalExtracted} skills! (${required_skills.length} required, ${preferred_skills.length} preferred). Limit: max 7+7, total max 15.`,
             );
             toast.success(`Skills extracted successfully! Total: ${totalExtracted}/15`);
         } catch (err) {
@@ -361,7 +361,7 @@ const CreateInternship = () => {
                                     },
                                 }}
                             >
-                                {extracting ? 'Extracting Skills...' : '✨ Extract Skills from Description'}
+                                {extracting ? 'Extracting Skills...' : 'Extract Skills from Description'}
                             </Button>
                             <Typography
                                 variant="caption"
