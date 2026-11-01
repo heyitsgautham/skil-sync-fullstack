@@ -4,7 +4,7 @@
 #   docker build --target frontend -t skillsync-frontend .
 
 # ---- backend: FastAPI on uvicorn ---------------------------------------------------------
-FROM python:3.12-slim AS backend
+FROM python:3.15-slim AS backend
 
 COPY --from=ghcr.io/astral-sh/uv:0.13.5 /uv /bin/uv
 
