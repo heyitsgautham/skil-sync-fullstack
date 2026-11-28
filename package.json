@@ -31,6 +31,6 @@
     "format": "prettier --write . && uv run ruff format ."
   },
   "devDependencies": {
-    "prettier": "^3.9.10"
+    "prettier": "^3.10.1"
   }
 }
